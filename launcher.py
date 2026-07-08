@@ -60,6 +60,7 @@ async def main():
                 print(f"⏳ Waiting {delay_seconds}s before starting {n} to avoid rate limits...")
                 await asyncio.sleep(delay_seconds)
             try:
+                print(f"🔍 DEBUG {n}: Token length is {len(t) if t else 'MISSING (None)'}")
                 await bot.start(t)
             except Exception as e:
                 print(f"❌ {n} crashed: {e.__class__.__name__}: {e}")
