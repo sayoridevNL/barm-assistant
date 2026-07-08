@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Bot Management Dashboard</title>
+    <title>Barm Assistant Manager</title>
     <link rel="stylesheet" href="/static/style.css">
     <!-- Google Fonts -->
     <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;700&display=swap" rel="stylesheet">
@@ -12,11 +12,13 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.13/theme/dracula.min.css">
 </head>
 <body>
+    <div id="background-gradient"></div>
     <div id="app">
         <!-- Login Screen -->
         <div id="login-screen" class="screen">
             <div class="glass-panel login-panel">
-                <h1>Bot Dashboard</h1>
+                <div class="glow-orb"></div>
+                <h1>Barm Assistant</h1>
                 <p>Welcome back. Please authenticate.</p>
                 <div class="input-group">
                     <input type="password" id="password-input" placeholder="Master Password">
@@ -34,23 +36,16 @@
             </nav>
 
             <main class="dashboard-content">
-                <!-- Control Panel -->
-                <div class="glass-panel control-panel">
-                    <h2>Control Center</h2>
-                    <div class="status-indicator">
-                        <div id="status-dot" class="dot stopped"></div>
-                        <span id="status-text">Status: Stopped</span>
-                    </div>
-                    <div class="action-buttons">
-                        <button id="start-btn" class="success-btn">Start Bot</button>
-                        <button id="stop-btn" class="danger-btn" disabled>Stop Bot</button>
-                    </div>
+                
+                <h2 class="section-title">Bot Fleet</h2>
+                <div class="bots-grid" id="bots-grid">
+                    <!-- Bot cards will be injected here by JS -->
                 </div>
 
                 <!-- Code Editor -->
+                <h2 class="section-title">Code Editor</h2>
                 <div class="glass-panel editor-panel">
                     <div class="editor-header">
-                        <h2>Code Editor</h2>
                         <div class="file-selector">
                             <select id="file-select">
                                 <option value="">Select a file...</option>

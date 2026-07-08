@@ -1,5 +1,5 @@
 """
-launcher.py — Single entry point for all six Barm assistant bots.
+launcher.py — Entry point for running an individual Barm assistant bot.
 """
 from __future__ import annotations
 import importlib
@@ -30,61 +30,76 @@ ensure_packages_installed()
 
 import asyncio
 import os
+import json
+import discord
+from discord.ext import tasks
 import shared  # noqa: F401 - imports shared .env loader before token lookup
 
-BOTS = [
-    ("MUSIC_BOT_TOKEN",      "music_bot"),
-    ("MODERATION_BOT_TOKEN", "moderation_bot"),
-    ("COMMUNITY_BOT_TOKEN",  "community_bot"),
-    ("GAMBLING_BOT_TOKEN",   "gambling_bot"),
-    ("UMAMUSUME_BOT_TOKEN",  "umamusume_bot"),
-    ("GENERAL_BOT_TOKEN",    "general_bot"),
-]
+BOTS = {
+    "music_bot": "MUSIC_BOT_TOKEN",
+    "moderation_bot": "MODERATION_BOT_TOKEN",
+    "community_bot": "COMMUNITY_BOT_TOKEN",
+    "gambling_bot": "GAMBLING_BOT_TOKEN",
+    "umamusume_bot": "UMAMUSUME_BOT_TOKEN",
+    "general_bot": "GENERAL_BOT_TOKEN",
+}
 
-async def main():
-    tasks, started = [], []
-    try:
-        subprocess.run(["ffmpeg", "-version"], capture_output=True, check=True)
-    except (FileNotFoundError, subprocess.CalledProcessError):
-        print("⚠️  FFmpeg not found on PATH — /play (music_bot) needs it installed separately.\n")
-
-    for env_var, module_name in BOTS:
-        token = os.getenv(env_var)
-        if not token:
-            print(f"⚠️  Skipping {module_name} — {env_var} is not set (check your .env).")
-            continue
-        module = importlib.import_module(module_name)
-        
-        async def run_bot(bot, t, n, delay_seconds):
-            if delay_seconds > 0:
-                print(f"⏳ Waiting {delay_seconds}s before starting {n} to avoid rate limits...")
-                await asyncio.sleep(delay_seconds)
-            try:
-                t = t.strip() if t else t
-                prefix = t[:5] if t else "NONE"
-                suffix = t[-3:] if t else "NONE"
-                print(f"🔍 DEBUG {n}: Token length {len(t) if t else 0} | Starts: '{prefix}' | Ends: '{suffix}'")
-                await bot.start(t)
-            except Exception as e:
-                print(f"❌ {n} crashed: {e.__class__.__name__}: {e}")
-                
-        delay = len(tasks) * 5
-        tasks.append(asyncio.create_task(run_bot(module.bot, token, module_name, delay), name=module_name))
-        started.append(module_name)
-
-    if not tasks:
-        print("❌ No bot tokens found. Copy .env.example to .env, fill in your tokens, and try again.")
+async def main(bot_name):
+    if bot_name not in BOTS:
+        print(f"❌ Unknown bot name: {bot_name}")
         return
 
-    print(f"🚀 Starting {len(tasks)}/6 bot(s): {', '.join(started)}\n")
+    env_var = BOTS[bot_name]
+    token = os.getenv(env_var)
+    
+    if not token:
+        print(f"⚠️  Skipping {bot_name} — {env_var} is not set (check your .env).")
+        return
+        
+    token = token.strip()
+    
+    module = importlib.import_module(bot_name)
+    bot = module.bot
+    
+    # Inject background task for presence checking
+    @tasks.loop(seconds=15)
+    async def update_presence_loop():
+        try:
+            if os.path.exists('presence.json'):
+                with open('presence.json', 'r', encoding='utf-8') as f:
+                    presences = json.load(f)
+                new_presence = presences.get(bot_name, "").strip()
+                
+                # Check current presence
+                current_presence = ""
+                if bot.guilds and bot.guilds[0].me.activity:
+                    current_presence = bot.guilds[0].me.activity.name
+                    
+                if new_presence and current_presence != new_presence:
+                    await bot.change_presence(activity=discord.Game(name=new_presence))
+        except Exception as e:
+            print(f"Presence update error for {bot_name}: {e}")
 
-    results = await asyncio.gather(*tasks, return_exceptions=True)
-    for task, result in zip(tasks, results):
-        if isinstance(result, Exception):
-            print(f"❌ {task.get_name()} crashed: {result}")
+    @update_presence_loop.before_loop
+    async def before_presence_loop():
+        await bot.wait_until_ready()
+
+    update_presence_loop.start()
+
+    try:
+        print(f"🚀 Starting {bot_name}...")
+        await bot.start(token)
+    except Exception as e:
+        print(f"❌ {bot_name} crashed: {e.__class__.__name__}: {e}")
 
 if __name__ == "__main__":
+    if len(sys.argv) < 2:
+        print("Usage: python launcher.py <bot_name>")
+        sys.exit(1)
+        
+    target_bot = sys.argv[1]
+    
     try:
-        asyncio.run(main())
+        asyncio.run(main(target_bot))
     except KeyboardInterrupt:
-        print("\n👋 Shutting down all bots.")
+        print(f"\n👋 Shutting down {target_bot}.")

@@ -1,22 +1,73 @@
 import os
 import subprocess
 import sys
+import json
+import threading
 from flask import Flask, request, jsonify, render_template, session, send_from_directory
 from dotenv import load_dotenv
 
 load_dotenv()
 
-app = Flask(__name__)
+app = Flask(__name__, static_folder='static', template_folder='templates')
 app.secret_key = os.getenv('FLASK_SECRET_KEY', os.urandom(24))
 ADMIN_PASSWORD = os.getenv('ADMIN_PASSWORD', 'admin123')
 
-bot_process = None
+BOTS = [
+    "music_bot",
+    "moderation_bot",
+    "community_bot",
+    "gambling_bot",
+    "umamusume_bot",
+    "general_bot"
+]
 
-def is_bot_running():
-    global bot_process
-    if bot_process is None:
+bot_processes = {bot: None for bot in BOTS}
+bot_lock = threading.Lock()
+
+def is_bot_running(bot_name):
+    process = bot_processes.get(bot_name)
+    if process is None:
         return False
-    return bot_process.poll() is None
+    return process.poll() is None
+
+def start_single_bot(bot_name):
+    if is_bot_running(bot_name):
+        return False, "Already running"
+    try:
+        # Start the bot process using launcher.py with the bot name as an argument
+        process = subprocess.Popen([sys.executable, 'launcher.py', bot_name])
+        bot_processes[bot_name] = process
+        return True, "Bot started"
+    except Exception as e:
+        return False, str(e)
+
+def stop_single_bot(bot_name):
+    process = bot_processes.get(bot_name)
+    if not is_bot_running(bot_name):
+        return False, "Not running"
+    try:
+        process.terminate()
+        process.wait(timeout=5)
+        bot_processes[bot_name] = None
+        return True, "Bot stopped"
+    except Exception as e:
+        if process:
+            process.kill()
+        bot_processes[bot_name] = None
+        return False, str(e)
+
+# --- Automatic Startup ---
+# We use a simple lock file to prevent multiple Gunicorn workers from spawning duplicate bots
+LOCK_FILE = '/tmp/barm_bots_started.lock'
+if not os.path.exists(LOCK_FILE):
+    try:
+        with open(LOCK_FILE, 'w') as f:
+            f.write('started')
+        for bot in BOTS:
+            start_single_bot(bot)
+    except Exception:
+        pass
+
 
 @app.route('/')
 def index():
@@ -39,43 +90,74 @@ def logout():
 def get_status():
     if not session.get('authenticated'):
         return jsonify({'error': 'Unauthorized'}), 401
-    return jsonify({'running': is_bot_running()})
+    
+    statuses = {bot: is_bot_running(bot) for bot in BOTS}
+    return jsonify({'running': any(statuses.values()), 'bots': statuses})
 
-@app.route('/api/start', methods=['POST'])
-def start_bot():
+@app.route('/api/start/<bot_name>', methods=['POST'])
+def start_bot_route(bot_name):
     if not session.get('authenticated'):
         return jsonify({'error': 'Unauthorized'}), 401
-    
-    global bot_process
-    if is_bot_running():
-        return jsonify({'success': False, 'message': 'Bot is already running'})
-    
-    try:
-        # Start the bot process
-        bot_process = subprocess.Popen([sys.executable, 'launcher.py'])
-        return jsonify({'success': True, 'message': 'Bot started'})
-    except Exception as e:
-        return jsonify({'success': False, 'message': str(e)}), 500
+    if bot_name not in BOTS:
+        return jsonify({'success': False, 'message': 'Invalid bot name'}), 400
+        
+    with bot_lock:
+        success, msg = start_single_bot(bot_name)
+    return jsonify({'success': success, 'message': msg}), 200 if success else 500
 
-@app.route('/api/stop', methods=['POST'])
-def stop_bot():
+@app.route('/api/stop/<bot_name>', methods=['POST'])
+def stop_bot_route(bot_name):
     if not session.get('authenticated'):
         return jsonify({'error': 'Unauthorized'}), 401
+    if bot_name not in BOTS:
+        return jsonify({'success': False, 'message': 'Invalid bot name'}), 400
+        
+    with bot_lock:
+        success, msg = stop_single_bot(bot_name)
+    return jsonify({'success': success, 'message': msg}), 200 if success else 500
+
+@app.route('/api/presence/<bot_name>', methods=['POST'])
+def set_presence(bot_name):
+    if not session.get('authenticated'):
+        return jsonify({'error': 'Unauthorized'}), 401
+    if bot_name not in BOTS:
+        return jsonify({'success': False, 'message': 'Invalid bot name'}), 400
+        
+    data = request.json
+    presence = data.get('presence', '').strip()
     
-    global bot_process
-    if not is_bot_running():
-        return jsonify({'success': False, 'message': 'Bot is not running'})
-    
+    # Save presence to a JSON file that the bots will read periodically
+    presence_file = 'presence.json'
     try:
-        bot_process.terminate()
-        bot_process.wait(timeout=5)
-        bot_process = None
-        return jsonify({'success': True, 'message': 'Bot stopped'})
-    except Exception as e:
-        if bot_process:
-            bot_process.kill()
-        bot_process = None
-        return jsonify({'success': False, 'message': str(e)}), 500
+        if os.path.exists(presence_file):
+            with open(presence_file, 'r', encoding='utf-8') as f:
+                presences = json.load(f)
+        else:
+            presences = {}
+    except:
+        presences = {}
+        
+    presences[bot_name] = presence
+    
+    with open(presence_file, 'w', encoding='utf-8') as f:
+        json.dump(presences, f)
+        
+    return jsonify({'success': True})
+
+@app.route('/api/presence', methods=['GET'])
+def get_presences():
+    if not session.get('authenticated'):
+        return jsonify({'error': 'Unauthorized'}), 401
+        
+    try:
+        if os.path.exists('presence.json'):
+            with open('presence.json', 'r', encoding='utf-8') as f:
+                presences = json.load(f)
+        else:
+            presences = {}
+    except:
+        presences = {}
+    return jsonify({'presences': presences})
 
 @app.route('/api/files', methods=['GET'])
 def list_files():

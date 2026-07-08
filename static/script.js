@@ -7,10 +7,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const loginError = document.getElementById('login-error');
     const logoutBtn = document.getElementById('logout-btn');
     
-    const statusDot = document.getElementById('status-dot');
-    const statusText = document.getElementById('status-text');
-    const startBtn = document.getElementById('start-btn');
-    const stopBtn = document.getElementById('stop-btn');
+    const botsGrid = document.getElementById('bots-grid');
     
     const fileSelect = document.getElementById('file-select');
     const saveBtn = document.getElementById('save-btn');
@@ -26,6 +23,10 @@ document.addEventListener('DOMContentLoaded', () => {
     });
 
     let statusInterval;
+    const BOT_NAMES = [
+        "music_bot", "moderation_bot", "community_bot", 
+        "gambling_bot", "umamusume_bot", "general_bot"
+    ];
 
     // --- Authentication ---
     loginBtn.addEventListener('click', async () => {
@@ -60,8 +61,9 @@ document.addEventListener('DOMContentLoaded', () => {
         loginError.classList.add('hidden');
         passwordInput.value = '';
         
-        // Initial fetches
+        initBotCards();
         fetchStatus();
+        fetchPresences();
         fetchFiles();
         
         // Poll status every 5 seconds
@@ -74,66 +76,129 @@ document.addEventListener('DOMContentLoaded', () => {
         clearInterval(statusInterval);
     }
 
-    // --- Bot Control ---
+    // --- Bot Cards UI ---
+    function initBotCards() {
+        botsGrid.innerHTML = '';
+        BOT_NAMES.forEach(bot => {
+            const card = document.createElement('div');
+            card.className = 'bot-card';
+            card.innerHTML = `
+                <div class="bot-card-header">
+                    <div class="bot-name">${bot.replace('_', ' ')} <span>(v2.0)</span></div>
+                    <div class="status-indicator">
+                        <div id="dot-${bot}" class="dot stopped"></div>
+                        <span id="text-${bot}">Stopped</span>
+                    </div>
+                </div>
+                <div style="display:flex; gap:10px; margin-bottom: 1rem;">
+                    <button id="start-${bot}" class="success-btn" style="margin:0;">Start</button>
+                    <button id="stop-${bot}" class="danger-btn" style="margin:0;" disabled>Stop</button>
+                </div>
+                <div>
+                    <input type="text" id="presence-${bot}" class="presence-input" placeholder="Custom Status (e.g. Playing a game)">
+                    <button id="set-presence-${bot}" class="presence-btn">Update Status</button>
+                </div>
+            `;
+            botsGrid.appendChild(card);
+
+            // Bind Bot Controls
+            const startBtn = document.getElementById(`start-${bot}`);
+            const stopBtn = document.getElementById(`stop-${bot}`);
+            
+            startBtn.addEventListener('click', () => toggleBot(bot, 'start'));
+            stopBtn.addEventListener('click', () => toggleBot(bot, 'stop'));
+
+            // Bind Presence Update
+            document.getElementById(`set-presence-${bot}`).addEventListener('click', async () => {
+                const presenceVal = document.getElementById(`presence-${bot}`).value;
+                const btn = document.getElementById(`set-presence-${bot}`);
+                btn.innerText = 'Updating...';
+                try {
+                    await fetch(`/api/presence/${bot}`, {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ presence: presenceVal })
+                    });
+                    btn.innerText = 'Updated!';
+                    setTimeout(() => btn.innerText = 'Update Status', 2000);
+                } catch (e) {
+                    console.error(e);
+                    btn.innerText = 'Failed';
+                }
+            });
+        });
+    }
+
+    async function toggleBot(bot, action) {
+        const startBtn = document.getElementById(`start-${bot}`);
+        const stopBtn = document.getElementById(`stop-${bot}`);
+        
+        startBtn.disabled = true;
+        stopBtn.disabled = true;
+        
+        try {
+            const res = await fetch(`/api/${action}/${bot}`, { method: 'POST' });
+            const data = await res.json();
+            if (!data.success) {
+                alert(data.message);
+            }
+            fetchStatus();
+        } catch (err) {
+            console.error(err);
+        }
+    }
+
     async function fetchStatus() {
         try {
             const res = await fetch('/api/status');
             if (res.status === 401) { showLogin(); return; }
             
             const data = await res.json();
-            updateStatusUI(data.running);
+            if (data.bots) {
+                BOT_NAMES.forEach(bot => {
+                    const isRunning = data.bots[bot];
+                    const dot = document.getElementById(`dot-${bot}`);
+                    const text = document.getElementById(`text-${bot}`);
+                    const startBtn = document.getElementById(`start-${bot}`);
+                    const stopBtn = document.getElementById(`stop-${bot}`);
+                    
+                    if (!dot) return; // UI not initialized
+                    
+                    if (isRunning) {
+                        dot.className = 'dot running';
+                        text.innerText = 'Running';
+                        startBtn.disabled = true;
+                        stopBtn.disabled = false;
+                    } else {
+                        dot.className = 'dot stopped';
+                        text.innerText = 'Stopped';
+                        startBtn.disabled = false;
+                        stopBtn.disabled = true;
+                    }
+                });
+            }
         } catch (err) {
             console.error(err);
         }
     }
-
-    function updateStatusUI(isRunning) {
-        if (isRunning) {
-            statusDot.className = 'dot running';
-            statusText.innerText = 'Status: Running';
-            startBtn.disabled = true;
-            stopBtn.disabled = false;
-        } else {
-            statusDot.className = 'dot stopped';
-            statusText.innerText = 'Status: Stopped';
-            startBtn.disabled = false;
-            stopBtn.disabled = true;
+    
+    async function fetchPresences() {
+        try {
+            const res = await fetch('/api/presence');
+            if (res.status === 401) return;
+            const data = await res.json();
+            if (data.presences) {
+                BOT_NAMES.forEach(bot => {
+                    const input = document.getElementById(`presence-${bot}`);
+                    if (input && data.presences[bot]) {
+                        input.value = data.presences[bot];
+                    }
+                });
+            }
+        } catch(e) {
+            console.error(e);
         }
     }
-
-    startBtn.addEventListener('click', async () => {
-        startBtn.disabled = true;
-        try {
-            const res = await fetch('/api/start', { method: 'POST' });
-            const data = await res.json();
-            if (data.success) {
-                updateStatusUI(true);
-            } else {
-                alert(data.message);
-                startBtn.disabled = false;
-            }
-        } catch (err) {
-            console.error(err);
-            startBtn.disabled = false;
-        }
-    });
-
-    stopBtn.addEventListener('click', async () => {
-        stopBtn.disabled = true;
-        try {
-            const res = await fetch('/api/stop', { method: 'POST' });
-            const data = await res.json();
-            if (data.success) {
-                updateStatusUI(false);
-            } else {
-                alert(data.message);
-                stopBtn.disabled = false;
-            }
-        } catch (err) {
-            console.error(err);
-            stopBtn.disabled = false;
-        }
-    });
 
     // --- Code Editor ---
     async function fetchFiles() {
