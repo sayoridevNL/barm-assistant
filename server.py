@@ -52,10 +52,7 @@ def start_bot():
     
     try:
         # Start the bot process
-        bot_process = subprocess.Popen([sys.executable, 'launcher.py'], 
-                                       stdout=subprocess.PIPE, 
-                                       stderr=subprocess.STDOUT,
-                                       text=True)
+        bot_process = subprocess.Popen([sys.executable, 'launcher.py'])
         return jsonify({'success': True, 'message': 'Bot started'})
     except Exception as e:
         return jsonify({'success': False, 'message': str(e)}), 500
