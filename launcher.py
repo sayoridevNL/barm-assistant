@@ -61,7 +61,9 @@ async def main():
                 await asyncio.sleep(delay_seconds)
             try:
                 t = t.strip() if t else t
-                print(f"🔍 DEBUG {n}: Token length is {len(t) if t else 'MISSING (None)'}")
+                prefix = t[:5] if t else "NONE"
+                suffix = t[-3:] if t else "NONE"
+                print(f"🔍 DEBUG {n}: Token length {len(t) if t else 0} | Starts: '{prefix}' | Ends: '{suffix}'")
                 await bot.start(t)
             except Exception as e:
                 print(f"❌ {n} crashed: {e.__class__.__name__}: {e}")
