@@ -6,3 +6,4 @@ PyNaCl
 Flask
 python-dotenv
 gunicorn
+pilmoji

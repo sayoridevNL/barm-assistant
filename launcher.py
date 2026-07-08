@@ -16,6 +16,7 @@ REQUIRED_PACKAGES = [
     ("PIL", "Pillow"),
     ("aiohttp", "aiohttp"),
     ("nacl", "PyNaCl"),
+    ("pilmoji", "pilmoji"),
 ]
 
 def ensure_packages_installed():
