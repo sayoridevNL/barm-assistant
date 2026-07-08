@@ -113,7 +113,13 @@ async def lootbox(interaction: discord.Interaction, tier: str = "basic"):
     color = _RARITY_COLORS[uma["rarity"]]; remoji = _RARITY_EMOJI[uma["rarity"]]
     is_leg = uma["rarity"] == "Legendary"
 
-    reveal_embed = (EmbedBuilder(color=color).title(f"{remoji} UNLOCKED: {uma['name']}  [{uma['rarity']}]").description(f"{'## 🎊 **LEGENDARY PULL!!!** 🎊\n' if is_leg else ''}\n>>> *A new Uma has joined your team!*").fields(("⚡ Speed", f"`{uma['speed']}`"), ("❤️ Stamina", f"`{uma['stamina']}`"), ("💪 Power", f"`{uma['power']}`"), ("🧠 Smartness", f"`{uma.get('smartness', 70)}`"), ("🔥 Guts", f"`{uma.get('guts', 70)}`"), ("🆔 Uma ID", f"`{uma['id']}`")).field(f"{t['emoji']} Box Used", f"**{t['label']}** — {cost:,} Sayories", inline=False).build())
+    leg_text = '## 🎊 **LEGENDARY PULL!!!** 🎊\n' if is_leg else ''
+    reveal_embed = (EmbedBuilder(color=color)
+        .title(f"{remoji} UNLOCKED: {uma['name']}  [{uma['rarity']}]")
+        .description(f"{leg_text}\n>>> *A new Uma has joined your team!*")
+        .fields(("⚡ Speed", f"`{uma['speed']}`"), ("❤️ Stamina", f"`{uma['stamina']}`"), ("💪 Power", f"`{uma['power']}`"), ("🧠 Smartness", f"`{uma.get('smartness', 70)}`"), ("🔥 Guts", f"`{uma.get('guts', 70)}`"), ("🆔 Uma ID", f"`{uma['id']}`"))
+        .field(f"{t['emoji']} Box Used", f"**{t['label']}** — {cost:,} Sayories", inline=False)
+        .build())
     img = _uma_image(uma)
     if img: reveal_embed.set_image(url=img)
     reveal_embed.set_author(name=interaction.user.display_name, icon_url=interaction.user.display_avatar.url)
