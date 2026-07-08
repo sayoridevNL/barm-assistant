@@ -22,4 +22,4 @@ ENV PORT=7860
 EXPOSE 7860
 
 # Start the web dashboard using gunicorn
-CMD ["gunicorn", "-b", "0.0.0.0:7860", "--timeout", "120", "server:app"]
+CMD ["python", "-u", "server.py"]
