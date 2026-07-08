@@ -55,13 +55,17 @@ async def main():
             continue
         module = importlib.import_module(module_name)
         
-        async def run_bot(bot, t, n):
+        async def run_bot(bot, t, n, delay_seconds):
+            if delay_seconds > 0:
+                print(f"⏳ Waiting {delay_seconds}s before starting {n} to avoid rate limits...")
+                await asyncio.sleep(delay_seconds)
             try:
                 await bot.start(t)
             except Exception as e:
                 print(f"❌ {n} crashed: {e.__class__.__name__}: {e}")
                 
-        tasks.append(asyncio.create_task(run_bot(module.bot, token, module_name), name=module_name))
+        delay = len(tasks) * 5
+        tasks.append(asyncio.create_task(run_bot(module.bot, token, module_name, delay), name=module_name))
         started.append(module_name)
 
     if not tasks:
