@@ -28,9 +28,22 @@ document.addEventListener('DOMContentLoaded', () => {
         "gambling_bot", "umamusume_bot", "general_bot"
     ];
 
+    // Icons mapping for visual flair
+    const BOT_ICONS = {
+        "music_bot": "fa-music",
+        "moderation_bot": "fa-shield-halved",
+        "community_bot": "fa-users",
+        "gambling_bot": "fa-dice",
+        "umamusume_bot": "fa-horse",
+        "general_bot": "fa-robot"
+    };
+
     // --- Authentication ---
     loginBtn.addEventListener('click', async () => {
         const password = passwordInput.value;
+        const btnText = loginBtn.querySelector('span');
+        btnText.innerText = 'Authenticating...';
+        
         try {
             const res = await fetch('/api/login', {
                 method: 'POST',
@@ -43,10 +56,17 @@ document.addEventListener('DOMContentLoaded', () => {
                 showDashboard();
             } else {
                 loginError.classList.remove('hidden');
+                setTimeout(() => loginError.classList.add('hidden'), 3000);
             }
         } catch (err) {
             console.error(err);
+        } finally {
+            btnText.innerText = 'Authenticate';
         }
+    });
+
+    passwordInput.addEventListener('keypress', (e) => {
+        if (e.key === 'Enter') loginBtn.click();
     });
 
     logoutBtn.addEventListener('click', async () => {
@@ -80,23 +100,41 @@ document.addEventListener('DOMContentLoaded', () => {
     function initBotCards() {
         botsGrid.innerHTML = '';
         BOT_NAMES.forEach(bot => {
+            const icon = BOT_ICONS[bot] || "fa-robot";
+            const displayName = bot.replace('_', ' ');
+            
             const card = document.createElement('div');
             card.className = 'bot-card';
             card.innerHTML = `
                 <div class="bot-card-header">
-                    <div class="bot-name">${bot.replace('_', ' ')} <span>(v2.0)</span></div>
-                    <div class="status-indicator">
-                        <div id="dot-${bot}" class="dot stopped"></div>
-                        <span id="text-${bot}">Stopped</span>
+                    <div class="bot-info">
+                        <div class="bot-name"><i class="fa-solid ${icon}"></i> ${displayName}</div>
+                        <div style="margin-top: 0.25rem;"><span class="bot-version">v2.0 Architecture</span></div>
+                    </div>
+                    <div id="badge-${bot}" class="status-badge loading">
+                        <i class="fa-solid fa-spinner fa-spin"></i> Loading...
                     </div>
                 </div>
-                <div style="display:flex; gap:10px; margin-bottom: 1rem;">
-                    <button id="start-${bot}" class="success-btn" style="margin:0;">Start</button>
-                    <button id="stop-${bot}" class="danger-btn" style="margin:0;" disabled>Stop</button>
+                
+                <div class="card-actions">
+                    <button id="start-${bot}" class="success-btn">
+                        <i class="fa-solid fa-play"></i> Start
+                    </button>
+                    <button id="stop-${bot}" class="danger-btn" disabled>
+                        <i class="fa-solid fa-stop"></i> Stop
+                    </button>
                 </div>
-                <div>
-                    <input type="text" id="presence-${bot}" class="presence-input" placeholder="Custom Status (e.g. Playing a game)">
-                    <button id="set-presence-${bot}" class="presence-btn">Update Status</button>
+                
+                <div class="presence-section">
+                    <div class="presence-label">
+                        <i class="fa-regular fa-message"></i> Custom Status
+                    </div>
+                    <div class="presence-input-wrapper">
+                        <input type="text" id="presence-${bot}" class="presence-input" placeholder="e.g. Playing a game...">
+                        <button id="set-presence-${bot}" class="presence-btn" title="Update Status">
+                            <i class="fa-solid fa-rotate-right"></i>
+                        </button>
+                    </div>
                 </div>
             `;
             botsGrid.appendChild(card);
@@ -109,22 +147,32 @@ document.addEventListener('DOMContentLoaded', () => {
             stopBtn.addEventListener('click', () => toggleBot(bot, 'stop'));
 
             // Bind Presence Update
-            document.getElementById(`set-presence-${bot}`).addEventListener('click', async () => {
-                const presenceVal = document.getElementById(`presence-${bot}`).value;
-                const btn = document.getElementById(`set-presence-${bot}`);
-                btn.innerText = 'Updating...';
+            const presenceBtn = document.getElementById(`set-presence-${bot}`);
+            const presenceInput = document.getElementById(`presence-${bot}`);
+            
+            const updatePresence = async () => {
+                const presenceVal = presenceInput.value;
+                const originalIcon = presenceBtn.innerHTML;
+                presenceBtn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i>';
+                
                 try {
                     await fetch(`/api/presence/${bot}`, {
                         method: 'POST',
                         headers: { 'Content-Type': 'application/json' },
                         body: JSON.stringify({ presence: presenceVal })
                     });
-                    btn.innerText = 'Updated!';
-                    setTimeout(() => btn.innerText = 'Update Status', 2000);
+                    presenceBtn.innerHTML = '<i class="fa-solid fa-check" style="color: var(--success-hover);"></i>';
+                    setTimeout(() => presenceBtn.innerHTML = originalIcon, 2000);
                 } catch (e) {
                     console.error(e);
-                    btn.innerText = 'Failed';
+                    presenceBtn.innerHTML = '<i class="fa-solid fa-xmark" style="color: var(--danger-hover);"></i>';
+                    setTimeout(() => presenceBtn.innerHTML = originalIcon, 2000);
                 }
+            };
+            
+            presenceBtn.addEventListener('click', updatePresence);
+            presenceInput.addEventListener('keypress', (e) => {
+                if (e.key === 'Enter') updatePresence();
             });
         });
     }
@@ -132,9 +180,12 @@ document.addEventListener('DOMContentLoaded', () => {
     async function toggleBot(bot, action) {
         const startBtn = document.getElementById(`start-${bot}`);
         const stopBtn = document.getElementById(`stop-${bot}`);
+        const badge = document.getElementById(`badge-${bot}`);
         
         startBtn.disabled = true;
         stopBtn.disabled = true;
+        badge.className = 'status-badge loading';
+        badge.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Processing...';
         
         try {
             const res = await fetch(`/api/${action}/${bot}`, { method: 'POST' });
@@ -157,21 +208,20 @@ document.addEventListener('DOMContentLoaded', () => {
             if (data.bots) {
                 BOT_NAMES.forEach(bot => {
                     const isRunning = data.bots[bot];
-                    const dot = document.getElementById(`dot-${bot}`);
-                    const text = document.getElementById(`text-${bot}`);
+                    const badge = document.getElementById(`badge-${bot}`);
                     const startBtn = document.getElementById(`start-${bot}`);
                     const stopBtn = document.getElementById(`stop-${bot}`);
                     
-                    if (!dot) return; // UI not initialized
+                    if (!badge) return; // UI not initialized
                     
                     if (isRunning) {
-                        dot.className = 'dot running';
-                        text.innerText = 'Running';
+                        badge.className = 'status-badge running';
+                        badge.innerHTML = '<i class="fa-solid fa-circle-check"></i> Online';
                         startBtn.disabled = true;
                         stopBtn.disabled = false;
                     } else {
-                        dot.className = 'dot stopped';
-                        text.innerText = 'Stopped';
+                        badge.className = 'status-badge stopped';
+                        badge.innerHTML = '<i class="fa-regular fa-circle-xmark"></i> Offline';
                         startBtn.disabled = false;
                         stopBtn.disabled = true;
                     }
@@ -207,7 +257,7 @@ document.addEventListener('DOMContentLoaded', () => {
             if (res.status === 401) return;
             const data = await res.json();
             
-            fileSelect.innerHTML = '<option value="">Select a file...</option>';
+            fileSelect.innerHTML = '<option value="">Select a file to edit...</option>';
             data.files.forEach(file => {
                 const opt = document.createElement('option');
                 opt.value = file;
@@ -247,7 +297,7 @@ document.addEventListener('DOMContentLoaded', () => {
         if (!filename) return;
         
         saveBtn.disabled = true;
-        saveBtn.innerText = 'Saving...';
+        saveBtn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Saving...';
         
         try {
             const res = await fetch(`/api/files/${filename}`, {
@@ -267,7 +317,7 @@ document.addEventListener('DOMContentLoaded', () => {
             alert('Failed to save file');
         } finally {
             saveBtn.disabled = false;
-            saveBtn.innerText = 'Save Changes';
+            saveBtn.innerHTML = '<i class="fa-solid fa-floppy-disk"></i> Save Changes';
         }
     });
     

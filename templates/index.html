@@ -3,60 +3,95 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Barm Assistant Manager</title>
+    <title>Barm Assistant Pro</title>
     <link rel="stylesheet" href="/static/style.css">
     <!-- Google Fonts -->
-    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <!-- FontAwesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <!-- CodeMirror for Code Editing -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.13/codemirror.min.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.13/theme/dracula.min.css">
 </head>
 <body>
-    <div id="background-gradient"></div>
+    <div id="background-gradient">
+        <div class="blob blob-1"></div>
+        <div class="blob blob-2"></div>
+        <div class="blob blob-3"></div>
+    </div>
+    
     <div id="app">
         <!-- Login Screen -->
         <div id="login-screen" class="screen">
             <div class="glass-panel login-panel">
-                <div class="glow-orb"></div>
-                <h1>Barm Assistant</h1>
-                <p>Welcome back. Please authenticate.</p>
+                <div class="login-header">
+                    <i class="fa-solid fa-robot brand-icon"></i>
+                    <h1>Barm OS</h1>
+                    <p>Enter master credentials to access the fleet.</p>
+                </div>
                 <div class="input-group">
+                    <i class="fa-solid fa-lock input-icon"></i>
                     <input type="password" id="password-input" placeholder="Master Password">
                 </div>
-                <button id="login-btn" class="primary-btn">Unlock</button>
-                <p id="login-error" class="error-text hidden">Invalid password</p>
+                <button id="login-btn" class="primary-btn glow-effect">
+                    <span>Authenticate</span> <i class="fa-solid fa-arrow-right"></i>
+                </button>
+                <div id="login-error" class="error-toast hidden">
+                    <i class="fa-solid fa-triangle-exclamation"></i> Invalid password
+                </div>
             </div>
         </div>
 
         <!-- Dashboard Screen -->
         <div id="dashboard-screen" class="screen hidden">
             <nav class="glass-nav">
-                <div class="nav-brand">Barm Assistant</div>
-                <button id="logout-btn" class="secondary-btn">Logout</button>
+                <div class="nav-brand">
+                    <i class="fa-solid fa-robot"></i> Barm OS
+                </div>
+                <div class="nav-actions">
+                    <div class="status-pill global-status">
+                        <div class="pulse-dot"></div> System Online
+                    </div>
+                    <button id="logout-btn" class="icon-btn" title="Logout">
+                        <i class="fa-solid fa-power-off"></i>
+                    </button>
+                </div>
             </nav>
 
             <main class="dashboard-content">
                 
-                <h2 class="section-title">Bot Fleet</h2>
+                <div class="section-header">
+                    <h2><i class="fa-solid fa-server"></i> Fleet Command</h2>
+                    <p class="section-desc">Manage your decentralized bot network in real-time.</p>
+                </div>
+                
                 <div class="bots-grid" id="bots-grid">
                     <!-- Bot cards will be injected here by JS -->
                 </div>
 
-                <!-- Code Editor -->
-                <h2 class="section-title">Code Editor</h2>
+                <div class="section-header mt-8">
+                    <h2><i class="fa-solid fa-code"></i> Developer Console</h2>
+                    <p class="section-desc">Live-edit your application source code.</p>
+                </div>
+                
                 <div class="glass-panel editor-panel">
                     <div class="editor-header">
                         <div class="file-selector">
+                            <i class="fa-regular fa-file-code"></i>
                             <select id="file-select">
-                                <option value="">Select a file...</option>
+                                <option value="">Select a file to edit...</option>
                             </select>
-                            <button id="save-btn" class="primary-btn" disabled>Save Changes</button>
                         </div>
+                        <button id="save-btn" class="primary-btn sm-btn" disabled>
+                            <i class="fa-solid fa-floppy-disk"></i> Save Changes
+                        </button>
                     </div>
                     <div class="editor-container">
                         <textarea id="code-editor"></textarea>
                     </div>
-                    <p id="save-msg" class="success-text hidden">Saved successfully!</p>
+                    <div id="save-msg" class="success-toast hidden">
+                        <i class="fa-solid fa-check-circle"></i> File saved successfully!
+                    </div>
                 </div>
             </main>
         </div>
