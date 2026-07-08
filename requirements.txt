@@ -1,0 +1,8 @@
+discord.py
+yt-dlp
+Pillow
+aiohttp
+PyNaCl
+Flask
+python-dotenv
+gunicorn

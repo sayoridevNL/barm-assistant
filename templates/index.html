@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Bot Management Dashboard</title>
+    <link rel="stylesheet" href="/static/style.css">
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;700&display=swap" rel="stylesheet">
+    <!-- CodeMirror for Code Editing -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.13/codemirror.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.13/theme/dracula.min.css">
+</head>
+<body>
+    <div id="app">
+        <!-- Login Screen -->
+        <div id="login-screen" class="screen">
+            <div class="glass-panel login-panel">
+                <h1>Bot Dashboard</h1>
+                <p>Welcome back. Please authenticate.</p>
+                <div class="input-group">
+                    <input type="password" id="password-input" placeholder="Master Password">
+                </div>
+                <button id="login-btn" class="primary-btn">Unlock</button>
+                <p id="login-error" class="error-text hidden">Invalid password</p>
+            </div>
+        </div>
+
+        <!-- Dashboard Screen -->
+        <div id="dashboard-screen" class="screen hidden">
+            <nav class="glass-nav">
+                <div class="nav-brand">Barm Assistant</div>
+                <button id="logout-btn" class="secondary-btn">Logout</button>
+            </nav>
+
+            <main class="dashboard-content">
+                <!-- Control Panel -->
+                <div class="glass-panel control-panel">
+                    <h2>Control Center</h2>
+                    <div class="status-indicator">
+                        <div id="status-dot" class="dot stopped"></div>
+                        <span id="status-text">Status: Stopped</span>
+                    </div>
+                    <div class="action-buttons">
+                        <button id="start-btn" class="success-btn">Start Bot</button>
+                        <button id="stop-btn" class="danger-btn" disabled>Stop Bot</button>
+                    </div>
+                </div>
+
+                <!-- Code Editor -->
+                <div class="glass-panel editor-panel">
+                    <div class="editor-header">
+                        <h2>Code Editor</h2>
+                        <div class="file-selector">
+                            <select id="file-select">
+                                <option value="">Select a file...</option>
+                            </select>
+                            <button id="save-btn" class="primary-btn" disabled>Save Changes</button>
+                        </div>
+                    </div>
+                    <div class="editor-container">
+                        <textarea id="code-editor"></textarea>
+                    </div>
+                    <p id="save-msg" class="success-text hidden">Saved successfully!</p>
+                </div>
+            </main>
+        </div>
+    </div>
+
+    <!-- Scripts -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.13/codemirror.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.13/mode/python/python.min.js"></script>
+    <script src="/static/script.js"></script>
+</body>
+</html>
