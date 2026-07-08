@@ -1,14 +1,6 @@
 FROM python:3.11-slim
 
-# Install ffmpeg for the music bot, and build tools for PyNaCl
-RUN apt-get update && apt-get install -y \
-    ffmpeg \
-    git \
-    build-essential \
-    libffi-dev \
-    libnacl-dev \
-    python3-dev \
-    && rm -rf /var/lib/apt/lists/*
+RUN apt-get update && apt-get install -y ffmpeg git && rm -rf /var/lib/apt/lists/*
 
 # Hugging Face Spaces require running as a non-root user
 RUN useradd -m -u 1000 user
