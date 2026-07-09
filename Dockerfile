@@ -15,7 +15,8 @@ COPY --chown=user . $HOME/app
 
 # Install Python requirements
 RUN pip install --no-cache-dir --upgrade pip && \
-    pip install --no-cache-dir -r requirements.txt
+    pip install --no-cache-dir -r requirements.txt && \
+    pip install -U --pre yt-dlp
 
 # Hugging Face Spaces routes traffic to port 7860 by default
 ENV PORT=7860

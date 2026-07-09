@@ -161,11 +161,9 @@ def get_presences():
 
 @app.route('/api/files', methods=['GET'])
 def list_files():
-    if not session.get('authenticated'):
-        return jsonify({'error': 'Unauthorized'}), 401
-    
-    files = [f for f in os.listdir('.') if f.endswith('.py')]
-    return jsonify({'files': files})
+    if not session.get('authenticated'): return jsonify({'success': False}), 401
+    files = [f for f in os.listdir('.') if f.endswith('.py') or f.endswith('.txt')]
+    return jsonify({'files': sorted(files)})
 
 @app.route('/api/files/<path:filename>', methods=['GET'])
 def get_file(filename):
