@@ -24,7 +24,7 @@ class MusicQueue:
 YDL_OPTIONS = {
     "format": "bestaudio/best", "noplaylist": True, "quiet": True, "no_warnings": True,
     "default_search": "scsearch5", "source_address": "0.0.0.0", "age_limit": 99,
-    "extractor_args": {"youtube": {"skip": ["translated_subs"]}},
+    "extractor_args": {"youtube": {"player_client": ["tv", "web_creator"], "skip": ["translated_subs"]}},
     "socket_timeout": 15,
 }
 if os.path.exists("cookies.txt"):
@@ -120,17 +120,7 @@ async def play(interaction: discord.Interaction, url: str):
     actual_url = url
     spotify_note = None
     
-    if "youtube.com" in url or "youtu.be" in url:
-        try:
-            import urllib.request, json as _json
-            noembed_api = f"https://noembed.com/embed?url={url}"
-            req = urllib.request.Request(noembed_api, headers={"User-Agent": "Mozilla/5.0"})
-            with urllib.request.urlopen(req, timeout=8) as resp:
-                meta = _json.loads(resp.read().decode('utf-8'))
-                track_title = meta.get("title", "")
-                if track_title: actual_url = f"scsearch5:{track_title}"
-        except Exception: pass
-    elif "open.spotify.com/track" in url:
+    if "open.spotify.com/track" in url:
         try:
             import urllib.request, json as _json
             oembed_api = f"https://open.spotify.com/oembed?url={url}"
