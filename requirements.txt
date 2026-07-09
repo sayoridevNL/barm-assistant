@@ -1,8 +1,7 @@
-discord.py
+discord.py[voice]
 yt-dlp
 Pillow
 aiohttp
-PyNaCl
 Flask
 python-dotenv
 gunicorn
