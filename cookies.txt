@@ -1,0 +1,11 @@
+# Netscape HTTP Cookie File
+# This is an empty cookies file.
+# Since YouTube has blocked your server's IP address, you need to provide your own cookies to bypass it.
+#
+# INSTRUCTIONS:
+# 1. Install the "Get cookies.txt LOCALLY" extension in Chrome/Firefox.
+# 2. Go to youtube.com and make sure you are logged in.
+# 3. Click the extension to export your cookies and copy the text.
+# 4. Delete all the text in this file and paste your copied cookies here.
+# 5. Click "Save Changes".
+# 6. Restart the Music Bot from the dashboard!
