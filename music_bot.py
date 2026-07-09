@@ -23,7 +23,7 @@ class MusicQueue:
 
 YDL_OPTIONS = {
     "format": "bestaudio/best", "noplaylist": True, "quiet": True, "no_warnings": True,
-    "default_search": "scsearch", "source_address": "0.0.0.0", "age_limit": 99,
+    "default_search": "ytsearch", "source_address": "0.0.0.0", "age_limit": 99,
     "extractor_args": {"youtube": {"player_client": ["android", "ios"], "skip": ["translated_subs"]}},
     "socket_timeout": 15,
 }
@@ -118,29 +118,17 @@ async def play(interaction: discord.Interaction, url: str):
     await interaction.response.defer()
 
     actual_url = url
-    
-    # Bypass YouTube Bot Blocks by converting YouTube/Spotify URLs to SoundCloud searches
-    if "youtube.com" in url or "youtu.be" in url:
-        try:
-            import urllib.request, json as _json
-            noembed_api = f"https://noembed.com/embed?url={url}"
-            req = urllib.request.Request(noembed_api, headers={"User-Agent": "Mozilla/5.0"})
-            with urllib.request.urlopen(req, timeout=8) as resp:
-                meta = _json.loads(resp.read().decode('utf-8'))
-                track_title = meta.get("title", "")
-                if track_title: actual_url = f"scsearch1:{track_title}"
-        except Exception: pass
-    elif "open.spotify.com/track" in url:
+    if "open.spotify.com/track" in url:
         try:
             import urllib.request, json as _json
             oembed_api = f"https://open.spotify.com/oembed?url={url}"
             req = urllib.request.Request(oembed_api, headers={"User-Agent": "Mozilla/5.0"})
             with urllib.request.urlopen(req, timeout=8) as resp: meta = _json.loads(resp.read())
             track_title = meta.get("title", "")
-            if track_title: actual_url = f"scsearch1:{track_title}"
-        except Exception: actual_url = f"scsearch1:{url}"
+            if track_title: actual_url = f"ytsearch1:{track_title}"
+        except Exception: actual_url = f"ytsearch1:{url}"
     elif not url.startswith("http"):
-        actual_url = f"scsearch1:{url}"
+        actual_url = f"ytsearch1:{url}"
 
     def _fetch():
         with yt_dlp.YoutubeDL(YDL_OPTIONS) as ydl:
@@ -188,6 +176,22 @@ async def skip(interaction: discord.Interaction):
         embed = EmbedBuilder(color=Palette.WARNING).title("⏭️ Song Skipped").footer("Barm assistant Music").build()
         await interaction.response.send_message(embed=embed)
     else: await interaction.response.send_message("❌ Nothing is playing.", ephemeral=True)
+
+@tree.command(name="set_youtube_cookies", description="[ADMIN] Upload a cookies.txt file to fix YouTube bot blocks")
+@app_commands.describe(cookie_file="The cookies.txt file you exported from your browser")
+@app_commands.default_permissions(administrator=True)
+async def set_youtube_cookies(interaction: discord.Interaction, cookie_file: discord.Attachment):
+    if not cookie_file.filename.endswith(".txt"):
+        return await interaction.response.send_message("❌ Please upload a .txt file", ephemeral=True)
+    await interaction.response.defer(ephemeral=True)
+    try:
+        content = await cookie_file.read()
+        with open("cookies.txt", "wb") as f:
+            f.write(content)
+        YDL_OPTIONS["cookiefile"] = "cookies.txt"
+        await interaction.followup.send("✅ **YouTube Cookies successfully installed!**\nyt-dlp has been updated. Try playing a song now!")
+    except Exception as e:
+        await interaction.followup.send(f"❌ Failed to process cookies: `{e}`")
 
 @tree.command(name="stop", description="Stop playback, clear the queue, and leave voice")
 async def stop(interaction: discord.Interaction):
