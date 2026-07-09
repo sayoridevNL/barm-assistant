@@ -171,7 +171,7 @@ async def play(interaction: discord.Interaction, url: str):
     q = bot.music_q(interaction.guild_id)
     q.queue.append(track)
 
-    mins, secs = divmod(duration, 60)
+    mins, secs = divmod(int(duration), 60)
     embed = (EmbedBuilder(color=Palette.PRIMARY).title("🎵 Added to Queue").description(f"**{title}**").thumbnail(thumbnail).fields(("⏱️ Duration", f"{mins}:{secs:02d}"), ("📋 Queue Size", str(len(q.queue))), ("👤 Requested by", interaction.user.mention)).footer("Barm assistant Music").build())
     if spotify_note: embed.add_field(name="🎵 Via Spotify", value=f"Searched YouTube for: *{spotify_note}*", inline=False)
     await interaction.followup.send(embed=embed)
@@ -228,7 +228,7 @@ async def nowplaying(interaction: discord.Interaction):
     if not await guild_check(interaction): return
     q = bot.music_q(interaction.guild_id)
     if q.current:
-        dur = q.current.get("duration", 0); mins, secs = divmod(dur, 60)
+        dur = int(q.current.get("duration", 0)); mins, secs = divmod(dur, 60)
         embed = (EmbedBuilder(color=Palette.PRIMARY).title("🎵 Now Playing").description(f"**{q.current['title']}**").thumbnail(q.current.get("thumbnail")).fields(("⏱️ Duration", f"{mins}:{secs:02d}"), ("👤 Requested by", str(q.current["requester"])), ("📋 Up Next", str(len(q.queue)) + " song(s)"), ("🔁 Loop", "On" if q.loop else "Off")).footer("Barm assistant Music").build())
         await interaction.response.send_message(embed=embed)
     else: await interaction.response.send_message("❌ Nothing is playing.")
@@ -246,7 +246,7 @@ async def queue_cmd(interaction: discord.Interaction):
         lines.append(f"**Now:** {q.current['title']}")
     for idx, track in enumerate(q.queue[:10], 1):
         duration = track.get("duration", 0)
-        mins, secs = divmod(duration, 60)
+        mins, secs = divmod(int(duration), 60)
         lines.append(f"`{idx}.` {track['title']} `[{mins}:{secs:02d}]`")
     if len(q.queue) > 10:
         lines.append(f"*...and {len(q.queue) - 10} more.*")
