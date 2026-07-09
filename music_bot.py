@@ -22,7 +22,10 @@ class MusicQueue:
         self.loop: bool = False
 
 YDL_OPTIONS = {
-    "format": "bestaudio/best", "noplaylist": True, "quiet": True, "no_warnings": True,
+    # Permissive format chain: try best audio, then audio (any codec), then best available.
+    # This prevents "Requested format is not available" errors from killing extraction entirely.
+    "format": "bestaudio[ext!=m4a]/bestaudio[ext!=webm]/bestaudio/best",
+    "noplaylist": True, "quiet": True, "no_warnings": True,
     "default_search": "scsearch5", "source_address": "0.0.0.0", "age_limit": 99,
     "socket_timeout": 15,
 }
@@ -168,16 +171,17 @@ async def play(interaction: discord.Interaction, url: str):
             vid = actual_url.split("v=")[-1].split("?")[0].split("&")[0]
             if "youtu.be/" in actual_url: vid = actual_url.split("youtu.be/")[-1].split("?")[0]
             
+            # Try Piped instances (usually best reliability for audio extraction)
             piped_apis = [
-                "https://pipedapi.moomoo.me",
+                "https://pipedapi.kavin.rocks",
+                "https://pipedapi.tokhmi.xyz",
                 "https://pipedapi.adminforge.de",
-                "https://pipedapi.mha.fi",
                 "https://api.piped.projectsegfault.com",
             ]
             for api in piped_apis:
                 try:
                     req = urllib.request.Request(f"{api}/streams/{vid}", headers={"User-Agent": "Mozilla/5.0"})
-                    with urllib.request.urlopen(req, timeout=15) as resp:
+                    with urllib.request.urlopen(req, timeout=10) as resp:
                         data = _json.loads(resp.read().decode('utf-8'))
                         if "error" in data: raise ValueError(data["error"])
                         streams = data.get("audioStreams", [])
@@ -185,41 +189,18 @@ async def play(interaction: discord.Interaction, url: str):
                             streams.sort(key=lambda x: x.get("bitrate", 0), reverse=True)
                             return (f"https://youtube.com/watch?v={vid}", streams[0]["url"], data.get("title", "Unknown"), int(data.get("duration", 0)), data.get("thumbnailUrl"))
                 except Exception as e: proxy_errors.append(f"Piped {api}: {e}")
-                
+
+            # Try Invidious instances (fallback if Piped all fail)
             inv_apis = [
-                "https://y.com.sb",
-                "https://iv.nboeck.de",
+                "https://inv.nadeko.net",
+                "https://invidious.tiekoetter.com",
                 "https://iv.datura.network",
-                "https://invidious.perennialte.ch",
+                "https://y.com.sb",
             ]
             for api in inv_apis:
                 try:
                     req = urllib.request.Request(f"{api}/api/v1/videos/{vid}", headers={"User-Agent": "Mozilla/5.0"})
-                    with urllib.request.urlopen(req, timeout=15) as resp:
-                        data = _json.loads(resp.read().decode('utf-8'))
-                        formats = [f for f in data.get("adaptiveFormats", []) if f.get("type", "").startswith("audio/")]
-                        if formats:
-                            formats.sort(key=lambda x: int(x.get("bitrate", 0)), reverse=True)
-                            thumb = data.get("videoThumbnails", [{}])[0].get("url") if data.get("videoThumbnails") else None
-                            return (f"https://youtube.com/watch?v={vid}", formats[0]["url"], data.get("title", "Unknown"), int(data.get("lengthSeconds", 0)), thumb)
-                except Exception as e: proxy_errors.append(f"Inv {api}: {e}")
-            for api in piped_apis:
-                try:
-                    req = urllib.request.Request(f"{api}/streams/{vid}", headers={"User-Agent": "Mozilla/5.0"})
-                    with urllib.request.urlopen(req, timeout=15) as resp:
-                        data = _json.loads(resp.read().decode('utf-8'))
-                        if "error" in data: raise ValueError(data["error"])
-                        streams = data.get("audioStreams", [])
-                        if streams:
-                            streams.sort(key=lambda x: x.get("bitrate", 0), reverse=True)
-                            return (f"https://youtube.com/watch?v={vid}", streams[0]["url"], data.get("title", "Unknown"), int(data.get("duration", 0)), data.get("thumbnailUrl"))
-                except Exception as e: proxy_errors.append(f"Piped {api}: {e}")
-                
-            inv_apis = ["https://invidious.nerdvpn.de", "https://inv.nadeko.net", "https://invidious.tiekoetter.com"]
-            for api in inv_apis:
-                try:
-                    req = urllib.request.Request(f"{api}/api/v1/videos/{vid}", headers={"User-Agent": "Mozilla/5.0"})
-                    with urllib.request.urlopen(req, timeout=15) as resp:
+                    with urllib.request.urlopen(req, timeout=10) as resp:
                         data = _json.loads(resp.read().decode('utf-8'))
                         formats = [f for f in data.get("adaptiveFormats", []) if f.get("type", "").startswith("audio/")]
                         if formats:
@@ -242,24 +223,39 @@ async def play(interaction: discord.Interaction, url: str):
 
             last_err = None
             for u in urls_to_try:
-                try:
-                    info = ydl.extract_info(u, download=False)
-                    if "entries" in info: info = info["entries"][0]
-                    stream_url = info.get("url")
-                    if not stream_url:
-                        formats = info.get("formats", [])
-                        audio_only = [f for f in formats if not f.get("height") and f.get("url")]
-                        if audio_only:
-                            audio_only.sort(key=lambda f: f.get("abr") or 0, reverse=True)
-                            stream_url = audio_only[0]["url"]
-                        else:
-                            for f in reversed(formats):
-                                if f.get("url"): stream_url = f["url"]; break
-                    if not stream_url: continue
-                    return (info.get("webpage_url") or stream_url, stream_url, info.get("title", "Unknown"), info.get("duration", 0), info.get("thumbnail", None))
-                except Exception as e:
-                    last_err = e
-            
+                # Try preferred format first; on "format not available", retry with wide-open format
+                for fmt_opts in [
+                    YDL_OPTIONS,
+                    {**YDL_OPTIONS, "format": "best"},  # last resort — take whatever YouTube gives
+                ]:
+                    try:
+                        with yt_dlp.YoutubeDL(fmt_opts) as retry_ydl:
+                            info = retry_ydl.extract_info(u, download=False)
+                        if "entries" in info: info = info["entries"][0]
+                        stream_url = info.get("url")
+                        if not stream_url:
+                            formats = info.get("formats", [])
+                            audio_only = [f for f in formats if not f.get("height") and f.get("url")]
+                            if audio_only:
+                                audio_only.sort(key=lambda f: f.get("abr") or 0, reverse=True)
+                                stream_url = audio_only[0]["url"]
+                            else:
+                                for f in reversed(formats):
+                                    if f.get("url"): stream_url = f["url"]; break
+                        if stream_url:
+                            return (info.get("webpage_url") or stream_url, stream_url, info.get("title", "Unknown"), info.get("duration", 0), info.get("thumbnail", None))
+                    except yt_dlp.utils.DownloadError as e:
+                        err_str = str(e)
+                        if "format" in err_str.lower():
+                            last_err = e
+                            continue  # retry with looser format
+                        last_err = e
+                        break
+                    except Exception as e:
+                        last_err = e
+                        break
+                proxy_errors.append(f"yt-dlp ({u}): {last_err}")
+
             raise ValueError(
                 f"All sources failed or DRM protected.\n\n"
                 f"**Proxy Errors:** {proxy_errors}\n\n"
