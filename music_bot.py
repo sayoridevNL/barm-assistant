@@ -23,7 +23,7 @@ class MusicQueue:
 
 YDL_OPTIONS = {
     "format": "bestaudio/best", "noplaylist": True, "quiet": True, "no_warnings": True,
-    "default_search": "ytsearch", "source_address": "0.0.0.0", "age_limit": 99,
+    "default_search": "scsearch", "source_address": "0.0.0.0", "age_limit": 99,
     "extractor_args": {"youtube": {"player_client": ["android", "ios"], "skip": ["translated_subs"]}},
     "socket_timeout": 15,
 }
@@ -117,16 +117,30 @@ async def play(interaction: discord.Interaction, url: str):
     if interaction.user.voice is None: return await interaction.response.send_message("❌ You must be in a voice channel.", ephemeral=True)
     await interaction.response.defer()
 
-    actual_url = url; spotify_note = None
-    if "open.spotify.com/track" in url:
+    actual_url = url
+    
+    # Bypass YouTube Bot Blocks by converting YouTube/Spotify URLs to SoundCloud searches
+    if "youtube.com" in url or "youtu.be" in url:
+        try:
+            import urllib.request
+            req = urllib.request.Request(url, headers={"User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64)"})
+            with urllib.request.urlopen(req, timeout=8) as resp:
+                html = resp.read().decode('utf-8', errors='ignore')
+                if '<title>' in html:
+                    title = html.split('<title>')[1].split('</title>')[0].replace(' - YouTube', '').strip()
+                    actual_url = f"scsearch1:{title}"
+        except Exception: pass
+    elif "open.spotify.com/track" in url:
         try:
             import urllib.request, json as _json
             oembed_api = f"https://open.spotify.com/oembed?url={url}"
             req = urllib.request.Request(oembed_api, headers={"User-Agent": "Mozilla/5.0"})
             with urllib.request.urlopen(req, timeout=8) as resp: meta = _json.loads(resp.read())
             track_title = meta.get("title", "")
-            if track_title: actual_url = f"ytsearch1:{track_title}"; spotify_note = track_title
-        except Exception: actual_url = f"ytsearch1:{url}"
+            if track_title: actual_url = f"scsearch1:{track_title}"
+        except Exception: actual_url = f"scsearch1:{url}"
+    elif not url.startswith("http"):
+        actual_url = f"scsearch1:{url}"
 
     def _fetch():
         with yt_dlp.YoutubeDL(YDL_OPTIONS) as ydl:
