@@ -24,7 +24,7 @@ class MusicQueue:
 YDL_OPTIONS = {
     "format": "bestaudio/best", "noplaylist": True, "quiet": True, "no_warnings": True,
     "default_search": "ytsearch", "source_address": "0.0.0.0", "age_limit": 99,
-    "extractor_args": {"youtube": {"player_client": ["android", "ios"], "skip": ["translated_subs"]}},
+    "extractor_args": {"youtube": {"skip": ["translated_subs"]}},
     "socket_timeout": 15,
 }
 if os.path.exists("cookies.txt"):
