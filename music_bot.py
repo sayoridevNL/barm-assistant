@@ -24,15 +24,40 @@ class MusicQueue:
 YDL_OPTIONS = {
     "format": "bestaudio/best", "noplaylist": True, "quiet": True, "no_warnings": True,
     "default_search": "scsearch5", "source_address": "0.0.0.0", "age_limit": 99,
-    "extractor_args": {"youtube": {"player_client": ["tv", "web_creator"], "skip": ["translated_subs"]}},
     "socket_timeout": 15,
 }
-if os.path.exists("cookies.txt"):
-    YDL_OPTIONS["cookiefile"] = "cookies.txt"
-elif os.path.exists("/etc/secrets/cookies.txt"):
-    YDL_OPTIONS["cookiefile"] = "/etc/secrets/cookies.txt"
-FFMPEG_OPTIONS = {"before_options": "-reconnect 1 -reconnect_streamed 1 -reconnect_delay_max 5", "options": "-vn"}
 
+# Build YouTube extractor args dynamically
+_youtube_extractor_args: dict = {
+    "player_client": ["android", "web", "ios"],
+    "player_skip": ["webpage"],
+    "skip": ["translated_subs"],
+}
+
+# PO token & visitor data from env (best way to bypass bot checks on cloud hosts)
+_po_token = os.getenv("YOUTUBE_PO_TOKEN")
+_visitor_data = os.getenv("YOUTUBE_VISITOR_DATA")
+if _po_token:
+    _youtube_extractor_args["po_token"] = [_po_token]
+if _visitor_data:
+    _youtube_extractor_args["visitor_data"] = _visitor_data
+
+YDL_OPTIONS["extractor_args"] = {"youtube": _youtube_extractor_args}
+
+# Cookie loading: file first, then base64 env var, then Render secret path
+if os.path.exists("cookies.txt") and os.path.getsize("cookies.txt") > 200:
+    YDL_OPTIONS["cookiefile"] = "cookies.txt"
+elif os.path.exists("/etc/secrets/cookies.txt") and os.path.getsize("/etc/secrets/cookies.txt") > 200:
+    YDL_OPTIONS["cookiefile"] = "/etc/secrets/cookies.txt"
+elif os.getenv("YOUTUBE_COOKIES_B64"):
+    import base64, tempfile
+    _decoded = base64.b64decode(os.getenv("YOUTUBE_COOKIES_B64"))
+    _tf = tempfile.NamedTemporaryFile(mode="wb", suffix=".txt", delete=False)
+    _tf.write(_decoded)
+    _tf.close()
+    YDL_OPTIONS["cookiefile"] = _tf.name
+
+FFMPEG_OPTIONS = {"before_options": "-reconnect 1 -reconnect_streamed 1 -reconnect_delay_max 5", "options": "-vn"}
 SPOTIFY_DB_FILE = "spotify_stats.json"
 SPOTIFY_PER_PAGE = 15
 spotify_db_data: dict = {}
@@ -143,7 +168,41 @@ async def play(interaction: discord.Interaction, url: str):
             vid = actual_url.split("v=")[-1].split("?")[0].split("&")[0]
             if "youtu.be/" in actual_url: vid = actual_url.split("youtu.be/")[-1].split("?")[0]
             
-            piped_apis = ["https://pipedapi.kavin.rocks", "https://pipedapi.tokhmi.xyz", "https://pipedapi.smnz.de", "https://pi.ggtyler.dev"]
+            piped_apis = [
+                "https://pipedapi.moomoo.me",
+                "https://pipedapi.adminforge.de",
+                "https://pipedapi.mha.fi",
+                "https://api.piped.projectsegfault.com",
+            ]
+            for api in piped_apis:
+                try:
+                    req = urllib.request.Request(f"{api}/streams/{vid}", headers={"User-Agent": "Mozilla/5.0"})
+                    with urllib.request.urlopen(req, timeout=15) as resp:
+                        data = _json.loads(resp.read().decode('utf-8'))
+                        if "error" in data: raise ValueError(data["error"])
+                        streams = data.get("audioStreams", [])
+                        if streams:
+                            streams.sort(key=lambda x: x.get("bitrate", 0), reverse=True)
+                            return (f"https://youtube.com/watch?v={vid}", streams[0]["url"], data.get("title", "Unknown"), int(data.get("duration", 0)), data.get("thumbnailUrl"))
+                except Exception as e: proxy_errors.append(f"Piped {api}: {e}")
+                
+            inv_apis = [
+                "https://y.com.sb",
+                "https://iv.nboeck.de",
+                "https://iv.datura.network",
+                "https://invidious.perennialte.ch",
+            ]
+            for api in inv_apis:
+                try:
+                    req = urllib.request.Request(f"{api}/api/v1/videos/{vid}", headers={"User-Agent": "Mozilla/5.0"})
+                    with urllib.request.urlopen(req, timeout=15) as resp:
+                        data = _json.loads(resp.read().decode('utf-8'))
+                        formats = [f for f in data.get("adaptiveFormats", []) if f.get("type", "").startswith("audio/")]
+                        if formats:
+                            formats.sort(key=lambda x: int(x.get("bitrate", 0)), reverse=True)
+                            thumb = data.get("videoThumbnails", [{}])[0].get("url") if data.get("videoThumbnails") else None
+                            return (f"https://youtube.com/watch?v={vid}", formats[0]["url"], data.get("title", "Unknown"), int(data.get("lengthSeconds", 0)), thumb)
+                except Exception as e: proxy_errors.append(f"Inv {api}: {e}")
             for api in piped_apis:
                 try:
                     req = urllib.request.Request(f"{api}/streams/{vid}", headers={"User-Agent": "Mozilla/5.0"})
@@ -201,13 +260,24 @@ async def play(interaction: discord.Interaction, url: str):
                 except Exception as e:
                     last_err = e
             
-            raise ValueError(f"All sources failed or DRM protected. Proxy Errors: {proxy_errors}. Last yt-dlp error: {last_err}")
+            raise ValueError(
+                f"All sources failed or DRM protected.\n\n"
+                f"**Proxy Errors:** {proxy_errors}\n\n"
+                f"**Last yt-dlp error:** {last_err}\n\n"
+                f"**How to fix this:**\n"
+                f"YouTube is blocking your server's IP. You have 3 options:\n"
+                f"1. Use `/set_youtube_cookies` and upload a valid cookies.txt from a logged-in browser.\n"
+                f"2. Set a `YOUTUBE_PO_TOKEN` environment variable (best method).\n"
+                f"3. Set `YOUTUBE_COOKIES_B64` env var with base64-encoded cookies.\n"
+                f"See: https://github.com/yt-dlp/yt-dlp/wiki/PO-Token-Guide"
+            )
 
     try:
         loop = asyncio.get_running_loop()
         page_url, stream_url, title, duration, thumbnail = await loop.run_in_executor(None, _fetch)
     except Exception as e:
-        return await interaction.followup.send(f"❌ Could not fetch audio: `{e}`")
+        err_msg = str(e)
+        return await interaction.followup.send("❌ Could not fetch audio:\n```\n" + err_msg[:1900] + "\n```")
 
     vc = await bot._ensure_vc(interaction)
     if vc is None: return
