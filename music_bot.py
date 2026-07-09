@@ -23,7 +23,7 @@ class MusicQueue:
 
 YDL_OPTIONS = {
     "format": "bestaudio/best", "noplaylist": True, "quiet": True, "no_warnings": True,
-    "default_search": "ytsearch", "source_address": "0.0.0.0", "age_limit": 99,
+    "default_search": "scsearch5", "source_address": "0.0.0.0", "age_limit": 99,
     "extractor_args": {"youtube": {"skip": ["translated_subs"]}},
     "socket_timeout": 15,
 }
@@ -120,36 +120,64 @@ async def play(interaction: discord.Interaction, url: str):
     actual_url = url
     spotify_note = None
     
-    if "open.spotify.com/track" in url:
+    if "youtube.com" in url or "youtu.be" in url:
+        try:
+            import urllib.request, json as _json
+            noembed_api = f"https://noembed.com/embed?url={url}"
+            req = urllib.request.Request(noembed_api, headers={"User-Agent": "Mozilla/5.0"})
+            with urllib.request.urlopen(req, timeout=8) as resp:
+                meta = _json.loads(resp.read().decode('utf-8'))
+                track_title = meta.get("title", "")
+                if track_title: actual_url = f"scsearch5:{track_title}"
+        except Exception: pass
+    elif "open.spotify.com/track" in url:
         try:
             import urllib.request, json as _json
             oembed_api = f"https://open.spotify.com/oembed?url={url}"
             req = urllib.request.Request(oembed_api, headers={"User-Agent": "Mozilla/5.0"})
             with urllib.request.urlopen(req, timeout=8) as resp: meta = _json.loads(resp.read())
             track_title = meta.get("title", "")
-            if track_title:
-                actual_url = f"ytsearch1:{track_title}"
+            if track_title: 
+                actual_url = f"scsearch5:{track_title}"
                 spotify_note = track_title
-        except Exception: actual_url = f"ytsearch1:{url}"
+        except Exception: actual_url = f"scsearch5:{url}"
     elif not url.startswith("http"):
-        actual_url = f"ytsearch1:{url}"
+        actual_url = f"scsearch5:{url}"
 
     def _fetch():
         with yt_dlp.YoutubeDL(YDL_OPTIONS) as ydl:
-            info = ydl.extract_info(actual_url, download=False)
-            if "entries" in info: info = info["entries"][0]
-            stream_url = info.get("url")
-            if not stream_url:
-                formats = info.get("formats", [])
-                audio_only = [f for f in formats if not f.get("height") and f.get("url")]
-                if audio_only:
-                    audio_only.sort(key=lambda f: f.get("abr") or 0, reverse=True)
-                    stream_url = audio_only[0]["url"]
+            try:
+                if actual_url.startswith("scsearch"):
+                    flat_ydl = yt_dlp.YoutubeDL({**YDL_OPTIONS, "extract_flat": True})
+                    info = flat_ydl.extract_info(actual_url, download=False)
+                    urls_to_try = [e['url'] for e in info.get("entries", []) if e.get('url')]
+                    if not urls_to_try: urls_to_try = [actual_url]
                 else:
-                    for f in reversed(formats):
-                        if f.get("url"): stream_url = f["url"]; break
-            if not stream_url: raise ValueError("yt-dlp returned no playable URL for this track.")
-            return (info.get("webpage_url") or stream_url, stream_url, info.get("title", "Unknown"), info.get("duration", 0), info.get("thumbnail", None))
+                    urls_to_try = [actual_url]
+            except Exception:
+                urls_to_try = [actual_url]
+
+            last_err = None
+            for u in urls_to_try:
+                try:
+                    info = ydl.extract_info(u, download=False)
+                    if "entries" in info: info = info["entries"][0]
+                    stream_url = info.get("url")
+                    if not stream_url:
+                        formats = info.get("formats", [])
+                        audio_only = [f for f in formats if not f.get("height") and f.get("url")]
+                        if audio_only:
+                            audio_only.sort(key=lambda f: f.get("abr") or 0, reverse=True)
+                            stream_url = audio_only[0]["url"]
+                        else:
+                            for f in reversed(formats):
+                                if f.get("url"): stream_url = f["url"]; break
+                    if not stream_url: continue
+                    return (info.get("webpage_url") or stream_url, stream_url, info.get("title", "Unknown"), info.get("duration", 0), info.get("thumbnail", None))
+                except Exception as e:
+                    last_err = e
+            
+            raise ValueError(f"All sources failed or DRM protected. Last error: {last_err}")
 
     try:
         loop = asyncio.get_running_loop()
