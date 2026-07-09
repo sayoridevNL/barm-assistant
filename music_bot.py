@@ -135,6 +135,38 @@ async def play(interaction: discord.Interaction, url: str):
         actual_url = f"scsearch5:{url}"
 
     def _fetch():
+        import urllib.request, json as _json
+        
+        # If it's a YouTube URL, try to bypass IP blocks using Piped and Invidious APIs first
+        if "youtube.com" in actual_url or "youtu.be" in actual_url:
+            vid = actual_url.split("v=")[-1].split("?")[0].split("&")[0]
+            if "youtu.be/" in actual_url: vid = actual_url.split("youtu.be/")[-1].split("?")[0]
+            
+            piped_apis = ["https://pipedapi.kavin.rocks", "https://pipedapi.tokhmi.xyz", "https://pipedapi.smnz.de", "https://pi.ggtyler.dev"]
+            for api in piped_apis:
+                try:
+                    req = urllib.request.Request(f"{api}/streams/{vid}", headers={"User-Agent": "Mozilla/5.0"})
+                    with urllib.request.urlopen(req, timeout=5) as resp:
+                        data = _json.loads(resp.read().decode('utf-8'))
+                        streams = data.get("audioStreams", [])
+                        if streams:
+                            streams.sort(key=lambda x: x.get("bitrate", 0), reverse=True)
+                            return (f"https://youtube.com/watch?v={vid}", streams[0]["url"], data.get("title", "Unknown"), int(data.get("duration", 0)), data.get("thumbnailUrl"))
+                except Exception: pass
+                
+            inv_apis = ["https://invidious.nerdvpn.de", "https://inv.nadeko.net", "https://invidious.tiekoetter.com"]
+            for api in inv_apis:
+                try:
+                    req = urllib.request.Request(f"{api}/api/v1/videos/{vid}", headers={"User-Agent": "Mozilla/5.0"})
+                    with urllib.request.urlopen(req, timeout=5) as resp:
+                        data = _json.loads(resp.read().decode('utf-8'))
+                        formats = [f for f in data.get("adaptiveFormats", []) if f.get("type", "").startswith("audio/")]
+                        if formats:
+                            formats.sort(key=lambda x: int(x.get("bitrate", 0)), reverse=True)
+                            thumb = data.get("videoThumbnails", [{}])[0].get("url")
+                            return (f"https://youtube.com/watch?v={vid}", formats[0]["url"], data.get("title", "Unknown"), int(data.get("lengthSeconds", 0)), thumb)
+                except Exception: pass
+
         with yt_dlp.YoutubeDL(YDL_OPTIONS) as ydl:
             try:
                 if actual_url.startswith("scsearch"):
