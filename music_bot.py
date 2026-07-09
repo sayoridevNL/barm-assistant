@@ -47,18 +47,27 @@ if _visitor_data:
 
 YDL_OPTIONS["extractor_args"] = {"youtube": _youtube_extractor_args}
 
-# Cookie loading: file first, then base64 env var, then Render secret path
-if os.path.exists("cookies.txt") and os.path.getsize("cookies.txt") > 200:
-    YDL_OPTIONS["cookiefile"] = "cookies.txt"
-elif os.path.exists("/etc/secrets/cookies.txt") and os.path.getsize("/etc/secrets/cookies.txt") > 200:
-    YDL_OPTIONS["cookiefile"] = "/etc/secrets/cookies.txt"
-elif os.getenv("YOUTUBE_COOKIES_B64"):
+# Cookie loading: file first (if it has real YouTube cookies), then base64 env var, then Render secret path
+_cookie_files = [
+    ("cookies.txt", "cookies.txt"),
+    ("/etc/secrets/cookies.txt", "/etc/secrets/cookies.txt"),
+]
+if os.getenv("YOUTUBE_COOKIES_B64"):
     import base64, tempfile
     _decoded = base64.b64decode(os.getenv("YOUTUBE_COOKIES_B64"))
     _tf = tempfile.NamedTemporaryFile(mode="wb", suffix=".txt", delete=False)
     _tf.write(_decoded)
     _tf.close()
     YDL_OPTIONS["cookiefile"] = _tf.name
+else:
+    for _label, _path in _cookie_files:
+        if os.path.exists(_path) and os.path.getsize(_path) > 200:
+            # Verify it has actual YouTube cookie content, not just a stub/readme
+            with open(_path, "r", encoding="utf-8", errors="ignore") as _f:
+                _content = _f.read()
+            if ".youtube.com" in _content or "VISITOR_INFO1_LIVE" in _content or "__Secure-1PSID" in _content:
+                YDL_OPTIONS["cookiefile"] = _path
+                break
 
 FFMPEG_OPTIONS = {"before_options": "-reconnect 1 -reconnect_streamed 1 -reconnect_delay_max 5", "options": "-vn"}
 SPOTIFY_DB_FILE = "spotify_stats.json"
