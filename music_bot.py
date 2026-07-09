@@ -267,6 +267,27 @@ async def play(interaction: discord.Interaction, url: str):
                         break
                 proxy_errors.append(f"yt-dlp ({u}): {last_err}")
 
+            # Implement silent fallback to SoundCloud for YouTube URLs
+            if ("youtube.com" in actual_url or "youtu.be" in actual_url) and not actual_url.startswith("scsearch"):
+                try:
+                    noembed_api = f"https://noembed.com/embed?url={actual_url}"
+                    req = urllib.request.Request(noembed_api, headers={"User-Agent": "Mozilla/5.0"})
+                    with urllib.request.urlopen(req, timeout=5) as resp: meta = _json.loads(resp.read())
+                    yt_title = meta.get("title", "")
+                    if yt_title:
+                        flat_ydl = yt_dlp.YoutubeDL({**YDL_OPTIONS, "extract_flat": True})
+                        sc_info = flat_ydl.extract_info(f"scsearch5:{yt_title}", download=False)
+                        for e in sc_info.get("entries", []):
+                            if not e.get("url"): continue
+                            try:
+                                with yt_dlp.YoutubeDL(YDL_OPTIONS) as retry_ydl:
+                                    track_info = retry_ydl.extract_info(e['url'], download=False)
+                                stream_url = track_info.get("url")
+                                if stream_url:
+                                    return (url, stream_url, yt_title + " (SoundCloud Fallback)", int(track_info.get("duration", 0)), track_info.get("thumbnail"))
+                            except Exception: pass
+                except Exception as e: proxy_errors.append(f"Soundcloud Fallback failed: {e}")
+
             raise ValueError(
                 f"All sources failed or DRM protected.\n\n"
                 f"**Proxy Errors:** {proxy_errors}\n\n"
