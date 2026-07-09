@@ -32,7 +32,7 @@ YDL_OPTIONS = {
 
 # Build YouTube extractor args dynamically
 _youtube_extractor_args: dict = {
-    "player_client": ["android", "web", "ios"],
+    "player_client": ["android_vr", "web_creator", "tv"],
     "player_skip": ["webpage"],
     "skip": ["translated_subs"],
 }
@@ -47,11 +47,11 @@ if _visitor_data:
 
 YDL_OPTIONS["extractor_args"] = {"youtube": _youtube_extractor_args}
 
-# Cookie loading: file first (if it has real YouTube cookies), then base64 env var, then Render secret path
-_cookie_files = [
-    ("cookies.txt", "cookies.txt"),
-    ("/etc/secrets/cookies.txt", "/etc/secrets/cookies.txt"),
-]
+# Cookie loading: try env var first (uncompressed to temp file), then check for real YouTube cookies in local files
+# Use an absolute path to avoid working-directory mismatches between the Flask parent and bot subprocess
+_app_dir = os.path.dirname(os.path.abspath(__file__))
+_cookie_path = os.path.join(_app_dir, "cookies.txt")
+
 if os.getenv("YOUTUBE_COOKIES_B64"):
     import base64, tempfile
     _decoded = base64.b64decode(os.getenv("YOUTUBE_COOKIES_B64"))
@@ -59,15 +59,17 @@ if os.getenv("YOUTUBE_COOKIES_B64"):
     _tf.write(_decoded)
     _tf.close()
     YDL_OPTIONS["cookiefile"] = _tf.name
-else:
-    for _label, _path in _cookie_files:
-        if os.path.exists(_path) and os.path.getsize(_path) > 200:
-            # Verify it has actual YouTube cookie content, not just a stub/readme
-            with open(_path, "r", encoding="utf-8", errors="ignore") as _f:
-                _content = _f.read()
-            if ".youtube.com" in _content or "VISITOR_INFO1_LIVE" in _content or "__Secure-1PSID" in _content:
-                YDL_OPTIONS["cookiefile"] = _path
-                break
+elif os.path.exists(_cookie_path) and os.path.getsize(_cookie_path) > 200:
+    with open(_cookie_path, "r", encoding="utf-8", errors="ignore") as _f:
+        _content = _f.read()
+    if ".youtube.com" in _content or "VISITOR_INFO1_LIVE" in _content or "__Secure-1PSID" in _content:
+        YDL_OPTIONS["cookiefile"] = _cookie_path
+        print(f"[music_bot] Using cookies from {_cookie_path} ({os.path.getsize(_cookie_path)} bytes)")
+elif os.path.exists("/etc/secrets/cookies.txt") and os.path.getsize("/etc/secrets/cookies.txt") > 200:
+    YDL_OPTIONS["cookiefile"] = "/etc/secrets/cookies.txt"
+
+if "cookiefile" in YDL_OPTIONS:
+    print(f"[music_bot] yt-dlp cookies: {YDL_OPTIONS['cookiefile']}")
 
 FFMPEG_OPTIONS = {"before_options": "-reconnect 1 -reconnect_streamed 1 -reconnect_delay_max 5", "options": "-vn"}
 SPOTIFY_DB_FILE = "spotify_stats.json"
@@ -317,10 +319,16 @@ async def set_youtube_cookies(interaction: discord.Interaction, cookie_file: dis
     await interaction.response.defer(ephemeral=True)
     try:
         content = await cookie_file.read()
-        with open("cookies.txt", "wb") as f:
+        # Write to the same absolute path the cookie loader uses, so both Flask and bot can find it
+        _cookie_path = os.path.join(os.path.dirname(os.path.abspath(__file__)), "cookies.txt")
+        with open(_cookie_path, "wb") as f:
             f.write(content)
-        YDL_OPTIONS["cookiefile"] = "cookies.txt"
-        await interaction.followup.send("✅ **YouTube Cookies successfully installed!**\nyt-dlp has been updated. Try playing a song now!")
+        YDL_OPTIONS["cookiefile"] = _cookie_path
+        await interaction.followup.send(
+            f"✅ **YouTube Cookies successfully installed!**\n"
+            f"Written to `{_cookie_path}` ({len(content)} bytes)\n"
+            f"yt-dlp will use these cookies on the next song. Try `/play`!"
+        )
     except Exception as e:
         await interaction.followup.send(f"❌ Failed to process cookies: `{e}`")
 
