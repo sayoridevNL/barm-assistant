@@ -29,6 +29,8 @@ YDL_OPTIONS = {
 }
 if os.path.exists("cookies.txt"):
     YDL_OPTIONS["cookiefile"] = "cookies.txt"
+elif os.path.exists("/etc/secrets/cookies.txt"):
+    YDL_OPTIONS["cookiefile"] = "/etc/secrets/cookies.txt"
 FFMPEG_OPTIONS = {"before_options": "-reconnect 1 -reconnect_streamed 1 -reconnect_delay_max 5", "options": "-vn"}
 
 SPOTIFY_DB_FILE = "spotify_stats.json"
