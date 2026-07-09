@@ -138,6 +138,7 @@ async def play(interaction: discord.Interaction, url: str):
         import urllib.request, json as _json
         
         # If it's a YouTube URL, try to bypass IP blocks using Piped and Invidious APIs first
+        proxy_errors = []
         if "youtube.com" in actual_url or "youtu.be" in actual_url:
             vid = actual_url.split("v=")[-1].split("?")[0].split("&")[0]
             if "youtu.be/" in actual_url: vid = actual_url.split("youtu.be/")[-1].split("?")[0]
@@ -146,26 +147,27 @@ async def play(interaction: discord.Interaction, url: str):
             for api in piped_apis:
                 try:
                     req = urllib.request.Request(f"{api}/streams/{vid}", headers={"User-Agent": "Mozilla/5.0"})
-                    with urllib.request.urlopen(req, timeout=5) as resp:
+                    with urllib.request.urlopen(req, timeout=15) as resp:
                         data = _json.loads(resp.read().decode('utf-8'))
+                        if "error" in data: raise ValueError(data["error"])
                         streams = data.get("audioStreams", [])
                         if streams:
                             streams.sort(key=lambda x: x.get("bitrate", 0), reverse=True)
                             return (f"https://youtube.com/watch?v={vid}", streams[0]["url"], data.get("title", "Unknown"), int(data.get("duration", 0)), data.get("thumbnailUrl"))
-                except Exception: pass
+                except Exception as e: proxy_errors.append(f"Piped {api}: {e}")
                 
             inv_apis = ["https://invidious.nerdvpn.de", "https://inv.nadeko.net", "https://invidious.tiekoetter.com"]
             for api in inv_apis:
                 try:
                     req = urllib.request.Request(f"{api}/api/v1/videos/{vid}", headers={"User-Agent": "Mozilla/5.0"})
-                    with urllib.request.urlopen(req, timeout=5) as resp:
+                    with urllib.request.urlopen(req, timeout=15) as resp:
                         data = _json.loads(resp.read().decode('utf-8'))
                         formats = [f for f in data.get("adaptiveFormats", []) if f.get("type", "").startswith("audio/")]
                         if formats:
                             formats.sort(key=lambda x: int(x.get("bitrate", 0)), reverse=True)
-                            thumb = data.get("videoThumbnails", [{}])[0].get("url")
+                            thumb = data.get("videoThumbnails", [{}])[0].get("url") if data.get("videoThumbnails") else None
                             return (f"https://youtube.com/watch?v={vid}", formats[0]["url"], data.get("title", "Unknown"), int(data.get("lengthSeconds", 0)), thumb)
-                except Exception: pass
+                except Exception as e: proxy_errors.append(f"Inv {api}: {e}")
 
         with yt_dlp.YoutubeDL(YDL_OPTIONS) as ydl:
             try:
@@ -199,7 +201,7 @@ async def play(interaction: discord.Interaction, url: str):
                 except Exception as e:
                     last_err = e
             
-            raise ValueError(f"All sources failed or DRM protected. Last error: {last_err}")
+            raise ValueError(f"All sources failed or DRM protected. Proxy Errors: {proxy_errors}. Last yt-dlp error: {last_err}")
 
     try:
         loop = asyncio.get_running_loop()
