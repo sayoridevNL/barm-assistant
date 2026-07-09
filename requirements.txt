@@ -1,9 +1,8 @@
 discord.py[voice]
-yt-dlp
 Pillow
 aiohttp
 Flask
-bgutil-ytdlp-pot-provider
 python-dotenv
 gunicorn
 pilmoji
+wavelink
