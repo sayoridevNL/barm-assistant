@@ -71,6 +71,11 @@ if not os.path.exists(LOCK_FILE):
 
 @app.route('/')
 def index():
+    # Watchdog: Pinging the website automatically restarts any dead bots
+    with bot_lock:
+        for bot in BOTS:
+            if not is_bot_running(bot):
+                start_single_bot(bot)
     return render_template('index.html')
 
 @app.route('/api/login', methods=['POST'])
