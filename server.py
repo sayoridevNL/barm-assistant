@@ -3,14 +3,19 @@ import subprocess
 import sys
 import json
 import threading
-from flask import Flask, request, jsonify, render_template, session, send_from_directory
+from flask import Flask, request, jsonify, render_template, session, send_from_directory, redirect
+import requests
 from dotenv import load_dotenv
 
 load_dotenv()
 
 app = Flask(__name__, static_folder='static', template_folder='templates')
 app.secret_key = os.getenv('FLASK_SECRET_KEY', os.urandom(24))
-ADMIN_PASSWORD = os.getenv('ADMIN_PASSWORD', 'admin123')
+
+DISCORD_CLIENT_ID = os.getenv('DISCORD_CLIENT_ID')
+DISCORD_CLIENT_SECRET = os.getenv('DISCORD_CLIENT_SECRET')
+DISCORD_REDIRECT_URI = os.getenv('DISCORD_REDIRECT_URI', 'http://localhost:5000/api/auth/callback')
+ADMIN_IDS = ["1043235209639886972", "1480592862734323763"]
 
 BOTS = [
     "music_bot",
@@ -76,24 +81,102 @@ def index():
         for bot in BOTS:
             if not is_bot_running(bot):
                 start_single_bot(bot)
-    return render_template('index.html')
+    
+    return render_template('index.html', user_id=session.get('user_id'), username=session.get('username'), avatar=session.get('avatar'), is_admin=is_admin())
 
-@app.route('/api/login', methods=['POST'])
+def is_admin():
+    return session.get('user_id') in ADMIN_IDS
+
+@app.route('/api/auth/login')
 def login():
-    data = request.json
-    if data.get('password') == ADMIN_PASSWORD:
-        session['authenticated'] = True
-        return jsonify({'success': True})
-    return jsonify({'success': False, 'message': 'Invalid password'}), 401
+    if not DISCORD_CLIENT_ID:
+        return "Discord OAuth not configured", 500
+    
+    auth_url = f"https://discord.com/api/oauth2/authorize?client_id={DISCORD_CLIENT_ID}&redirect_uri={requests.utils.quote(DISCORD_REDIRECT_URI)}&response_type=code&scope=identify"
+    return redirect(auth_url)
 
-@app.route('/api/logout', methods=['POST'])
+@app.route('/api/auth/callback')
+def callback():
+    code = request.args.get('code')
+    if not code:
+        return "Missing code", 400
+        
+    data = {
+        'client_id': DISCORD_CLIENT_ID,
+        'client_secret': DISCORD_CLIENT_SECRET,
+        'grant_type': 'authorization_code',
+        'code': code,
+        'redirect_uri': DISCORD_REDIRECT_URI
+    }
+    
+    headers = {
+        'Content-Type': 'application/x-www-form-urlencoded'
+    }
+    
+    r = requests.post('https://discord.com/api/oauth2/token', data=data, headers=headers)
+    if not r.ok:
+        return f"Failed to get token: {r.text}", 400
+        
+    token_data = r.json()
+    access_token = token_data['access_token']
+    
+    user_r = requests.get('https://discord.com/api/users/@me', headers={
+        'Authorization': f"Bearer {access_token}"
+    })
+    
+    if not user_r.ok:
+        return "Failed to get user info", 400
+        
+    user_data = user_r.json()
+    session['user_id'] = user_data['id']
+    session['username'] = user_data['username']
+    session['avatar'] = user_data.get('avatar')
+    
+    return redirect('/')
+
+@app.route('/api/auth/logout')
 def logout():
-    session.pop('authenticated', None)
-    return jsonify({'success': True})
+    session.clear()
+    return redirect('/')
+
+@app.route('/api/user/stats')
+def user_stats():
+    user_id = session.get('user_id')
+    if not user_id:
+        return jsonify({'error': 'Unauthorized'}), 401
+        
+    try:
+        with open('data/global.json', 'r', encoding='utf-8') as f:
+            g_data = json.load(f)
+    except:
+        g_data = {}
+        
+    quotes = g_data.get('quotes', {}).get(user_id, {}).get('stars', 0)
+    sayories = g_data.get('economy', {}).get(user_id, {}).get('balance', 0)
+    
+    try:
+        with open('data/global.json', 'r', encoding='utf-8') as f:
+            uma_data = json.load(f).get('uma_inventory', {})
+    except:
+        uma_data = {}
+        
+    umas = len(uma_data.get(user_id, {}).get('umas', []))
+    
+    return jsonify({
+        'user_id': user_id,
+        'username': session.get('username'),
+        'avatar': session.get('avatar'),
+        'is_admin': is_admin(),
+        'stats': {
+            'quotes': quotes,
+            'sayories': sayories,
+            'umamusume': umas
+        }
+    })
 
 @app.route('/api/status', methods=['GET'])
 def get_status():
-    if not session.get('authenticated'):
+    if not is_admin():
         return jsonify({'error': 'Unauthorized'}), 401
     
     statuses = {bot: is_bot_running(bot) for bot in BOTS}
@@ -101,7 +184,7 @@ def get_status():
 
 @app.route('/api/start/<bot_name>', methods=['POST'])
 def start_bot_route(bot_name):
-    if not session.get('authenticated'):
+    if not is_admin():
         return jsonify({'error': 'Unauthorized'}), 401
     if bot_name not in BOTS:
         return jsonify({'success': False, 'message': 'Invalid bot name'}), 400
@@ -112,7 +195,7 @@ def start_bot_route(bot_name):
 
 @app.route('/api/stop/<bot_name>', methods=['POST'])
 def stop_bot_route(bot_name):
-    if not session.get('authenticated'):
+    if not is_admin():
         return jsonify({'error': 'Unauthorized'}), 401
     if bot_name not in BOTS:
         return jsonify({'success': False, 'message': 'Invalid bot name'}), 400
@@ -123,7 +206,7 @@ def stop_bot_route(bot_name):
 
 @app.route('/api/presence/<bot_name>', methods=['POST'])
 def set_presence(bot_name):
-    if not session.get('authenticated'):
+    if not is_admin():
         return jsonify({'error': 'Unauthorized'}), 401
     if bot_name not in BOTS:
         return jsonify({'success': False, 'message': 'Invalid bot name'}), 400
@@ -151,7 +234,7 @@ def set_presence(bot_name):
 
 @app.route('/api/presence', methods=['GET'])
 def get_presences():
-    if not session.get('authenticated'):
+    if not is_admin():
         return jsonify({'error': 'Unauthorized'}), 401
         
     try:
@@ -166,13 +249,13 @@ def get_presences():
 
 @app.route('/api/files', methods=['GET'])
 def list_files():
-    if not session.get('authenticated'): return jsonify({'success': False}), 401
+    if not is_admin(): return jsonify({'success': False}), 401
     files = [f for f in os.listdir('.') if f.endswith('.py') or f.endswith('.txt')]
     return jsonify({'files': sorted(files)})
 
 @app.route('/api/files/<path:filename>', methods=['GET'])
 def get_file(filename):
-    if not session.get('authenticated'):
+    if not is_admin():
         return jsonify({'error': 'Unauthorized'}), 401
     
     if not filename.endswith('.py') or '..' in filename:
@@ -187,7 +270,7 @@ def get_file(filename):
 
 @app.route('/api/files/<path:filename>', methods=['POST'])
 def save_file(filename):
-    if not session.get('authenticated'):
+    if not is_admin():
         return jsonify({'error': 'Unauthorized'}), 401
         
     if not filename.endswith('.py') or '..' in filename:

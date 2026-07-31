@@ -18,6 +18,7 @@ REQUIRED_PACKAGES = [
     ("pilmoji", "pilmoji"),
     ("wavelink", "wavelink"),
     ("dotenv", "python-dotenv"),
+    ("requests", "requests"),
 ]
 
 def ensure_packages_installed():

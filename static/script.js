@@ -38,62 +38,69 @@ document.addEventListener('DOMContentLoaded', () => {
         "general_bot": "fa-robot"
     };
 
-    // --- Authentication ---
-    loginBtn.addEventListener('click', async () => {
-        const password = passwordInput.value;
-        const btnText = loginBtn.querySelector('span');
-        btnText.innerText = 'Authenticating...';
-        
-        try {
-            const res = await fetch('/api/login', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ password })
-            });
-            const data = await res.json();
-            
-            if (data.success) {
-                showDashboard();
-            } else {
-                loginError.classList.remove('hidden');
-                setTimeout(() => loginError.classList.add('hidden'), 3000);
-            }
-        } catch (err) {
-            console.error(err);
-        } finally {
-            btnText.innerText = 'Authenticate';
-        }
-    });
-
-    passwordInput.addEventListener('keypress', (e) => {
-        if (e.key === 'Enter') loginBtn.click();
-    });
-
-    logoutBtn.addEventListener('click', async () => {
-        await fetch('/api/logout', { method: 'POST' });
+    // --- Authentication & Initialization ---
+    if (typeof USER_ID !== 'undefined' && USER_ID) {
+        // User is logged in via Discord
+        showDashboard();
+    } else {
         showLogin();
-    });
+    }
 
     // --- Dashboard logic ---
     function showDashboard() {
         loginScreen.classList.add('hidden');
         dashboardScreen.classList.remove('hidden');
-        loginError.classList.add('hidden');
-        passwordInput.value = '';
         
-        initBotCards();
-        fetchStatus();
-        fetchPresences();
-        fetchFiles();
+        // Populate User Info
+        document.getElementById('profile-img').src = AVATAR_URL;
+        document.getElementById('profile-name').innerText = USERNAME || 'User';
         
-        // Poll status every 5 seconds
-        statusInterval = setInterval(fetchStatus, 5000);
+        // Hide admin tabs if not admin
+        if (!IS_ADMIN) {
+            document.querySelectorAll('.admin-only').forEach(el => el.style.display = 'none');
+        }
+        
+        // Tab Switching Logic
+        document.querySelectorAll('.tab-btn').forEach(btn => {
+            btn.addEventListener('click', (e) => {
+                document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+                document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
+                
+                btn.classList.add('active');
+                document.getElementById(btn.dataset.target).classList.add('active');
+            });
+        });
+        
+        fetchUserStats();
+        
+        if (IS_ADMIN) {
+            initBotCards();
+            fetchStatus();
+            fetchPresences();
+            fetchFiles();
+            // Poll status every 5 seconds
+            statusInterval = setInterval(fetchStatus, 5000);
+        }
     }
 
     function showLogin() {
         dashboardScreen.classList.add('hidden');
         loginScreen.classList.remove('hidden');
-        clearInterval(statusInterval);
+        if (typeof statusInterval !== 'undefined') clearInterval(statusInterval);
+    }
+    
+    async function fetchUserStats() {
+        try {
+            const res = await fetch('/api/user/stats');
+            const data = await res.json();
+            if (data.stats) {
+                document.getElementById('stat-sayories').innerText = data.stats.sayories.toLocaleString();
+                document.getElementById('stat-quotes').innerText = data.stats.quotes.toLocaleString();
+                document.getElementById('stat-umas').innerText = data.stats.umamusume.toLocaleString();
+            }
+        } catch (e) {
+            console.error('Failed to fetch user stats:', e);
+        }
     }
 
     // --- Bot Cards UI ---

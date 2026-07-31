@@ -12,6 +12,33 @@
     <!-- CodeMirror for Code Editing -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.13/codemirror.min.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.13/theme/dracula.min.css">
+    <script>
+        const USER_ID = {{ user_id | tojson | safe }};
+        const USERNAME = {{ username | tojson | safe }};
+        const AVATAR_HASH = {{ avatar | tojson | safe }};
+        const IS_ADMIN = {{ is_admin | tojson | safe }};
+        const AVATAR_URL = AVATAR_HASH ? `https://cdn.discordapp.com/avatars/${USER_ID}/${AVATAR_HASH}.png` : 'https://cdn.discordapp.com/embed/avatars/0.png';
+    </script>
+    <style>
+        .tabs { display: flex; gap: 1rem; margin-bottom: 2rem; border-bottom: 1px solid rgba(255,255,255,0.1); padding-bottom: 1rem; }
+        .tab-btn { background: none; border: none; color: #aaa; font-family: inherit; font-size: 1.1rem; cursor: pointer; padding: 0.5rem 1rem; border-radius: 8px; transition: all 0.3s; }
+        .tab-btn:hover { color: #fff; background: rgba(255,255,255,0.05); }
+        .tab-btn.active { color: #fff; background: rgba(255,255,255,0.1); font-weight: 600; }
+        .tab-content { display: none; }
+        .tab-content.active { display: block; }
+        
+        .stats-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 1.5rem; }
+        .stat-card { background: rgba(20, 20, 25, 0.6); border: 1px solid rgba(255,255,255,0.05); border-radius: 12px; padding: 1.5rem; text-align: center; }
+        .stat-value { font-size: 2.5rem; font-weight: 700; margin: 1rem 0 0.5rem 0; color: #fff; }
+        .stat-label { color: #aaa; font-size: 0.9rem; text-transform: uppercase; letter-spacing: 1px; }
+        
+        .profile-header { display: flex; align-items: center; gap: 1.5rem; margin-bottom: 2rem; }
+        .profile-avatar { width: 80px; height: 80px; border-radius: 50%; border: 3px solid var(--primary-color); }
+        .profile-name { font-size: 2rem; margin: 0; }
+        
+        .discord-btn { background-color: #5865F2; color: white; display: flex; align-items: center; justify-content: center; gap: 0.75rem; text-decoration: none; border-radius: 8px; font-weight: 600; padding: 0.75rem 1.5rem; font-size: 1.1rem; transition: background 0.3s; width: 100%; cursor: pointer; border: none; }
+        .discord-btn:hover { background-color: #4752C4; }
+    </style>
 </head>
 <body>
     <div id="background-gradient">
@@ -27,18 +54,11 @@
                 <div class="login-header">
                     <i class="fa-solid fa-robot brand-icon"></i>
                     <h1>Barm OS</h1>
-                    <p>Enter master credentials to access the fleet.</p>
+                    <p>Log in with Discord to access the dashboard.</p>
                 </div>
-                <div class="input-group">
-                    <i class="fa-solid fa-lock input-icon"></i>
-                    <input type="password" id="password-input" placeholder="Master Password">
-                </div>
-                <button id="login-btn" class="primary-btn glow-effect">
-                    <span>Authenticate</span> <i class="fa-solid fa-arrow-right"></i>
+                <button onclick="window.location.href='/api/auth/login'" class="discord-btn glow-effect">
+                    <i class="fa-brands fa-discord"></i> Login with Discord
                 </button>
-                <div id="login-error" class="error-toast hidden">
-                    <i class="fa-solid fa-triangle-exclamation"></i> Invalid password
-                </div>
             </div>
         </div>
 
@@ -52,45 +72,82 @@
                     <div class="status-pill global-status">
                         <div class="pulse-dot"></div> System Online
                     </div>
-                    <button id="logout-btn" class="icon-btn" title="Logout">
+                    <button id="logout-btn" onclick="window.location.href='/api/auth/logout'" class="icon-btn" title="Logout">
                         <i class="fa-solid fa-power-off"></i>
                     </button>
                 </div>
             </nav>
 
             <main class="dashboard-content">
-                
-                <div class="section-header">
-                    <h2><i class="fa-solid fa-server"></i> Fleet Command</h2>
-                    <p class="section-desc">Manage your decentralized bot network in real-time.</p>
+                <div class="tabs">
+                    <button class="tab-btn active" data-target="stats-tab"><i class="fa-solid fa-user"></i> My Stats</button>
+                    <button class="tab-btn admin-only" data-target="fleet-tab"><i class="fa-solid fa-server"></i> Fleet Command</button>
+                    <button class="tab-btn admin-only" data-target="dev-tab"><i class="fa-solid fa-code"></i> Developer Console</button>
                 </div>
                 
-                <div class="bots-grid" id="bots-grid">
-                    <!-- Bot cards will be injected here by JS -->
+                <!-- Stats Tab -->
+                <div id="stats-tab" class="tab-content active">
+                    <div class="profile-header">
+                        <img id="profile-img" src="" class="profile-avatar">
+                        <div>
+                            <h2 class="profile-name" id="profile-name">User</h2>
+                            <p style="color: #aaa; margin: 0.25rem 0 0 0;">View your global economy and stats</p>
+                        </div>
+                    </div>
+                    <div class="stats-grid">
+                        <div class="stat-card glow-effect" style="border-top: 4px solid #FFD700">
+                            <i class="fa-solid fa-coins fa-2x" style="color: #FFD700"></i>
+                            <div class="stat-value" id="stat-sayories">0</div>
+                            <div class="stat-label">Sayories</div>
+                        </div>
+                        <div class="stat-card glow-effect" style="border-top: 4px solid #FF69B4">
+                            <i class="fa-solid fa-quote-right fa-2x" style="color: #FF69B4"></i>
+                            <div class="stat-value" id="stat-quotes">0</div>
+                            <div class="stat-label">Quote Stars</div>
+                        </div>
+                        <div class="stat-card glow-effect" style="border-top: 4px solid #B983FF">
+                            <i class="fa-solid fa-horse-head fa-2x" style="color: #B983FF"></i>
+                            <div class="stat-value" id="stat-umas">0</div>
+                            <div class="stat-label">Umamusume Collected</div>
+                        </div>
+                    </div>
                 </div>
 
-                <div class="section-header mt-8">
-                    <h2><i class="fa-solid fa-code"></i> Developer Console</h2>
-                    <p class="section-desc">Live-edit your application source code.</p>
+                <!-- Fleet Command Tab -->
+                <div id="fleet-tab" class="tab-content admin-only">
+                    <div class="section-header">
+                        <h2><i class="fa-solid fa-server"></i> Fleet Command</h2>
+                        <p class="section-desc">Manage your decentralized bot network in real-time.</p>
+                    </div>
+                    <div class="bots-grid" id="bots-grid">
+                        <!-- Bot cards will be injected here by JS -->
+                    </div>
                 </div>
-                
-                <div class="glass-panel editor-panel">
-                    <div class="editor-header">
-                        <div class="file-selector">
-                            <i class="fa-regular fa-file-code"></i>
-                            <select id="file-select">
-                                <option value="">Select a file to edit...</option>
-                            </select>
+
+                <!-- Developer Console Tab -->
+                <div id="dev-tab" class="tab-content admin-only">
+                    <div class="section-header mt-8">
+                        <h2><i class="fa-solid fa-code"></i> Developer Console</h2>
+                        <p class="section-desc">Live-edit your application source code.</p>
+                    </div>
+                    <div class="glass-panel editor-panel">
+                        <div class="editor-header">
+                            <div class="file-selector">
+                                <i class="fa-regular fa-file-code"></i>
+                                <select id="file-select">
+                                    <option value="">Select a file to edit...</option>
+                                </select>
+                            </div>
+                            <button id="save-btn" class="primary-btn sm-btn" disabled>
+                                <i class="fa-solid fa-floppy-disk"></i> Save Changes
+                            </button>
                         </div>
-                        <button id="save-btn" class="primary-btn sm-btn" disabled>
-                            <i class="fa-solid fa-floppy-disk"></i> Save Changes
-                        </button>
-                    </div>
-                    <div class="editor-container">
-                        <textarea id="code-editor"></textarea>
-                    </div>
-                    <div id="save-msg" class="success-toast hidden">
-                        <i class="fa-solid fa-check-circle"></i> File saved successfully!
+                        <div class="editor-container">
+                            <textarea id="code-editor"></textarea>
+                        </div>
+                        <div id="save-msg" class="success-toast hidden">
+                            <i class="fa-solid fa-check-circle"></i> File saved successfully!
+                        </div>
                     </div>
                 </div>
             </main>
