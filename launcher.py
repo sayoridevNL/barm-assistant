@@ -12,11 +12,12 @@ if hasattr(sys.stdout, 'reconfigure'):
 
 REQUIRED_PACKAGES = [
     ("discord", "discord.py"),
-    ("yt_dlp", "yt-dlp"),
     ("PIL", "Pillow"),
     ("aiohttp", "aiohttp"),
     ("nacl", "PyNaCl"),
     ("pilmoji", "pilmoji"),
+    ("wavelink", "wavelink"),
+    ("dotenv", "python-dotenv"),
 ]
 
 def ensure_packages_installed():

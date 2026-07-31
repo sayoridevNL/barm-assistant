@@ -295,3 +295,8 @@ async def spotify_top(interaction: discord.Interaction, user: _Optional[discord.
     await interaction.response.send_message(embed=embed)
 
 spotify_load_or_create_db()
+
+if __name__ == "__main__":
+    from dotenv import load_dotenv
+    load_dotenv()
+    bot.run(os.getenv("DISCORD_BOT_TOKEN"))
