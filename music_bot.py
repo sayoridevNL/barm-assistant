@@ -25,8 +25,8 @@ class MusicBot(commands.Bot):
 
     async def setup_hook(self):
         # Configure the public Lavalink node
-        uri = os.getenv("LAVALINK_URI", "https://lavalink.darrennathanael.com") # Note: Usually port 443 with HTTPS
-        password = os.getenv("LAVALINK_PASSWORD", "youshallnotpass")
+        uri = os.getenv("LAVALINK_URI", "https://lava-v4.ajourney.dev:443")
+        password = os.getenv("LAVALINK_PASSWORD", "maybeiwasboring")
         
         # Connect to NodePool
         node = wavelink.Node(uri=uri, password=password)
