@@ -207,6 +207,35 @@ def get_discord_username(uid):
     except: pass
     return f"User {uid}"
 
+@app.route('/api/admin/publish_embed', methods=['POST'])
+def publish_embed():
+    if not is_admin():
+        return jsonify({'error': 'Unauthorized'}), 401
+    
+    data = request.json
+    title = data.get('title', '').strip()
+    desc = data.get('desc', '').strip()
+    color = data.get('color', '').strip()
+    image = data.get('image', '').strip()
+    footer = data.get('footer', '').strip()
+
+    if not title and not desc:
+        return jsonify({'error': 'Title or description required'}), 400
+
+    if mongo_db is not None:
+        import time
+        mongo_db.broadcast_queue.insert_one({
+            'title': title,
+            'desc': desc,
+            'color': color,
+            'image': image,
+            'footer': footer,
+            'timestamp': int(time.time())
+        })
+        return jsonify({'message': 'Broadcast queued successfully!'})
+    else:
+        return jsonify({'error': 'MongoDB is not connected. Broadcasts require MongoDB.'}), 500
+
 @app.route('/api/leaderboards', methods=['GET'])
 def get_leaderboards():
     if not session.get('user_id'): return jsonify({'error': 'Unauthorized'}), 401

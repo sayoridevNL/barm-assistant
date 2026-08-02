@@ -6,7 +6,7 @@ import time
 
 import discord
 from discord import app_commands
-from discord.ext import commands
+from discord.ext import commands, tasks
 
 from shared import *
 from theme import EmbedBuilder, Palette
@@ -192,6 +192,43 @@ class GeneralBot(commands.Bot):
         print_banner("general", self)
         asyncio.create_task(_send_server_list_to_owner(self))
         await self.change_presence(activity=discord.CustomActivity(name=BOT_INFO["general"]["status"]))
+        
+        if not self.broadcast_task.is_running():
+            self.broadcast_task.start()
+
+    @tasks.loop(seconds=10)
+    async def broadcast_task(self):
+        db = _get_mongo_db()
+        if db is None: return
+        
+        async for broadcast in db.broadcast_queue.find():
+            b_id = broadcast["_id"]
+            title = broadcast.get("title", "")
+            desc = broadcast.get("desc", "")
+            color_hex = broadcast.get("color", "")
+            image_url = broadcast.get("image", "")
+            footer = broadcast.get("footer", "")
+            
+            color = Palette.PRIMARY
+            if color_hex and color_hex.startswith("#"):
+                try: color = int(color_hex[1:], 16)
+                except: pass
+                
+            embed = discord.Embed(title=title, description=desc, color=color)
+            if image_url: embed.set_image(url=image_url)
+            if footer: embed.set_footer(text=footer)
+            
+            for guild in self.guilds:
+                for channel in guild.text_channels:
+                    perms = channel.permissions_for(guild.me)
+                    if perms.send_messages and perms.view_channel:
+                        try:
+                            await channel.send(embed=embed)
+                            break
+                        except Exception:
+                            continue
+                            
+            await db.broadcast_queue.delete_one({"_id": b_id})
 
 bot = GeneralBot()
 tree = bot.tree

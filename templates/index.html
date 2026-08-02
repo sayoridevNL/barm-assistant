@@ -88,6 +88,7 @@
                     <button class="tab-btn" data-target="umas-tab"><i class="fa-solid fa-horse-head"></i> My Uma Trainees</button>
                     <button class="tab-btn" data-target="quotes-tab"><i class="fa-solid fa-quote-left"></i> My Quotes</button>
                     <button class="tab-btn admin-only" data-target="fleet-tab"><i class="fa-solid fa-server"></i> Fleet Command</button>
+                    <button class="tab-btn admin-only" data-target="broadcast-tab"><i class="fa-solid fa-bullhorn"></i> Global Broadcast</button>
                     <button class="tab-btn admin-only" data-target="dev-tab"><i class="fa-solid fa-code"></i> Developer Console</button>
                 </div>
                 
@@ -171,6 +172,41 @@
                     </div>
                     <div class="bots-grid" id="bots-grid">
                         <!-- Bot cards will be injected here by JS -->
+                    </div>
+                </div>
+
+                <!-- Global Broadcast Tab -->
+                <div id="broadcast-tab" class="tab-content admin-only">
+                    <div class="section-header">
+                        <h2><i class="fa-solid fa-bullhorn"></i> Global Broadcast</h2>
+                        <p class="section-desc">Publish a rich embed message to all servers instantly.</p>
+                    </div>
+                    <div class="glass-panel" style="max-width: 600px; padding: 2rem;">
+                        <div class="input-group">
+                            <i class="fa-solid fa-heading input-icon"></i>
+                            <input type="text" id="bc-title" placeholder="Embed Title (e.g. New Feature!)">
+                        </div>
+                        <div class="input-group">
+                            <textarea id="bc-desc" placeholder="Embed Description (Supports Markdown)" style="width: 100%; height: 120px; padding: 1rem; background: rgba(0,0,0,0.2); border: 1px solid var(--panel-border); border-radius: 12px; color: var(--text-primary); font-family: inherit; resize: vertical;"></textarea>
+                        </div>
+                        <div class="input-group" style="display: flex; gap: 1rem;">
+                            <div style="flex: 1;">
+                                <i class="fa-solid fa-palette input-icon"></i>
+                                <input type="text" id="bc-color" placeholder="Hex Color (e.g. #FF69B4)">
+                            </div>
+                            <div style="flex: 1;">
+                                <i class="fa-solid fa-image input-icon"></i>
+                                <input type="text" id="bc-image" placeholder="Image URL (Optional)">
+                            </div>
+                        </div>
+                        <div class="input-group">
+                            <i class="fa-solid fa-shoe-prints input-icon"></i>
+                            <input type="text" id="bc-footer" placeholder="Footer Text (Optional)">
+                        </div>
+                        <button id="bc-submit-btn" class="primary-btn" onclick="publishBroadcast()">
+                            <i class="fa-solid fa-paper-plane"></i> Publish to All Servers
+                        </button>
+                        <div id="bc-msg" class="success-toast hidden" style="position: relative; transform: none; left: 0; bottom: 0; margin-top: 1rem; text-align: center;"></div>
                     </div>
                 </div>
 

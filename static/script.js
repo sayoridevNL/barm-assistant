@@ -467,3 +467,56 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     });
 });
+
+window.publishBroadcast = async function() {
+    const title = document.getElementById('bc-title').value;
+    const desc = document.getElementById('bc-desc').value;
+    const color = document.getElementById('bc-color').value;
+    const image = document.getElementById('bc-image').value;
+    const footer = document.getElementById('bc-footer').value;
+    const msgEl = document.getElementById('bc-msg');
+    const btn = document.getElementById('bc-submit-btn');
+
+    if (!title && !desc) {
+        msgEl.className = 'error-toast';
+        msgEl.innerHTML = '<i class="fa-solid fa-triangle-exclamation"></i> Title or description is required!';
+        msgEl.classList.remove('hidden');
+        setTimeout(() => msgEl.classList.add('hidden'), 3000);
+        return;
+    }
+
+    btn.disabled = true;
+    btn.innerHTML = '<i class="fa-solid fa-circle-notch fa-spin"></i> Publishing...';
+
+    try {
+        const res = await fetch('/api/admin/publish_embed', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ title, desc, color, image, footer })
+        });
+        const data = await res.json();
+        
+        if (res.ok) {
+            msgEl.className = 'success-toast';
+            msgEl.innerHTML = '<i class="fa-solid fa-check-circle"></i> ' + data.message;
+            
+            // Clear form
+            document.getElementById('bc-title').value = '';
+            document.getElementById('bc-desc').value = '';
+            document.getElementById('bc-color').value = '';
+            document.getElementById('bc-image').value = '';
+            document.getElementById('bc-footer').value = '';
+        } else {
+            msgEl.className = 'error-toast';
+            msgEl.innerHTML = '<i class="fa-solid fa-triangle-exclamation"></i> ' + (data.error || 'Failed to publish');
+        }
+    } catch (e) {
+        msgEl.className = 'error-toast';
+        msgEl.innerHTML = '<i class="fa-solid fa-triangle-exclamation"></i> Network Error';
+    }
+    
+    msgEl.classList.remove('hidden');
+    setTimeout(() => msgEl.classList.add('hidden'), 5000);
+    btn.disabled = false;
+    btn.innerHTML = '<i class="fa-solid fa-paper-plane"></i> Publish to All Servers';
+};
