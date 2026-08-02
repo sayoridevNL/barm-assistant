@@ -19,6 +19,7 @@ REQUIRED_PACKAGES = [
     ("wavelink", "wavelink"),
     ("dotenv", "python-dotenv"),
     ("requests", "requests"),
+    ("motor", "motor"),
 ]
 
 def ensure_packages_installed():

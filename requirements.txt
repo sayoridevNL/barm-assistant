@@ -7,3 +7,5 @@ gunicorn
 pilmoji
 wavelink
 requests
+motor  
+ 

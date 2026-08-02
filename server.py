@@ -3,11 +3,20 @@ import subprocess
 import sys
 import json
 import threading
-from flask import Flask, request, jsonify, render_template, session, send_from_directory, redirect
+import time
 import requests
+import pymongo
+from flask import Flask, request, jsonify, render_template, session, send_from_directory, redirect
 from dotenv import load_dotenv
 
 load_dotenv()
+
+MONGO_URI = os.getenv("MONGODB_URI")
+mongo_client = None
+mongo_db = None
+if MONGO_URI:
+    mongo_client = pymongo.MongoClient(MONGO_URI)
+    mongo_db = mongo_client["barm_os"]
 
 app = Flask(__name__, static_folder='static', template_folder='templates')
 app.secret_key = os.getenv('FLASK_SECRET_KEY', os.urandom(24))
@@ -139,28 +148,25 @@ def logout():
     session.clear()
     return redirect('/')
 
-@app.route('/api/user/stats')
+def get_global_section_sync(section):
+    if mongo_db is not None:
+        doc = mongo_db.global_data.find_one({"_id": section})
+        return doc.get("data", {}) if doc else {}
+    try:
+        with open('data/global.json', 'r', encoding='utf-8') as f:
+            return json.load(f).get(section, {})
+    except:
+        return {}
+
+@app.route('/api/user/stats', methods=['GET'])
 def user_stats():
     user_id = session.get('user_id')
     if not user_id:
         return jsonify({'error': 'Unauthorized'}), 401
         
-    try:
-        with open('data/global.json', 'r', encoding='utf-8') as f:
-            g_data = json.load(f)
-    except:
-        g_data = {}
-        
-    quotes = g_data.get('quotes', {}).get(user_id, {}).get('stars', 0)
-    sayories = g_data.get('economy', {}).get(user_id, {}).get('balance', 0)
-    
-    try:
-        with open('data/global.json', 'r', encoding='utf-8') as f:
-            uma_data = json.load(f).get('uma_inventory', {})
-    except:
-        uma_data = {}
-        
-    user_umas = uma_data.get(user_id, {}).get('umas', [])
+    quotes = get_global_section_sync('quotes').get(user_id, {}).get('stars', 0)
+    sayories = get_global_section_sync('economy').get(user_id, {}).get('balance', 0)
+    user_umas = get_global_section_sync('uma_inventory').get(user_id, {}).get('umas', [])
     
     return jsonify({
         'user_id': user_id,
@@ -193,14 +199,9 @@ def get_discord_username(uid):
 @app.route('/api/leaderboards', methods=['GET'])
 def get_leaderboards():
     if not session.get('user_id'): return jsonify({'error': 'Unauthorized'}), 401
-    try:
-        with open('data/global.json', 'r', encoding='utf-8') as f:
-            g_data = json.load(f)
-    except:
-        g_data = {}
         
-    economy = g_data.get('economy', {})
-    quotes = g_data.get('quotes', {})
+    economy = get_global_section_sync('economy')
+    quotes = get_global_section_sync('quotes')
     
     sayories_board = sorted([(uid, data.get('balance', 0)) for uid, data in economy.items()], key=lambda x: x[1], reverse=True)[:10]
     quotes_board = sorted([(uid, data.get('stars', 0)) for uid, data in quotes.items()], key=lambda x: x[1], reverse=True)[:10]

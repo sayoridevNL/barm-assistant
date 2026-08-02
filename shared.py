@@ -8,9 +8,17 @@ import json
 import os
 from pathlib import Path
 from datetime import datetime, timezone
-
 import discord
 from discord.ext import commands
+import motor.motor_asyncio
+from typing import Optional, Union, List, Dict, Any
+
+MONGO_URI = os.getenv("MONGODB_URI")
+mongo_client = None
+mongo_db = None
+if MONGO_URI:
+    mongo_client = motor.motor_asyncio.AsyncIOMotorClient(MONGO_URI)
+    mongo_db = mongo_client["barm_os"]
 
 # ── .env LOADER ──────────────────────────────────────────────────────────────
 BASE_DIR = Path(__file__).resolve().parent
@@ -52,32 +60,38 @@ def _db_lock(guild_id: int) -> asyncio.Lock:
     if guild_id not in _locks: _locks[guild_id] = asyncio.Lock()
     return _locks[guild_id]
 
-def _db_load(guild_id: int) -> dict:
-    p = _db_path(guild_id)
-    if p.exists():
+async def _db_load(guild_id: int) -> dict:
+    if mongo_db is not None:
+        doc = await mongo_db.guilds.find_one({"_id": str(guild_id)})
+        return doc.get("data", {}) if doc else {}
+    path = _db_path(guild_id)
+    if path.exists():
         try:
-            with open(p, encoding="utf-8") as f: 
+            with open(path, encoding="utf-8") as f:
                 return json.load(f)
         except json.JSONDecodeError:
             pass
     return {}
 
-def _db_save(guild_id: int, data: dict):
+async def _db_save(guild_id: int, data: dict):
+    if mongo_db is not None:
+        await mongo_db.guilds.update_one({"_id": str(guild_id)}, {"$set": {"data": data}}, upsert=True)
+        return
     with open(_db_path(guild_id), "w", encoding="utf-8") as f:
         json.dump(data, f, indent=2, ensure_ascii=False)
 
 async def db_get_section(guild_id: int, section: str) -> dict:
-    async with _db_lock(guild_id): return _db_load(guild_id).get(section, {})
+    async with _db_lock(guild_id): return (await _db_load(guild_id)).get(section, {})
 
 async def db_save_section(guild_id: int, section: str, data: dict):
     async with _db_lock(guild_id):
-        d = _db_load(guild_id)
+        d = await _db_load(guild_id)
         d[section] = data
-        _db_save(guild_id, d)
+        await _db_save(guild_id, d)
 
 async def db_get(guild_id: int, *keys, default=None):
     async with _db_lock(guild_id):
-        d = _db_load(guild_id)
+        d = await _db_load(guild_id)
         for k in keys:
             if not isinstance(d, dict) or k not in d: return default
             d = d[k]
@@ -85,17 +99,17 @@ async def db_get(guild_id: int, *keys, default=None):
 
 async def db_set(guild_id: int, value, *keys):
     async with _db_lock(guild_id):
-        d = _db_load(guild_id)
+        d = await _db_load(guild_id)
         ref = d
         for k in keys[:-1]: ref = ref.setdefault(k, {})
         ref[keys[-1]] = value
-        _db_save(guild_id, d)
+        await _db_save(guild_id, d)
 
 # ── GLOBAL DATA ──────────────────────────────────────────────────────────────
 GLOBAL_FILE = DATA_DIR / "global.json"
 _global_lock = asyncio.Lock()
 
-def _load_global() -> dict:
+def _load_global_sync() -> dict:
     if GLOBAL_FILE.exists():
         try:
             with open(GLOBAL_FILE, encoding="utf-8") as f: 
@@ -104,42 +118,43 @@ def _load_global() -> dict:
             pass
     return {"economy": {}, "levels": {}, "quotes": {}}
 
-def _save_global(data: dict):
+def _save_global_sync(data: dict):
     with open(GLOBAL_FILE, "w", encoding="utf-8") as f:
         json.dump(data, f, indent=2, ensure_ascii=False)
 
 async def global_get_section(section: str) -> dict:
-    async with _global_lock: return _load_global().get(section, {})
+    if mongo_db is not None:
+        doc = await mongo_db.global_data.find_one({"_id": section})
+        return doc.get("data", {}) if doc else {}
+    async with _global_lock: return _load_global_sync().get(section, {})
 
 async def global_save_section(section: str, data: dict):
+    if mongo_db is not None:
+        await mongo_db.global_data.update_one({"_id": section}, {"$set": {"data": data}}, upsert=True)
+        return
     async with _global_lock:
-        d = _load_global()
+        d = _load_global_sync()
         d[section] = data
-        _save_global(d)
+        _save_global_sync(d)
 
-# ── ECONOMY ──────────────────────────────────────────────────────────────────
 async def g_eco_get(user_id: int) -> int:
     eco = await global_get_section("economy")
     return eco.get(str(user_id), {}).get("balance", 0)
 
 async def g_eco_add(user_id: int, amount: int) -> int:
-    async with _global_lock:
-        d = _load_global()
-        eco = d.setdefault("economy", {})
-        uid = str(user_id)
-        eco.setdefault(uid, {})
-        eco[uid]["balance"] = max(0, eco[uid].get("balance", 0) + amount)
-        _save_global(d)
-        return eco[uid]["balance"]
+    eco = await global_get_section("economy")
+    uid = str(user_id)
+    eco.setdefault(uid, {})
+    eco[uid]["balance"] = max(0, eco[uid].get("balance", 0) + amount)
+    await global_save_section("economy", eco)
+    return eco[uid]["balance"]
 
 async def g_eco_set(user_id: int, amount: int):
-    async with _global_lock:
-        d = _load_global()
-        eco = d.setdefault("economy", {})
-        uid = str(user_id)
-        eco.setdefault(uid, {})
-        eco[uid]["balance"] = max(0, amount)
-        _save_global(d)
+    eco = await global_get_section("economy")
+    uid = str(user_id)
+    eco.setdefault(uid, {})
+    eco[uid]["balance"] = max(0, amount)
+    await global_save_section("economy", eco)
 
 # ── TIER SYSTEM ──────────────────────────────────────────────────────────────
 TIER_EMOJIS = {1: "🌱", 2: "🌿", 3: "🍃", 4: "🌸", 5: "🌺", 6: "⭐", 7: "🌟", 8: "💫", 9: "✨", 10: "🔥", 11: "🌊", 12: "⚡", 13: "🌪️", 14: "❄️", 15: "🌈", 16: "💎", 17: "🏆", 18: "👑", 19: "🦋", 20: "🐉", 21: "🌌", 22: "⚜️", 23: "🔮", 24: "🌠", 25: "💠"}
