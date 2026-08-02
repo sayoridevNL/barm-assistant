@@ -13,7 +13,6 @@ from discord.ext import commands, tasks
 from PIL import Image, ImageDraw, ImageFilter
 
 from shared import *
-from shared import _global_lock, _load_global, _save_global, _db_lock, _db_load, _db_save
 from theme import EmbedBuilder, Palette, Emojis, progress_bar
 from ui_kit import (
     CooldownMap,
@@ -41,17 +40,10 @@ class CommunityBot(commands.Bot):
                     await self._pay_vc_member(guild, member, vc_sayories)
 
     async def _pay_vc_member(self, guild: discord.Guild, member: discord.Member, amount: int) -> None:
-        async with _global_lock:
-            gdata = _load_global()
-            eco = gdata.setdefault("economy", {})
-            uid = str(member.id)
-            eco.setdefault(uid, {})
-            old_bal = eco[uid].get("balance", 0)
-            old_tier = tier_from_xp(old_bal)
-            new_bal = old_bal + amount
-            new_tier = tier_from_xp(new_bal)
-            eco[uid]["balance"] = new_bal
-            _save_global(gdata)
+        old_bal = await g_eco_get(member.id)
+        old_tier = tier_from_xp(old_bal)
+        new_bal = await g_eco_add(member.id, amount)
+        new_tier = tier_from_xp(new_bal)
 
         if new_tier > old_tier and new_tier >= 1:
             await assign_tier_role(member, new_tier)
@@ -292,17 +284,10 @@ async def _handle_guild_message(message: discord.Message) -> None:
 
 async def _award_chat_sayories(message: discord.Message, gain: int) -> None:
     author = message.author
-    async with _global_lock:
-        gdata = _load_global()
-        eco = gdata.setdefault("economy", {})
-        uid = str(author.id)
-        eco.setdefault(uid, {})
-        old_bal = eco[uid].get("balance", 0)
-        old_tier = tier_from_xp(old_bal)
-        new_bal = old_bal + gain
-        new_tier = tier_from_xp(new_bal)
-        eco[uid]["balance"] = new_bal
-        _save_global(gdata)
+    old_bal = await g_eco_get(author.id)
+    old_tier = tier_from_xp(old_bal)
+    new_bal = await g_eco_add(author.id, gain)
+    new_tier = tier_from_xp(new_bal)
 
     if new_tier > old_tier and new_tier >= 1:
         await _announce_tier_up(message, new_tier, new_bal)
@@ -545,16 +530,14 @@ async def _counting_save(guild_id: int, data: dict) -> None: await db_save_secti
 
 async def _counting_add_score(guild_id: int, user_id: int, mode: str) -> None:
     uid = str(user_id)
-    async with _db_lock(guild_id):
-        d = _db_load(guild_id)
-        lb = d.setdefault("counting_lb", {})
-        lb.setdefault(uid, {})
-        lb[uid]["total"] = lb[uid].get("total", 0) + 1
-        lb[uid][mode] = lb[uid].get(mode, 0) + 1
-        _db_save(guild_id, d)
+    lb = await db_get_section(guild_id, "counting_lb")
+    lb.setdefault(uid, {})
+    lb[uid]["total"] = lb[uid].get("total", 0) + 1
+    lb[uid][mode] = lb[uid].get(mode, 0) + 1
+    await db_save_section(guild_id, "counting_lb", lb)
 
 async def _counting_get_lb(guild_id: int) -> dict:
-    async with _db_lock(guild_id): return _db_load(guild_id).get("counting_lb", {})
+    return await db_get_section(guild_id, "counting_lb")
 
 async def _handle_counting_message(message: discord.Message) -> bool:
     if message.author.bot or not message.guild: return False

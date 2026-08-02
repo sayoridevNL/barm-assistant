@@ -10,7 +10,6 @@ from discord import app_commands
 from discord.ext import commands
 
 from shared import *
-from shared import _global_lock, _load_global, _save_global
 from theme import EmbedBuilder, Palette
 from ui_kit import Paginator, ask_confirm, install_error_handler
 
@@ -37,10 +36,9 @@ async def _uma_get_inventory(user_id: int) -> dict:
     return inv.get(str(user_id), {})
 
 async def _uma_save_inventory(user_id: int, data: dict):
-    async with _global_lock:
-        d = _load_global()
-        d.setdefault(_UMA_GLOBAL_SECTION, {})[str(user_id)] = data
-        _save_global(d)
+    inv_global = await global_get_section(_UMA_GLOBAL_SECTION)
+    inv_global[str(user_id)] = data
+    await global_save_section(_UMA_GLOBAL_SECTION, inv_global)
 
 _LOOTBOX_TIERS = {
     "basic": {"label": "🎁 Basic Box", "emoji": "🎁", "cost": 2_000, "color": 0x3498DB, "weights": {"Legendary": 0.10, "SSR": 1.5, "SR": 13.4, "R": 85.0}, "flavor": "A standard capsule fresh off the track."},

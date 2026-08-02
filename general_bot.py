@@ -9,7 +9,6 @@ from discord import app_commands
 from discord.ext import commands
 
 from shared import *
-from shared import _global_lock, _load_global, _save_global
 from theme import EmbedBuilder, Palette
 from ui_kit import install_error_handler
 from PIL import Image, ImageDraw, ImageFilter, ImageFont
@@ -338,21 +337,19 @@ async def daily(interaction: discord.Interaction):
     if not await dm_check(interaction): return
     uid = str(interaction.user.id)
     now = time.time()
-    async with _global_lock:
-        gdata = _load_global()
-        eco = gdata.setdefault("economy", {})
-        eco.setdefault(uid, {})
-        last = eco[uid].get("last_daily", 0)
-        if now - last < 86400:
-            rem = int(86400 - (now - last)); h, m = divmod(rem // 60, 60)
-            embed = (EmbedBuilder(color=Palette.DANGER).title("⏳ Daily Already Claimed").description(f"Come back in **{h}h {m}m** for your next daily reward!").footer("Barm assistant Economy").build())
-            return await interaction.response.send_message(embed=embed, ephemeral=True)
-        eco[uid]["balance"] = eco[uid].get("balance", 0) + 200
-        eco[uid]["last_daily"] = now
-        new_bal = eco[uid]["balance"]
-        old_tier = tier_from_xp(new_bal - 200)
-        new_tier = tier_from_xp(new_bal)
-        _save_global(gdata)
+    eco = await global_get_section("economy")
+    eco.setdefault(uid, {})
+    last = eco[uid].get("last_daily", 0)
+    if now - last < 86400:
+        rem = int(86400 - (now - last)); h, m = divmod(rem // 60, 60)
+        embed = (EmbedBuilder(color=Palette.DANGER).title("⏳ Daily Already Claimed").description(f"Come back in **{h}h {m}m** for your next daily reward!").footer("Barm assistant Economy").build())
+        return await interaction.response.send_message(embed=embed, ephemeral=True)
+    eco[uid]["balance"] = eco[uid].get("balance", 0) + 200
+    eco[uid]["last_daily"] = now
+    new_bal = eco[uid]["balance"]
+    old_tier = tier_from_xp(new_bal - 200)
+    new_tier = tier_from_xp(new_bal)
+    await global_save_section("economy", eco)
     if interaction.guild and new_tier > old_tier and new_tier >= 1: await assign_tier_role(interaction.user, new_tier)
     embed = (EmbedBuilder(color=Palette.SUCCESS).title("💰 Daily Reward Claimed!").description(f"{interaction.user.mention} collected their daily **200 Sayories**! 🎉").thumbnail(interaction.user.display_avatar.url).fields(("💵 Earned", "200 Sayories"), ("💰 New Balance", f"{new_bal:,} Sayories")).footer("Come back tomorrow for more! • Barm assistant Economy").build())
     await interaction.response.send_message(embed=embed)
@@ -373,16 +370,14 @@ async def work(interaction: discord.Interaction):
     jobs = [("🧹", "cleaned the city fountain"), ("📦", "delivered packages"), ("🐕", "walked dogs"), ("💻", "fixed computers"), ("🍳", "cooked meals at the café"), ("📚", "tutored students"), ("🚖", "drove a taxi"), ("⌨️", "wrote code"), ("🖌️", "painted fences"), ("🎸", "busked in the park"), ("🌿", "tended a garden"), ("📸", "photographed events")]
     emoji, job = random.choice(jobs)
     old_tier = 0; new_tier = 0; new_bal = 0
-    async with _global_lock:
-        gdata = _load_global()
-        eco = gdata.setdefault("economy", {})
-        eco.setdefault(uid_str, {})
-        old_bal = eco[uid_str].get("balance", 0)
-        old_tier = tier_from_xp(old_bal)
-        new_bal = old_bal + earned
-        new_tier = tier_from_xp(new_bal)
-        eco[uid_str]["balance"] = new_bal
-        _save_global(gdata)
+    eco = await global_get_section("economy")
+    eco.setdefault(uid_str, {})
+    old_bal = eco[uid_str].get("balance", 0)
+    old_tier = tier_from_xp(old_bal)
+    new_bal = old_bal + earned
+    new_tier = tier_from_xp(new_bal)
+    eco[uid_str]["balance"] = new_bal
+    await global_save_section("economy", eco)
     if interaction.guild and new_tier > old_tier and new_tier >= 1: await assign_tier_role(interaction.user, new_tier)
     embed = (EmbedBuilder(color=Palette.SUCCESS).title(f"{emoji} Work Complete!").description(f"**{interaction.user.display_name}** {job} and earned some Sayories!").thumbnail(interaction.user.display_avatar.url).fields(("💵 Earned", f"**{earned:,} Sayories**"), ("🏦 New Balance", f"**{new_bal:,} Sayories**")).footer("Barm assistant Economy • Global • Work cooldown: 1 hour").build())
     await interaction.response.send_message(embed=embed)
@@ -406,20 +401,18 @@ async def pay(interaction: discord.Interaction, member: discord.Member, amount: 
     insufficient_bal: int | None = None
     new_sender_bal = 0
     new_receiver_bal = 0
-    async with _global_lock:
-        gdata = _load_global()
-        eco = gdata.setdefault("economy", {})
-        eco.setdefault(sender_id, {})
-        eco.setdefault(receiver_id, {})
-        sender_bal = eco[sender_id].get("balance", 0)
-        if sender_bal < amount:
-            insufficient_bal = sender_bal
-        else:
-            eco[sender_id]["balance"] = sender_bal - amount
-            eco[receiver_id]["balance"] = eco[receiver_id].get("balance", 0) + amount
-            new_sender_bal = eco[sender_id]["balance"]
-            new_receiver_bal = eco[receiver_id]["balance"]
-            _save_global(gdata)
+    eco = await global_get_section("economy")
+    eco.setdefault(sender_id, {})
+    eco.setdefault(receiver_id, {})
+    sender_bal = eco[sender_id].get("balance", 0)
+    if sender_bal < amount:
+        insufficient_bal = sender_bal
+    else:
+        eco[sender_id]["balance"] = sender_bal - amount
+        eco[receiver_id]["balance"] = eco[receiver_id].get("balance", 0) + amount
+        new_sender_bal = eco[sender_id]["balance"]
+        new_receiver_bal = eco[receiver_id]["balance"]
+        await global_save_section("economy", eco)
 
     if insufficient_bal is not None:
         await interaction.response.send_message(f"❌ Not enough Sayories (you have {insufficient_bal:,}).", ephemeral=True)
