@@ -203,9 +203,9 @@ class GeneralBot(commands.Bot):
         
         async for broadcast in db.broadcast_queue.find():
             b_id = broadcast["_id"]
-            title = broadcast.get("title", "")
-            desc = broadcast.get("desc", "")
-            color_hex = broadcast.get("color", "")
+            title = broadcast.get("title", "").strip() or None
+            desc = broadcast.get("desc", "").strip() or None
+            color_hex = broadcast.get("color", "").strip()
             image_url = broadcast.get("image", "")
             footer = broadcast.get("footer", "")
             
