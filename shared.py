@@ -16,9 +16,13 @@ from typing import Optional, Union, List, Dict, Any
 MONGO_URI = os.getenv("MONGODB_URI")
 mongo_client = None
 mongo_db = None
-if MONGO_URI:
-    mongo_client = motor.motor_asyncio.AsyncIOMotorClient(MONGO_URI)
-    mongo_db = mongo_client["barm_os"]
+
+def _get_mongo_db():
+    global mongo_client, mongo_db
+    if mongo_db is None and MONGO_URI:
+        mongo_client = motor.motor_asyncio.AsyncIOMotorClient(MONGO_URI)
+        mongo_db = mongo_client["barm_os"]
+    return mongo_db
 
 # ── .env LOADER ──────────────────────────────────────────────────────────────
 BASE_DIR = Path(__file__).resolve().parent
@@ -61,8 +65,9 @@ def _db_lock(guild_id: int) -> asyncio.Lock:
     return _locks[guild_id]
 
 async def _db_load(guild_id: int) -> dict:
-    if mongo_db is not None:
-        doc = await mongo_db.guilds.find_one({"_id": str(guild_id)})
+    db = _get_mongo_db()
+    if db is not None:
+        doc = await db.guilds.find_one({"_id": str(guild_id)})
         return doc.get("data", {}) if doc else {}
     path = _db_path(guild_id)
     if path.exists():
@@ -74,8 +79,9 @@ async def _db_load(guild_id: int) -> dict:
     return {}
 
 async def _db_save(guild_id: int, data: dict):
-    if mongo_db is not None:
-        await mongo_db.guilds.update_one({"_id": str(guild_id)}, {"$set": {"data": data}}, upsert=True)
+    db = _get_mongo_db()
+    if db is not None:
+        await db.guilds.update_one({"_id": str(guild_id)}, {"$set": {"data": data}}, upsert=True)
         return
     with open(_db_path(guild_id), "w", encoding="utf-8") as f:
         json.dump(data, f, indent=2, ensure_ascii=False)
@@ -123,14 +129,16 @@ def _save_global_sync(data: dict):
         json.dump(data, f, indent=2, ensure_ascii=False)
 
 async def global_get_section(section: str) -> dict:
-    if mongo_db is not None:
-        doc = await mongo_db.global_data.find_one({"_id": section})
+    db = _get_mongo_db()
+    if db is not None:
+        doc = await db.global_data.find_one({"_id": section})
         return doc.get("data", {}) if doc else {}
     async with _global_lock: return _load_global_sync().get(section, {})
 
 async def global_save_section(section: str, data: dict):
-    if mongo_db is not None:
-        await mongo_db.global_data.update_one({"_id": section}, {"$set": {"data": data}}, upsert=True)
+    db = _get_mongo_db()
+    if db is not None:
+        await db.global_data.update_one({"_id": section}, {"$set": {"data": data}}, upsert=True)
         return
     async with _global_lock:
         d = _load_global_sync()
