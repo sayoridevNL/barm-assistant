@@ -400,6 +400,17 @@ async def _process_quote(trigger_msg: discord.Message, ref: discord.Message) -> 
 
     raw_text = ref.content or "*[no text]*"
     quote_text = resolve_mentions(raw_text, guild=trigger_msg.guild)
+
+    import time
+    qhist = await global_get_section("quote_history")
+    qhist.setdefault(quid, [])
+    qhist[quid].insert(0, {
+        "text": quote_text,
+        "quoter": trigger_msg.author.display_name,
+        "timestamp": int(time.time())
+    })
+    qhist[quid] = qhist[quid][:100]
+    await global_save_section("quote_history", qhist)
     try: av_bytes = await ref.author.display_avatar.with_size(256).read()
     except (discord.HTTPException, discord.Forbidden): av_bytes = None
 
@@ -433,6 +444,17 @@ async def _handle_dm_quote(message: discord.Message) -> None:
     new_stars = quotes[quid]["stars"]
 
     quote_text = resolve_mentions(ref.content or "*[no text — see attachment]*")
+
+    import time
+    qhist = await global_get_section("quote_history")
+    qhist.setdefault(quid, [])
+    qhist[quid].insert(0, {
+        "text": quote_text,
+        "quoter": message.author.display_name,
+        "timestamp": int(time.time())
+    })
+    qhist[quid] = qhist[quid][:100]
+    await global_save_section("quote_history", qhist)
     try: av_bytes = await ref.author.display_avatar.with_size(256).read()
     except (discord.HTTPException, discord.Forbidden): av_bytes = None
 

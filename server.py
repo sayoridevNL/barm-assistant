@@ -181,6 +181,17 @@ def user_stats():
         }
     })
 
+@app.route('/api/quotes', methods=['GET'])
+def get_user_quotes():
+    user_id = session.get('user_id')
+    if not user_id:
+        return jsonify({'error': 'Unauthorized'}), 401
+    
+    qhist = get_global_section_sync('quote_history')
+    user_quotes = qhist.get(user_id, [])
+    
+    return jsonify({'quotes': user_quotes})
+
 USERNAME_CACHE = {}
 def get_discord_username(uid):
     if uid in USERNAME_CACHE: return USERNAME_CACHE[uid]

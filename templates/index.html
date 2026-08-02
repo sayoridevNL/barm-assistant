@@ -40,7 +40,7 @@
         .discord-btn:hover { background-color: #4752C4; }
     </style>
 </head>
-<body>
+<body class="dark-theme">
     <div id="background-gradient">
         <div class="blob blob-1"></div>
         <div class="blob blob-2"></div>
@@ -72,6 +72,9 @@
                     <div class="status-pill global-status">
                         <div class="pulse-dot"></div> System Online
                     </div>
+                    <button id="theme-toggle-btn" class="icon-btn" title="Toggle Theme">
+                        <i class="fa-solid fa-moon"></i>
+                    </button>
                     <button id="logout-btn" onclick="window.location.href='/api/auth/logout'" class="icon-btn" title="Logout">
                         <i class="fa-solid fa-power-off"></i>
                     </button>
@@ -83,6 +86,7 @@
                     <button class="tab-btn active" data-target="stats-tab"><i class="fa-solid fa-user"></i> My Stats</button>
                     <button class="tab-btn" data-target="leaderboard-tab"><i class="fa-solid fa-trophy"></i> Leaderboards</button>
                     <button class="tab-btn" data-target="umas-tab"><i class="fa-solid fa-horse-head"></i> My Uma Trainees</button>
+                    <button class="tab-btn" data-target="quotes-tab"><i class="fa-solid fa-quote-left"></i> My Quotes</button>
                     <button class="tab-btn admin-only" data-target="fleet-tab"><i class="fa-solid fa-server"></i> Fleet Command</button>
                     <button class="tab-btn admin-only" data-target="dev-tab"><i class="fa-solid fa-code"></i> Developer Console</button>
                 </div>
@@ -134,6 +138,17 @@
                                 <li style="text-align:center; color:#aaa; padding: 1rem;">Loading...</li>
                             </ul>
                         </div>
+                    </div>
+                </div>
+
+                <!-- My Quotes Tab -->
+                <div id="quotes-tab" class="tab-content">
+                    <div class="section-header">
+                        <h2><i class="fa-solid fa-quote-left"></i> My Quotes History</h2>
+                        <p class="section-desc">A permanent history of every time you've been quoted!</p>
+                    </div>
+                    <div id="quotes-history-container" class="glass-panel" style="padding: 1.5rem;">
+                        <div style="text-align: center; color: var(--text-secondary); padding: 2rem;">Loading quotes...</div>
                     </div>
                 </div>
 

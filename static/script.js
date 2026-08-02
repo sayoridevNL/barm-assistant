@@ -73,6 +73,7 @@ document.addEventListener('DOMContentLoaded', () => {
         
         fetchUserStats();
         fetchLeaderboards();
+        fetchQuotes();
         
         if (IS_ADMIN) {
             initBotCards();
@@ -190,6 +191,48 @@ document.addEventListener('DOMContentLoaded', () => {
         } catch (e) {
             console.error('Failed to fetch leaderboards:', e);
         }
+    }
+
+    async function fetchQuotes() {
+        try {
+            const res = await fetch('/api/quotes');
+            const data = await res.json();
+            const container = document.getElementById('quotes-history-container');
+            container.innerHTML = '';
+            if (data.quotes && data.quotes.length > 0) {
+                data.quotes.forEach(quote => {
+                    const el = document.createElement('div');
+                    el.style.padding = '1rem';
+                    el.style.borderBottom = '1px solid var(--panel-border)';
+                    const d = new Date(quote.timestamp * 1000);
+                    el.innerHTML = `
+                        <div style="font-style: italic; font-size: 1.1rem; margin-bottom: 0.5rem; font-weight: 600;">"${quote.text}"</div>
+                        <div style="font-size: 0.85rem; color: var(--text-secondary);">Quoted by <span style="color: var(--primary-color); font-weight: bold;">${quote.quoter}</span> • ${d.toLocaleDateString()}</div>
+                    `;
+                    container.appendChild(el);
+                });
+            } else {
+                container.innerHTML = '<div style="text-align: center; color: var(--text-secondary); padding: 2rem;">No quotes found. Tell your friends to reply to your messages with "quote"!</div>';
+            }
+        } catch(e) {
+            console.error('Failed to fetch quotes:', e);
+        }
+    }
+
+    const themeToggle = document.getElementById('theme-toggle-btn');
+    if (themeToggle) {
+        themeToggle.addEventListener('click', () => {
+            document.body.classList.toggle('light-theme');
+            document.body.classList.toggle('dark-theme');
+            const icon = themeToggle.querySelector('i');
+            if (document.body.classList.contains('light-theme')) {
+                icon.classList.remove('fa-moon');
+                icon.classList.add('fa-sun');
+            } else {
+                icon.classList.remove('fa-sun');
+                icon.classList.add('fa-moon');
+            }
+        });
     }
 
     // --- Bot Cards UI ---
