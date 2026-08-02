@@ -72,6 +72,7 @@ document.addEventListener('DOMContentLoaded', () => {
         });
         
         fetchUserStats();
+        fetchLeaderboards();
         
         if (IS_ADMIN) {
             initBotCards();
@@ -97,9 +98,97 @@ document.addEventListener('DOMContentLoaded', () => {
                 document.getElementById('stat-sayories').innerText = data.stats.sayories.toLocaleString();
                 document.getElementById('stat-quotes').innerText = data.stats.quotes.toLocaleString();
                 document.getElementById('stat-umas').innerText = data.stats.umamusume.toLocaleString();
+                
+                // Render Uma Trainees
+                const umasGrid = document.getElementById('umas-grid');
+                umasGrid.innerHTML = '';
+                if (data.stats.umas_list && data.stats.umas_list.length > 0) {
+                    data.stats.umas_list.forEach(uma => {
+                        const imgUrl = uma.image ? (uma.image.includes('?') ? uma.image + '&_cb=' + Date.now() : uma.image + '?_cb=' + Date.now()) : '';
+                        
+                        const rarityColors = {
+                            "Legendary": "#FFD700",
+                            "SSR": "#FF69B4",
+                            "SR": "#B983FF",
+                            "R": "#4CAF50"
+                        };
+                        const rarityColor = rarityColors[uma.rarity] || "#aaa";
+                        
+                        const card = document.createElement('div');
+                        card.className = 'glass-panel';
+                        card.style.borderTop = `4px solid ${rarityColor}`;
+                        card.style.overflow = 'hidden';
+                        
+                        let imgHtml = imgUrl ? `<div style="height: 150px; overflow: hidden; display: flex; align-items: center; justify-content: center; background: rgba(0,0,0,0.3);"><img src="${imgUrl}" style="max-height: 100%; object-fit: contain;"></div>` : '';
+                        
+                        card.innerHTML = `
+                            ${imgHtml}
+                            <div style="padding: 1rem;">
+                                <h3 style="margin: 0 0 0.5rem 0; font-size: 1.2rem;">${uma.name}</h3>
+                                <span style="background: ${rarityColor}40; color: ${rarityColor}; padding: 0.2rem 0.5rem; border-radius: 4px; font-size: 0.8rem; font-weight: bold;">${uma.rarity}</span>
+                                <div style="margin-top: 1rem; display: grid; grid-template-columns: 1fr 1fr; gap: 0.5rem; font-size: 0.9rem;">
+                                    <div>⚡ SPD: ${uma.speed}</div>
+                                    <div>❤️ STA: ${uma.stamina}</div>
+                                    <div>💪 POW: ${uma.power}</div>
+                                    <div>🏆 ${uma.wins}W / ${uma.races}R</div>
+                                </div>
+                            </div>
+                        `;
+                        umasGrid.appendChild(card);
+                    });
+                } else {
+                    umasGrid.innerHTML = '<div style="grid-column: 1 / -1; text-align: center; color: #aaa; padding: 2rem;">You have no Umamusume! Go use the /lootbox command in Discord to get some!</div>';
+                }
             }
         } catch (e) {
             console.error('Failed to fetch user stats:', e);
+        }
+    }
+
+    async function fetchLeaderboards() {
+        try {
+            const res = await fetch('/api/leaderboards');
+            const data = await res.json();
+            
+            const renderBoard = (items, elementId, unit) => {
+                const list = document.getElementById(elementId);
+                list.innerHTML = '';
+                if (!items || items.length === 0) {
+                    list.innerHTML = '<li style="text-align:center; color:#aaa; padding: 1rem;">No data available</li>';
+                    return;
+                }
+                
+                items.forEach((item, index) => {
+                    const li = document.createElement('li');
+                    li.style.padding = '0.75rem';
+                    li.style.borderBottom = '1px solid rgba(255,255,255,0.05)';
+                    li.style.display = 'flex';
+                    li.style.justifyContent = 'space-between';
+                    li.style.alignItems = 'center';
+                    
+                    let rankHtml = `<span style="font-weight: bold; width: 20px; display: inline-block; color: #aaa;">${index+1}</span>`;
+                    if (index === 0) rankHtml = `<span style="font-weight: bold; width: 20px; display: inline-block; color: #FFD700;"><i class="fa-solid fa-crown"></i></span>`;
+                    if (index === 1) rankHtml = `<span style="font-weight: bold; width: 20px; display: inline-block; color: #C0C0C0;">2</span>`;
+                    if (index === 2) rankHtml = `<span style="font-weight: bold; width: 20px; display: inline-block; color: #CD7F32;">3</span>`;
+                    
+                    li.innerHTML = `
+                        <div style="display: flex; align-items: center; gap: 1rem;">
+                            ${rankHtml}
+                            <span style="font-weight: 500;">${item.username}</span>
+                        </div>
+                        <div style="font-weight: bold;">
+                            ${item.score.toLocaleString()} <span style="font-size: 0.8rem; font-weight: normal; color: #aaa;">${unit}</span>
+                        </div>
+                    `;
+                    list.appendChild(li);
+                });
+            };
+            
+            renderBoard(data.sayories, 'lb-sayories', '🪙');
+            renderBoard(data.quotes, 'lb-quotes', '⭐');
+            
+        } catch (e) {
+            console.error('Failed to fetch leaderboards:', e);
         }
     }
 

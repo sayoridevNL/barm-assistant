@@ -81,6 +81,8 @@
             <main class="dashboard-content">
                 <div class="tabs">
                     <button class="tab-btn active" data-target="stats-tab"><i class="fa-solid fa-user"></i> My Stats</button>
+                    <button class="tab-btn" data-target="leaderboard-tab"><i class="fa-solid fa-trophy"></i> Leaderboards</button>
+                    <button class="tab-btn" data-target="umas-tab"><i class="fa-solid fa-horse-head"></i> My Uma Trainees</button>
                     <button class="tab-btn admin-only" data-target="fleet-tab"><i class="fa-solid fa-server"></i> Fleet Command</button>
                     <button class="tab-btn admin-only" data-target="dev-tab"><i class="fa-solid fa-code"></i> Developer Console</button>
                 </div>
@@ -110,6 +112,39 @@
                             <div class="stat-value" id="stat-umas">0</div>
                             <div class="stat-label">Umamusume Collected</div>
                         </div>
+                    </div>
+                </div>
+
+                <!-- Leaderboards Tab -->
+                <div id="leaderboard-tab" class="tab-content">
+                    <div class="section-header">
+                        <h2><i class="fa-solid fa-trophy"></i> Global Leaderboards</h2>
+                        <p class="section-desc">See who reigns supreme in the Barm ecosystem.</p>
+                    </div>
+                    <div class="leaderboard-container" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 2rem;">
+                        <div class="leaderboard-panel glass-panel" style="padding: 1.5rem; border-top: 4px solid #FFD700;">
+                            <h3 style="margin-top:0; text-align:center; color:#FFD700;"><i class="fa-solid fa-coins"></i> Top Sayories</h3>
+                            <ul id="lb-sayories" style="list-style: none; padding: 0; margin: 0;">
+                                <li style="text-align:center; color:#aaa; padding: 1rem;">Loading...</li>
+                            </ul>
+                        </div>
+                        <div class="leaderboard-panel glass-panel" style="padding: 1.5rem; border-top: 4px solid #FF69B4;">
+                            <h3 style="margin-top:0; text-align:center; color:#FF69B4;"><i class="fa-solid fa-quote-right"></i> Top Quote Stars</h3>
+                            <ul id="lb-quotes" style="list-style: none; padding: 0; margin: 0;">
+                                <li style="text-align:center; color:#aaa; padding: 1rem;">Loading...</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Uma Trainees Tab -->
+                <div id="umas-tab" class="tab-content">
+                    <div class="section-header">
+                        <h2><i class="fa-solid fa-horse-head"></i> My Uma Trainees</h2>
+                        <p class="section-desc">Your collected Umamusume from the /lootbox gacha.</p>
+                    </div>
+                    <div id="umas-grid" style="display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 1.5rem;">
+                        <div style="grid-column: 1 / -1; text-align: center; color: #aaa; padding: 2rem;">Loading trainees...</div>
                     </div>
                 </div>
 

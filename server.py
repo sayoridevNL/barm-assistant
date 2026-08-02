@@ -160,7 +160,7 @@ def user_stats():
     except:
         uma_data = {}
         
-    umas = len(uma_data.get(user_id, {}).get('umas', []))
+    user_umas = uma_data.get(user_id, {}).get('umas', [])
     
     return jsonify({
         'user_id': user_id,
@@ -170,9 +170,45 @@ def user_stats():
         'stats': {
             'quotes': quotes,
             'sayories': sayories,
-            'umamusume': umas
+            'umamusume': len(user_umas),
+            'umas_list': user_umas
         }
     })
+
+USERNAME_CACHE = {}
+def get_discord_username(uid):
+    if uid in USERNAME_CACHE: return USERNAME_CACHE[uid]
+    token = os.getenv("GENERAL_BOT_TOKEN")
+    if not token: return f"User {uid}"
+    try:
+        import requests
+        r = requests.get(f'https://discord.com/api/v10/users/{uid}', headers={'Authorization': f'Bot {token.strip()}'})
+        if r.status_code == 200:
+            name = r.json().get('username', f"User {uid}")
+            USERNAME_CACHE[uid] = name
+            return name
+    except: pass
+    return f"User {uid}"
+
+@app.route('/api/leaderboards', methods=['GET'])
+def get_leaderboards():
+    if not session.get('user_id'): return jsonify({'error': 'Unauthorized'}), 401
+    try:
+        with open('data/global.json', 'r', encoding='utf-8') as f:
+            g_data = json.load(f)
+    except:
+        g_data = {}
+        
+    economy = g_data.get('economy', {})
+    quotes = g_data.get('quotes', {})
+    
+    sayories_board = sorted([(uid, data.get('balance', 0)) for uid, data in economy.items()], key=lambda x: x[1], reverse=True)[:10]
+    quotes_board = sorted([(uid, data.get('stars', 0)) for uid, data in quotes.items()], key=lambda x: x[1], reverse=True)[:10]
+    
+    s_res = [{"user_id": u, "username": get_discord_username(u), "score": s} for u, s in sayories_board]
+    q_res = [{"user_id": u, "username": get_discord_username(u), "score": s} for u, s in quotes_board]
+    
+    return jsonify({"sayories": s_res, "quotes": q_res})
 
 @app.route('/api/status', methods=['GET'])
 def get_status():
