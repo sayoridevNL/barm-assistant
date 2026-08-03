@@ -284,7 +284,7 @@ async def pull_trainee_cmd(interaction: discord.Interaction, banner: str, amount
             
         embed.description = desc
         img = _uma_image(best_uma)
-        if img: embed.set_thumbnail(url=img)
+        if img: embed.thumbnail(img)
         embed.footer(f"Highlighting {best_uma['name']}!")
         
         await interaction.followup.send(embed=embed.build())
@@ -349,7 +349,7 @@ async def pull_support_cmd(interaction: discord.Interaction, banner: str, amount
             
         embed.description = desc
         img = _support_image(best_card)
-        if img: embed.set_thumbnail(url=img)
+        if img: embed.thumbnail(img)
         embed.footer(f"Highlighting {best_card['name']}!")
         
         await interaction.followup.send(embed=embed.build())
