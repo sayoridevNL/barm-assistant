@@ -19,26 +19,7 @@
         const IS_ADMIN = {{ is_admin | tojson | safe }};
         const AVATAR_URL = AVATAR_HASH ? `https://cdn.discordapp.com/avatars/${USER_ID}/${AVATAR_HASH}.png` : 'https://cdn.discordapp.com/embed/avatars/0.png';
     </script>
-    <style>
-        .tabs { display: flex; gap: 1rem; margin-bottom: 2rem; border-bottom: 1px solid rgba(255,255,255,0.1); padding-bottom: 1rem; }
-        .tab-btn { background: none; border: none; color: #aaa; font-family: inherit; font-size: 1.1rem; cursor: pointer; padding: 0.5rem 1rem; border-radius: 8px; transition: all 0.3s; }
-        .tab-btn:hover { color: #fff; background: rgba(255,255,255,0.05); }
-        .tab-btn.active { color: #fff; background: rgba(255,255,255,0.1); font-weight: 600; }
-        .tab-content { display: none; }
-        .tab-content.active { display: block; }
-        
-        .stats-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 1.5rem; }
-        .stat-card { background: rgba(20, 20, 25, 0.6); border: 1px solid rgba(255,255,255,0.05); border-radius: 12px; padding: 1.5rem; text-align: center; }
-        .stat-value { font-size: 2.5rem; font-weight: 700; margin: 1rem 0 0.5rem 0; color: #fff; }
-        .stat-label { color: #aaa; font-size: 0.9rem; text-transform: uppercase; letter-spacing: 1px; }
-        
-        .profile-header { display: flex; align-items: center; gap: 1.5rem; margin-bottom: 2rem; }
-        .profile-avatar { width: 80px; height: 80px; border-radius: 50%; border: 3px solid var(--primary-color); }
-        .profile-name { font-size: 2rem; margin: 0; }
-        
-        .discord-btn { background-color: #5865F2; color: white; display: flex; align-items: center; justify-content: center; gap: 0.75rem; text-decoration: none; border-radius: 8px; font-weight: 600; padding: 0.75rem 1.5rem; font-size: 1.1rem; transition: background 0.3s; width: 100%; cursor: pointer; border: none; }
-        .discord-btn:hover { background-color: #4752C4; }
-    </style>
+
 </head>
 <body class="dark-theme">
     <div id="background-gradient">
@@ -72,24 +53,24 @@
                     <div class="status-pill global-status">
                         <div class="pulse-dot"></div> System Online
                     </div>
-                    <button id="theme-toggle-btn" class="icon-btn" title="Toggle Theme">
+                    <button id="theme-toggle-btn" class="icon-btn" title="Toggle Theme" aria-label="Toggle Theme">
                         <i class="fa-solid fa-moon"></i>
                     </button>
-                    <button id="logout-btn" onclick="window.location.href='/api/auth/logout'" class="icon-btn" title="Logout">
+                    <button id="logout-btn" onclick="window.location.href='/api/auth/logout'" class="icon-btn" title="Logout" aria-label="Logout">
                         <i class="fa-solid fa-power-off"></i>
                     </button>
                 </div>
             </nav>
 
             <main class="dashboard-content">
-                <div class="tabs">
-                    <button class="tab-btn active" data-target="stats-tab"><i class="fa-solid fa-user"></i> My Stats</button>
-                    <button class="tab-btn" data-target="leaderboard-tab"><i class="fa-solid fa-trophy"></i> Leaderboards</button>
-                    <button class="tab-btn" data-target="umas-tab"><i class="fa-solid fa-horse-head"></i> My Uma Trainees</button>
-                    <button class="tab-btn" data-target="quotes-tab"><i class="fa-solid fa-quote-left"></i> My Quotes</button>
-                    <button class="tab-btn admin-only" data-target="fleet-tab"><i class="fa-solid fa-server"></i> Fleet Command</button>
-                    <button class="tab-btn admin-only" data-target="broadcast-tab"><i class="fa-solid fa-bullhorn"></i> Global Broadcast</button>
-                    <button class="tab-btn admin-only" data-target="dev-tab"><i class="fa-solid fa-code"></i> Developer Console</button>
+                <div class="tabs" role="tablist" aria-label="Dashboard Tabs">
+                    <button class="tab-btn active" data-target="stats-tab" role="tab" aria-selected="true" aria-controls="stats-tab"><i class="fa-solid fa-user"></i> My Stats</button>
+                    <button class="tab-btn" data-target="leaderboard-tab" role="tab" aria-selected="false" aria-controls="leaderboard-tab"><i class="fa-solid fa-trophy"></i> Leaderboards</button>
+                    <button class="tab-btn" data-target="umas-tab" role="tab" aria-selected="false" aria-controls="umas-tab"><i class="fa-solid fa-horse-head"></i> My Uma Trainees</button>
+                    <button class="tab-btn" data-target="quotes-tab" role="tab" aria-selected="false" aria-controls="quotes-tab"><i class="fa-solid fa-quote-left"></i> My Quotes</button>
+                    <button class="tab-btn admin-only" data-target="fleet-tab" role="tab" aria-selected="false" aria-controls="fleet-tab"><i class="fa-solid fa-server"></i> Fleet Command</button>
+                    <button class="tab-btn admin-only" data-target="broadcast-tab" role="tab" aria-selected="false" aria-controls="broadcast-tab"><i class="fa-solid fa-bullhorn"></i> Global Broadcast</button>
+                    <button class="tab-btn admin-only" data-target="dev-tab" role="tab" aria-selected="false" aria-controls="dev-tab"><i class="fa-solid fa-code"></i> Developer Console</button>
                 </div>
                 
                 <!-- Stats Tab -->
@@ -98,32 +79,32 @@
                         <img id="profile-img" src="" class="profile-avatar">
                         <div>
                             <h2 class="profile-name" id="profile-name">User</h2>
-                            <p style="color: #aaa; margin: 0.25rem 0 0 0;">View your global economy and stats</p>
+                            <p class="section-desc">View your global economy and stats</p>
                         </div>
                     </div>
                     <div class="stats-grid">
-                        <div class="stat-card glow-effect" style="border-top: 4px solid #FFD700">
-                            <i class="fa-solid fa-coins fa-2x" style="color: #FFD700"></i>
+                        <div class="stat-card gold glow-effect">
+                            <i class="fa-solid fa-coins fa-2x"></i>
                             <div class="stat-value" id="stat-sayories">0</div>
                             <div class="stat-label">Sayories</div>
                         </div>
-                        <div class="stat-card glow-effect" style="border-top: 4px solid #FF69B4">
-                            <i class="fa-solid fa-quote-right fa-2x" style="color: #FF69B4"></i>
+                        <div class="stat-card pink glow-effect">
+                            <i class="fa-solid fa-quote-right fa-2x"></i>
                             <div class="stat-value" id="stat-quotes">0</div>
                             <div class="stat-label">Quote Stars</div>
                         </div>
-                        <div class="stat-card glow-effect" style="border-top: 4px solid #B983FF">
-                            <i class="fa-solid fa-horse-head fa-2x" style="color: #B983FF"></i>
+                        <div class="stat-card purple glow-effect">
+                            <i class="fa-solid fa-horse-head fa-2x"></i>
                             <div class="stat-value" id="stat-umas">0</div>
                             <div class="stat-label">Umamusume Collected</div>
                         </div>
-                        <div class="stat-card glow-effect" style="border-top: 4px solid #4CAF50">
-                            <i class="fa-solid fa-ticket fa-2x" style="color: #4CAF50"></i>
+                        <div class="stat-card green glow-effect">
+                            <i class="fa-solid fa-ticket fa-2x"></i>
                             <div class="stat-value" id="stat-free-haru">0</div>
                             <div class="stat-label">Free Haru-Urara-Coins</div>
                         </div>
-                        <div class="stat-card glow-effect" style="border-top: 4px solid #FF4500">
-                            <i class="fa-solid fa-gem fa-2x" style="color: #FF4500"></i>
+                        <div class="stat-card orange glow-effect">
+                            <i class="fa-solid fa-gem fa-2x"></i>
                             <div class="stat-value" id="stat-paid-haru">0</div>
                             <div class="stat-label">Paid Haru-Urara-Coins</div>
                         </div>
@@ -191,32 +172,32 @@
                         <h2><i class="fa-solid fa-bullhorn"></i> Global Broadcast</h2>
                         <p class="section-desc">Publish a rich embed message to all servers instantly.</p>
                     </div>
-                    <div class="glass-panel" style="max-width: 600px; padding: 2rem;">
-                        <div class="input-group">
-                            <i class="fa-solid fa-heading input-icon"></i>
+                    <div class="glass-panel" style="max-width: 600px; margin: 0 auto; padding: 2rem;">
+                        <div class="broadcast-form-group">
+                            <label for="bc-title"><i class="fa-solid fa-heading"></i> Title</label>
                             <input type="text" id="bc-title" placeholder="Embed Title (e.g. New Feature!)">
                         </div>
-                        <div class="input-group">
-                            <textarea id="bc-desc" placeholder="Embed Description (Supports Markdown)" style="width: 100%; height: 120px; padding: 1rem; background: rgba(0,0,0,0.2); border: 1px solid var(--panel-border); border-radius: 12px; color: var(--text-primary); font-family: inherit; resize: vertical;"></textarea>
+                        <div class="broadcast-form-group">
+                            <label for="bc-desc"><i class="fa-solid fa-align-left"></i> Description</label>
+                            <textarea id="bc-desc" placeholder="Embed Description (Supports Markdown)" rows="5"></textarea>
                         </div>
-                        <div class="input-group" style="display: flex; gap: 1rem;">
-                            <div style="flex: 1;">
-                                <i class="fa-solid fa-palette input-icon"></i>
+                        <div style="display: flex; gap: 1rem; flex-wrap: wrap;">
+                            <div class="broadcast-form-group" style="flex: 1; min-width: 200px;">
+                                <label for="bc-color"><i class="fa-solid fa-palette"></i> Color</label>
                                 <input type="text" id="bc-color" placeholder="Hex Color (e.g. #FF69B4)">
                             </div>
-                            <div style="flex: 1;">
-                                <i class="fa-solid fa-image input-icon"></i>
+                            <div class="broadcast-form-group" style="flex: 1; min-width: 200px;">
+                                <label for="bc-image"><i class="fa-solid fa-image"></i> Image URL</label>
                                 <input type="text" id="bc-image" placeholder="Image URL (Optional)">
                             </div>
                         </div>
-                        <div class="input-group">
-                            <i class="fa-solid fa-shoe-prints input-icon"></i>
+                        <div class="broadcast-form-group">
+                            <label for="bc-footer"><i class="fa-solid fa-shoe-prints"></i> Footer</label>
                             <input type="text" id="bc-footer" placeholder="Footer Text (Optional)">
                         </div>
-                        <button id="bc-submit-btn" class="primary-btn" onclick="publishBroadcast()">
+                        <button id="bc-submit-btn" class="primary-btn" onclick="publishBroadcast()" style="margin-top: 1rem;">
                             <i class="fa-solid fa-paper-plane"></i> Publish to All Servers
                         </button>
-                        <div id="bc-msg" class="success-toast hidden" style="position: relative; transform: none; left: 0; bottom: 0; margin-top: 1rem; text-align: center;"></div>
                     </div>
                 </div>
 
@@ -240,9 +221,6 @@
                         </div>
                         <div class="editor-container">
                             <textarea id="code-editor"></textarea>
-                        </div>
-                        <div id="save-msg" class="success-toast hidden">
-                            <i class="fa-solid fa-check-circle"></i> File saved successfully!
                         </div>
                     </div>
                 </div>

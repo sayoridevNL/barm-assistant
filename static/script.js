@@ -2,16 +2,14 @@ document.addEventListener('DOMContentLoaded', () => {
     // DOM Elements
     const loginScreen = document.getElementById('login-screen');
     const dashboardScreen = document.getElementById('dashboard-screen');
-    const passwordInput = document.getElementById('password-input');
-    const loginBtn = document.getElementById('login-btn');
-    const loginError = document.getElementById('login-error');
-    const logoutBtn = document.getElementById('logout-btn');
     
-    const botsGrid = document.getElementById('bots-grid');
-    
-    const fileSelect = document.getElementById('file-select');
-    const saveBtn = document.getElementById('save-btn');
-    const saveMsg = document.getElementById('save-msg');
+    // Toast Host Setup
+    if (!document.getElementById('toast-host')) {
+        const toastHost = document.createElement('div');
+        toastHost.id = 'toast-host';
+        toastHost.setAttribute('aria-live', 'polite');
+        document.body.appendChild(toastHost);
+    }
 
     // CodeMirror instance
     const editor = CodeMirror.fromTextArea(document.getElementById('code-editor'), {
@@ -28,7 +26,6 @@ document.addEventListener('DOMContentLoaded', () => {
         "gambling_bot", "umamusume_bot", "general_bot"
     ];
 
-    // Icons mapping for visual flair
     const BOT_ICONS = {
         "music_bot": "fa-music",
         "moderation_bot": "fa-shield-halved",
@@ -38,38 +35,77 @@ document.addEventListener('DOMContentLoaded', () => {
         "general_bot": "fa-robot"
     };
 
+    // --- Toast Utility ---
+    window.showToast = function(message, type = 'success') {
+        const host = document.getElementById('toast-host');
+        const toast = document.createElement('div');
+        toast.className = `toast ${type}`;
+        toast.innerHTML = `<i class="fa-solid ${type === 'success' ? 'fa-check-circle' : 'fa-triangle-exclamation'}"></i> ${message}`;
+        host.appendChild(toast);
+        
+        requestAnimationFrame(() => toast.classList.add('show'));
+        setTimeout(() => {
+            toast.classList.remove('show');
+            setTimeout(() => toast.remove(), 300);
+        }, 3000);
+    };
+
+    // --- Skeleton & Empty State Utilities ---
+    function renderSkeletons(containerId, type, count = 3) {
+        const container = document.getElementById(containerId);
+        if (!container) return;
+        container.innerHTML = '';
+        for(let i=0; i<count; i++) {
+            const div = document.createElement('div');
+            div.className = `skeleton skeleton-${type}`;
+            container.appendChild(div);
+        }
+    }
+
+    function renderEmptyState(containerId, icon, message) {
+        const container = document.getElementById(containerId);
+        if (!container) return;
+        container.innerHTML = `<div class="empty-state"><i class="fa-solid ${icon}"></i><div>${message}</div></div>`;
+    }
+
     // --- Authentication & Initialization ---
     if (typeof USER_ID !== 'undefined' && USER_ID) {
-        // User is logged in via Discord
         showDashboard();
     } else {
         showLogin();
     }
 
-    // --- Dashboard logic ---
     function showDashboard() {
         loginScreen.classList.add('hidden');
         dashboardScreen.classList.remove('hidden');
         
-        // Populate User Info
         document.getElementById('profile-img').src = AVATAR_URL;
         document.getElementById('profile-name').innerText = USERNAME || 'User';
         
-        // Hide admin tabs if not admin
         if (!IS_ADMIN) {
             document.querySelectorAll('.admin-only').forEach(el => el.style.display = 'none');
         }
         
-        // Tab Switching Logic
+        // Tab Switching Logic with ARIA
         document.querySelectorAll('.tab-btn').forEach(btn => {
             btn.addEventListener('click', (e) => {
-                document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+                document.querySelectorAll('.tab-btn').forEach(b => {
+                    b.classList.remove('active');
+                    b.setAttribute('aria-selected', 'false');
+                });
                 document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
                 
                 btn.classList.add('active');
+                btn.setAttribute('aria-selected', 'true');
                 document.getElementById(btn.dataset.target).classList.add('active');
             });
         });
+        
+        // Initial Skeletons
+        renderSkeletons('umas-grid', 'card', 3);
+        renderSkeletons('lb-sayories', 'row', 5);
+        renderSkeletons('lb-quotes', 'row', 5);
+        renderSkeletons('quotes-history-container', 'row', 3);
         
         fetchUserStats();
         fetchLeaderboards();
@@ -80,7 +116,6 @@ document.addEventListener('DOMContentLoaded', () => {
             fetchStatus();
             fetchPresences();
             fetchFiles();
-            // Poll status every 5 seconds
             statusInterval = setInterval(fetchStatus, 5000);
         }
     }
@@ -102,53 +137,43 @@ document.addEventListener('DOMContentLoaded', () => {
                 
                 const freeHaruElem = document.getElementById('stat-free-haru');
                 if (freeHaruElem) freeHaruElem.innerText = (data.stats.free_haru_coins || 0).toLocaleString();
-                
                 const paidHaruElem = document.getElementById('stat-paid-haru');
                 if (paidHaruElem) paidHaruElem.innerText = (data.stats.paid_haru_coins || 0).toLocaleString();
                 
-                // Render Uma Trainees
                 const umasGrid = document.getElementById('umas-grid');
                 umasGrid.innerHTML = '';
                 if (data.stats.umas_list && data.stats.umas_list.length > 0) {
                     data.stats.umas_list.forEach(uma => {
                         const imgUrl = uma.image ? (uma.image.includes('?') ? uma.image + '&_cb=' + Date.now() : uma.image + '?_cb=' + Date.now()) : '';
-                        
-                        const rarityColors = {
-                            "Legendary": "#FFD700",
-                            "SSR": "#FF69B4",
-                            "SR": "#B983FF",
-                            "R": "#4CAF50"
-                        };
-                        const rarityColor = rarityColors[uma.rarity] || "#aaa";
+                        const rarityClass = uma.rarity || ""; // Legendary, SSR, SR, R
                         
                         const card = document.createElement('div');
-                        card.className = 'glass-panel';
-                        card.style.borderTop = `4px solid ${rarityColor}`;
-                        card.style.overflow = 'hidden';
+                        card.className = `uma-card rarity-${rarityClass}`;
                         
-                        let imgHtml = imgUrl ? `<div style="height: 150px; overflow: hidden; display: flex; align-items: center; justify-content: center; background: rgba(0,0,0,0.3);"><img src="${imgUrl}" style="max-height: 100%; object-fit: contain;"></div>` : '';
+                        let imgHtml = imgUrl ? `<div class="uma-img-wrapper"><img src="${imgUrl}" alt="${uma.name}"></div>` : '';
                         
                         card.innerHTML = `
                             ${imgHtml}
-                            <div style="padding: 1rem;">
-                                <h3 style="margin: 0 0 0.5rem 0; font-size: 1.2rem;">${uma.name}</h3>
-                                <span style="background: ${rarityColor}40; color: ${rarityColor}; padding: 0.2rem 0.5rem; border-radius: 4px; font-size: 0.8rem; font-weight: bold;">${uma.rarity}</span>
-                                <div style="margin-top: 1rem; display: grid; grid-template-columns: 1fr 1fr; gap: 0.5rem; font-size: 0.9rem;">
-                                    <div>⚡ SPD: ${uma.speed}</div>
-                                    <div>❤️ STA: ${uma.stamina}</div>
-                                    <div>💪 POW: ${uma.power}</div>
-                                    <div>🏆 ${uma.wins}W / ${uma.races}R</div>
-                                </div>
+                            <div class="uma-card-header">
+                                <h3>${uma.name}</h3>
+                                <span class="rarity-badge">${uma.rarity}</span>
+                            </div>
+                            <div class="uma-stats">
+                                <div>⚡ SPD: ${uma.speed}</div>
+                                <div>❤️ STA: ${uma.stamina}</div>
+                                <div>💪 POW: ${uma.power}</div>
+                                <div>🏆 ${uma.wins}W / ${uma.races}R</div>
                             </div>
                         `;
                         umasGrid.appendChild(card);
                     });
                 } else {
-                    umasGrid.innerHTML = '<div style="grid-column: 1 / -1; text-align: center; color: #aaa; padding: 2rem;">You have no Umamusume! Go use the /lootbox command in Discord to get some!</div>';
+                    renderEmptyState('umas-grid', 'fa-horse', 'No trainees yet — try <code>/lootbox</code> to recruit one!');
                 }
             }
         } catch (e) {
             console.error('Failed to fetch user stats:', e);
+            renderEmptyState('umas-grid', 'fa-triangle-exclamation', 'Failed to load trainees.');
         }
     }
 
@@ -161,30 +186,24 @@ document.addEventListener('DOMContentLoaded', () => {
                 const list = document.getElementById(elementId);
                 list.innerHTML = '';
                 if (!items || items.length === 0) {
-                    list.innerHTML = '<li style="text-align:center; color:#aaa; padding: 1rem;">No data available</li>';
+                    renderEmptyState(elementId, 'fa-trophy', 'No data available yet. Start playing to top the charts!');
                     return;
                 }
                 
                 items.forEach((item, index) => {
                     const li = document.createElement('li');
-                    li.style.padding = '0.75rem';
-                    li.style.borderBottom = '1px solid rgba(255,255,255,0.05)';
-                    li.style.display = 'flex';
-                    li.style.justifyContent = 'space-between';
-                    li.style.alignItems = 'center';
+                    li.className = `leaderboard-row rank-${index + 1}`;
                     
-                    let rankHtml = `<span style="font-weight: bold; width: 20px; display: inline-block; color: #aaa;">${index+1}</span>`;
-                    if (index === 0) rankHtml = `<span style="font-weight: bold; width: 20px; display: inline-block; color: #FFD700;"><i class="fa-solid fa-crown"></i></span>`;
-                    if (index === 1) rankHtml = `<span style="font-weight: bold; width: 20px; display: inline-block; color: #C0C0C0;">2</span>`;
-                    if (index === 2) rankHtml = `<span style="font-weight: bold; width: 20px; display: inline-block; color: #CD7F32;">3</span>`;
+                    let rankHtml = `<span class="leaderboard-rank">${index+1}</span>`;
+                    if (index === 0) rankHtml = `<span class="leaderboard-rank"><i class="fa-solid fa-crown"></i></span>`;
                     
                     li.innerHTML = `
                         <div style="display: flex; align-items: center; gap: 1rem;">
                             ${rankHtml}
                             <span style="font-weight: 500;">${item.username}</span>
                         </div>
-                        <div style="font-weight: bold;">
-                            ${item.score.toLocaleString()} <span style="font-size: 0.8rem; font-weight: normal; color: #aaa;">${unit}</span>
+                        <div class="leaderboard-score">
+                            ${item.score.toLocaleString()} <span style="font-size: 0.8rem; font-weight: normal; color: var(--text-secondary);">${unit}</span>
                         </div>
                     `;
                     list.appendChild(li);
@@ -208,17 +227,16 @@ document.addEventListener('DOMContentLoaded', () => {
             if (data.quotes && data.quotes.length > 0) {
                 data.quotes.forEach(quote => {
                     const el = document.createElement('div');
-                    el.style.padding = '1rem';
-                    el.style.borderBottom = '1px solid var(--panel-border)';
+                    el.className = 'quote-item';
                     const d = new Date(quote.timestamp * 1000);
                     el.innerHTML = `
-                        <div style="font-style: italic; font-size: 1.1rem; margin-bottom: 0.5rem; font-weight: 600;">"${quote.text}"</div>
-                        <div style="font-size: 0.85rem; color: var(--text-secondary);">Quoted by <span style="color: var(--primary-color); font-weight: bold;">${quote.quoter}</span> • ${d.toLocaleDateString()}</div>
+                        <div class="quote-text">"${quote.text}"</div>
+                        <div class="quote-meta">Quoted by <span class="quoter">${quote.quoter}</span> • ${d.toLocaleDateString()}</div>
                     `;
                     container.appendChild(el);
                 });
             } else {
-                container.innerHTML = '<div style="text-align: center; color: var(--text-secondary); padding: 2rem;">No quotes found. Tell your friends to reply to your messages with "quote"!</div>';
+                renderEmptyState('quotes-history-container', 'fa-comment-dots', 'No quotes found. Tell your friends to reply to your messages with "quote"!');
             }
         } catch(e) {
             console.error('Failed to fetch quotes:', e);
@@ -228,21 +246,28 @@ document.addEventListener('DOMContentLoaded', () => {
     const themeToggle = document.getElementById('theme-toggle-btn');
     if (themeToggle) {
         themeToggle.addEventListener('click', () => {
-            document.body.classList.toggle('light-theme');
-            document.body.classList.toggle('dark-theme');
             const icon = themeToggle.querySelector('i');
-            if (document.body.classList.contains('light-theme')) {
-                icon.classList.remove('fa-moon');
-                icon.classList.add('fa-sun');
-            } else {
-                icon.classList.remove('fa-sun');
-                icon.classList.add('fa-moon');
-            }
+            icon.style.transition = 'transform 0.15s ease';
+            icon.style.transform = 'rotate(180deg) scale(0)';
+            
+            setTimeout(() => {
+                document.body.classList.toggle('light-theme');
+                document.body.classList.toggle('dark-theme');
+                if (document.body.classList.contains('light-theme')) {
+                    icon.classList.remove('fa-moon');
+                    icon.classList.add('fa-sun');
+                } else {
+                    icon.classList.remove('fa-sun');
+                    icon.classList.add('fa-moon');
+                }
+                icon.style.transform = 'rotate(0deg) scale(1)';
+            }, 150);
         });
     }
 
     // --- Bot Cards UI ---
     function initBotCards() {
+        const botsGrid = document.getElementById('bots-grid');
         botsGrid.innerHTML = '';
         BOT_NAMES.forEach(bot => {
             const icon = BOT_ICONS[bot] || "fa-robot";
@@ -254,7 +279,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 <div class="bot-card-header">
                     <div class="bot-info">
                         <div class="bot-name"><i class="fa-solid ${icon}"></i> ${displayName}</div>
-                        <div style="margin-top: 0.25rem;"><span class="bot-version">v2.0 Architecture</span></div>
+                        <span class="bot-version">v2.0 Architecture</span>
                     </div>
                     <div id="badge-${bot}" class="status-badge loading">
                         <i class="fa-solid fa-spinner fa-spin"></i> Loading...
@@ -276,7 +301,7 @@ document.addEventListener('DOMContentLoaded', () => {
                     </div>
                     <div class="presence-input-wrapper">
                         <input type="text" id="presence-${bot}" class="presence-input" placeholder="e.g. Playing a game...">
-                        <button id="set-presence-${bot}" class="presence-btn" title="Update Status">
+                        <button id="set-presence-${bot}" class="presence-btn" title="Update Status" aria-label="Update Status">
                             <i class="fa-solid fa-rotate-right"></i>
                         </button>
                     </div>
@@ -284,14 +309,12 @@ document.addEventListener('DOMContentLoaded', () => {
             `;
             botsGrid.appendChild(card);
 
-            // Bind Bot Controls
             const startBtn = document.getElementById(`start-${bot}`);
             const stopBtn = document.getElementById(`stop-${bot}`);
             
             startBtn.addEventListener('click', () => toggleBot(bot, 'start'));
             stopBtn.addEventListener('click', () => toggleBot(bot, 'stop'));
 
-            // Bind Presence Update
             const presenceBtn = document.getElementById(`set-presence-${bot}`);
             const presenceInput = document.getElementById(`presence-${bot}`);
             
@@ -336,11 +359,12 @@ document.addEventListener('DOMContentLoaded', () => {
             const res = await fetch(`/api/${action}/${bot}`, { method: 'POST' });
             const data = await res.json();
             if (!data.success) {
-                alert(data.message);
+                showToast(data.message, 'error');
             }
             fetchStatus();
         } catch (err) {
             console.error(err);
+            showToast('Failed to toggle bot.', 'error');
         }
     }
 
@@ -357,7 +381,7 @@ document.addEventListener('DOMContentLoaded', () => {
                     const startBtn = document.getElementById(`start-${bot}`);
                     const stopBtn = document.getElementById(`stop-${bot}`);
                     
-                    if (!badge) return; // UI not initialized
+                    if (!badge) return; 
                     
                     if (isRunning) {
                         badge.className = 'status-badge running';
@@ -397,6 +421,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // --- Code Editor ---
     async function fetchFiles() {
+        const fileSelect = document.getElementById('file-select');
         try {
             const res = await fetch('/api/files');
             if (res.status === 401) return;
@@ -414,8 +439,9 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     }
 
-    fileSelect.addEventListener('change', async (e) => {
+    document.getElementById('file-select').addEventListener('change', async (e) => {
         const filename = e.target.value;
+        const saveBtn = document.getElementById('save-btn');
         if (!filename) {
             editor.setValue('');
             saveBtn.disabled = true;
@@ -436,9 +462,11 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     });
 
-    saveBtn.addEventListener('click', async () => {
-        const filename = fileSelect.value;
+    document.getElementById('save-btn').addEventListener('click', async () => {
+        const filename = document.getElementById('file-select').value;
         const content = editor.getValue();
+        const saveBtn = document.getElementById('save-btn');
+        
         if (!filename) return;
         
         saveBtn.disabled = true;
@@ -452,25 +480,22 @@ document.addEventListener('DOMContentLoaded', () => {
             });
             
             if (res.ok) {
-                saveMsg.classList.remove('hidden');
-                setTimeout(() => saveMsg.classList.add('hidden'), 3000);
+                showToast('File saved successfully!', 'success');
             } else {
-                alert('Failed to save file');
+                showToast('Failed to save file.', 'error');
             }
         } catch (err) {
             console.error(err);
-            alert('Failed to save file');
+            showToast('Network error saving file.', 'error');
         } finally {
             saveBtn.disabled = false;
             saveBtn.innerHTML = '<i class="fa-solid fa-floppy-disk"></i> Save Changes';
         }
     });
     
-    // Check initial auth status by trying to get status
+    // Initial Auth Check
     fetch('/api/status').then(res => {
-        if (res.ok) {
-            showDashboard();
-        }
+        if (res.ok) showDashboard();
     });
 });
 
@@ -480,14 +505,10 @@ window.publishBroadcast = async function() {
     const color = document.getElementById('bc-color').value;
     const image = document.getElementById('bc-image').value;
     const footer = document.getElementById('bc-footer').value;
-    const msgEl = document.getElementById('bc-msg');
     const btn = document.getElementById('bc-submit-btn');
 
     if (!title && !desc) {
-        msgEl.className = 'error-toast';
-        msgEl.innerHTML = '<i class="fa-solid fa-triangle-exclamation"></i> Title or description is required!';
-        msgEl.classList.remove('hidden');
-        setTimeout(() => msgEl.classList.add('hidden'), 3000);
+        showToast('Title or description is required!', 'error');
         return;
     }
 
@@ -503,26 +524,19 @@ window.publishBroadcast = async function() {
         const data = await res.json();
         
         if (res.ok) {
-            msgEl.className = 'success-toast';
-            msgEl.innerHTML = '<i class="fa-solid fa-check-circle"></i> ' + data.message;
-            
-            // Clear form
+            showToast(data.message, 'success');
             document.getElementById('bc-title').value = '';
             document.getElementById('bc-desc').value = '';
             document.getElementById('bc-color').value = '';
             document.getElementById('bc-image').value = '';
             document.getElementById('bc-footer').value = '';
         } else {
-            msgEl.className = 'error-toast';
-            msgEl.innerHTML = '<i class="fa-solid fa-triangle-exclamation"></i> ' + (data.error || 'Failed to publish');
+            showToast(data.error || 'Failed to publish', 'error');
         }
     } catch (e) {
-        msgEl.className = 'error-toast';
-        msgEl.innerHTML = '<i class="fa-solid fa-triangle-exclamation"></i> Network Error';
+        showToast('Network Error', 'error');
     }
     
-    msgEl.classList.remove('hidden');
-    setTimeout(() => msgEl.classList.add('hidden'), 5000);
     btn.disabled = false;
     btn.innerHTML = '<i class="fa-solid fa-paper-plane"></i> Publish to All Servers';
 };
