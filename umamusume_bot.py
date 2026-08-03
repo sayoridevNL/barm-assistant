@@ -18,8 +18,8 @@ def _wiki_icon(name: str) -> str:
     return f"https://umamusu.wiki/w/thumb.php?f={slug}_%28Icon%29.png&width=140"
 
 # ─────────────────────────────  Uma (Trainee) gacha  ─────────────────────────────
-_UMA_RARITY_WEIGHTS = {"3-Star": 3, "2-Star": 15, "1-Star": 82}
-_PAID_UMA_WEIGHTS = {"3-Star": 6, "2-Star": 24, "1-Star": 70}
+_UMA_RARITY_WEIGHTS = {"3-Star": 1, "2-Star": 8, "1-Star": 91}
+_PAID_UMA_WEIGHTS = {"3-Star": 3, "2-Star": 12, "1-Star": 85}
 
 _UMA_RARITY_COLORS  = {"3-Star": 0xFFD700, "2-Star": 0x9B59B6, "1-Star": 0x3498DB}
 _UMA_RARITY_EMOJI   = {"3-Star": "⭐⭐⭐", "2-Star": "⭐⭐", "1-Star": "⭐"}
@@ -91,8 +91,8 @@ def _uma_image(uma: dict) -> str:
     return img
 
 # ─────────────────────────────  Support Card gacha  ─────────────────────────────
-_SUPPORT_RARITY_WEIGHTS = {"SSR": 3, "SR": 15, "R": 82}
-_PAID_SUPPORT_WEIGHTS = {"SSR": 6, "SR": 24, "R": 70}
+_SUPPORT_RARITY_WEIGHTS = {"SSR": 1, "SR": 8, "R": 91}
+_PAID_SUPPORT_WEIGHTS = {"SSR": 3, "SR": 12, "R": 85}
 
 _SUPPORT_RARITY_COLORS  = {"SSR": 0xFF4500, "SR": 0x9B59B6, "R": 0x3498DB}
 _SUPPORT_RARITY_EMOJI   = {"SSR": "🔶", "SR": "🔷", "R": "⬜"}
