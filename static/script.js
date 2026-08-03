@@ -100,6 +100,12 @@ document.addEventListener('DOMContentLoaded', () => {
                 document.getElementById('stat-quotes').innerText = data.stats.quotes.toLocaleString();
                 document.getElementById('stat-umas').innerText = data.stats.umamusume.toLocaleString();
                 
+                const freeHaruElem = document.getElementById('stat-free-haru');
+                if (freeHaruElem) freeHaruElem.innerText = (data.stats.free_haru_coins || 0).toLocaleString();
+                
+                const paidHaruElem = document.getElementById('stat-paid-haru');
+                if (paidHaruElem) paidHaruElem.innerText = (data.stats.paid_haru_coins || 0).toLocaleString();
+                
                 // Render Uma Trainees
                 const umasGrid = document.getElementById('umas-grid');
                 umasGrid.innerHTML = '';

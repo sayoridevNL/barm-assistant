@@ -165,7 +165,10 @@ def user_stats():
         return jsonify({'error': 'Unauthorized'}), 401
         
     quotes = get_global_section_sync('quotes').get(user_id, {}).get('stars', 0)
-    sayories = get_global_section_sync('economy').get(user_id, {}).get('balance', 0)
+    user_eco = get_global_section_sync('economy').get(user_id, {})
+    sayories = user_eco.get('balance', 0)
+    free_haru_coins = user_eco.get('free_haru_coins', 0)
+    paid_haru_coins = user_eco.get('paid_haru_coins', 0)
     user_umas = get_global_section_sync('uma_inventory').get(user_id, {}).get('umas', [])
     
     return jsonify({
@@ -176,6 +179,8 @@ def user_stats():
         'stats': {
             'quotes': quotes,
             'sayories': sayories,
+            'free_haru_coins': free_haru_coins,
+            'paid_haru_coins': paid_haru_coins,
             'umamusume': len(user_umas),
             'umas_list': user_umas
         }

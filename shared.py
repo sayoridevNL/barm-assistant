@@ -164,6 +164,21 @@ async def g_eco_set(user_id: int, amount: int):
     eco[uid]["balance"] = max(0, amount)
     await global_save_section("economy", eco)
 
+async def g_haru_get(user_id: int) -> tuple[int, int]:
+    """Returns (free_coins, paid_coins)"""
+    eco = await global_get_section("economy")
+    user_eco = eco.get(str(user_id), {})
+    return user_eco.get("free_haru_coins", 0), user_eco.get("paid_haru_coins", 0)
+
+async def g_haru_add(user_id: int, free_amount: int, paid_amount: int) -> tuple[int, int]:
+    eco = await global_get_section("economy")
+    uid = str(user_id)
+    eco.setdefault(uid, {})
+    eco[uid]["free_haru_coins"] = max(0, eco[uid].get("free_haru_coins", 0) + free_amount)
+    eco[uid]["paid_haru_coins"] = max(0, eco[uid].get("paid_haru_coins", 0) + paid_amount)
+    await global_save_section("economy", eco)
+    return eco[uid]["free_haru_coins"], eco[uid]["paid_haru_coins"]
+
 # ── TIER SYSTEM ──────────────────────────────────────────────────────────────
 TIER_EMOJIS = {1: "🌱", 2: "🌿", 3: "🍃", 4: "🌸", 5: "🌺", 6: "⭐", 7: "🌟", 8: "💫", 9: "✨", 10: "🔥", 11: "🌊", 12: "⚡", 13: "🌪️", 14: "❄️", 15: "🌈", 16: "💎", 17: "🏆", 18: "👑", 19: "🦋", 20: "🐉", 21: "🌌", 22: "⚜️", 23: "🔮", 24: "🌠", 25: "💠"}
 TIER_TITLES = {1: "Seedling", 2: "Sprout", 3: "Sapling", 4: "Blossom", 5: "Bloom", 6: "Rising Star", 7: "Shining Star", 8: "Radiant", 9: "Glimmering", 10: "Blazing", 11: "Tidal Force", 12: "Thunderstruck", 13: "Tempest", 14: "Frostbound", 15: "Prism Walker", 16: "Diamond", 17: "Champion", 18: "Crowned", 19: "Transcendent", 20: "Dragonheart", 21: "Cosmic", 22: "Exalted", 23: "Arcane Master", 24: "Celestial", 25: "Sayorie Legend"}

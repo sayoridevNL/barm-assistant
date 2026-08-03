@@ -18,12 +18,9 @@ def _wiki_icon(name: str) -> str:
     return f"https://umamusu.wiki/w/thumb.php?f={slug}_%28Icon%29.png&width=140"
 
 # ─────────────────────────────  Uma (Trainee) gacha  ─────────────────────────────
-# Real game note: Trainees are rated in Stars (1-3), NOT R/SR/SSR — that scale is
-# reserved for Support Cards below. Duplicates raise a Trainee's Star Grade further
-# (up to 5) via Star Pieces in the real game; we skip that extra layer here and just
-# track ownership + a flat power score.
+_UMA_RARITY_WEIGHTS = {"3-Star": 3, "2-Star": 15, "1-Star": 82}
+_PAID_UMA_WEIGHTS = {"3-Star": 6, "2-Star": 24, "1-Star": 70}
 
-_UMA_RARITY_WEIGHTS = {"3-Star": 3, "2-Star": 18, "1-Star": 79}
 _UMA_RARITY_COLORS  = {"3-Star": 0xFFD700, "2-Star": 0x9B59B6, "1-Star": 0x3498DB}
 _UMA_RARITY_EMOJI   = {"3-Star": "⭐⭐⭐", "2-Star": "⭐⭐", "1-Star": "⭐"}
 _UMA_GLOBAL_SECTION = "uma_inventory"
@@ -51,8 +48,6 @@ _UMA_POOL = [
     ("King Halo", "2-Star", 85, 85, 90, 75, 90, _wiki_icon("King_Halo")),
     ("Nice Nature", "1-Star", 75, 80, 75, 90, 80, _wiki_icon("Nice_Nature")),
     ("Haru Urara", "1-Star", 40, 55, 45, 60, 90, _wiki_icon("Haru_Urara")),
-    # Special/seasonal versions — in the real game every alternate costume is treated
-    # as a fully distinct Trainee with its own pull entry, own stats, own art.
     ("Haru Urara (New Year)", "3-Star", 55, 65, 55, 65, 110, _wiki_icon("Haru_Urara")),
     ("Maruzensky (Summer)", "3-Star", 115, 75, 85, 80, 80, _wiki_icon("Maruzensky")),
 ]
@@ -73,16 +68,15 @@ async def _uma_save_inventory(user_id: int, data: dict):
     inv_global[str(user_id)] = data
     await global_save_section(_UMA_GLOBAL_SECTION, inv_global)
 
-_UMA_LOOTBOX_TIERS = {
-    "basic":   {"label": "🎁 Basic Box",   "emoji": "🎁", "cost": 2_000,   "color": 0x3498DB, "weights": {"3-Star": 3,  "2-Star": 18, "1-Star": 79}, "flavor": "A standard capsule fresh off the track — same odds as the real Pretty Derby Scout."},
-    "premium": {"label": "💎 Premium Box", "emoji": "💎", "cost": 8_000,   "color": 0x9B59B6, "weights": {"3-Star": 10, "2-Star": 30, "1-Star": 60}, "flavor": "A premium capsule — noticeably better 2★/3★ odds."},
-    "elite":   {"label": "🏆 Elite Box",   "emoji": "🏆", "cost": 25_000,  "color": 0xFF4500, "weights": {"3-Star": 25, "2-Star": 40, "1-Star": 35}, "flavor": "Elite-grade capsule — 3★ pulls start getting common."},
-    "legend":  {"label": "👑 Legend Box",  "emoji": "👑", "cost": 75_000,  "color": 0xFFD700, "weights": {"3-Star": 50, "2-Star": 40, "1-Star": 10}, "flavor": "Legend-tier capsule — mostly 2★/3★ trainees."},
-    "divine":  {"label": "✨ Divine Box",  "emoji": "✨", "cost": 200_000, "color": 0xFFFFFF, "weights": {"3-Star": 80, "2-Star": 20, "1-Star": 0},  "flavor": "Divine capsule — guaranteed 2★ or better, heavy odds on 3★."},
-}
+def _uma_roll(weights_override: dict | None = None, min_rarity: str = "1-Star") -> dict:
+    w = dict(weights_override or _UMA_RARITY_WEIGHTS)
+    
+    if min_rarity == "2-Star":
+        w["1-Star"] = 0
+    elif min_rarity == "3-Star":
+        w["1-Star"] = 0
+        w["2-Star"] = 0
 
-def _uma_roll(weights_override: dict | None = None) -> dict:
-    w = weights_override or _UMA_RARITY_WEIGHTS
     valid_rarities = {r for r, wt in w.items() if wt > 0}
     filtered = [u for u in _UMA_POOL if u[1] in valid_rarities]
     weights = [w[u[1]] for u in filtered]
@@ -97,13 +91,9 @@ def _uma_image(uma: dict) -> str:
     return img
 
 # ─────────────────────────────  Support Card gacha  ─────────────────────────────
-# Real game note: Support Cards are a completely separate gacha pool from Trainees
-# (their own banner, own pity), using real R / SR / SSR rarity and one of six real
-# specialties (Speed, Stamina, Power, Guts, Wit, Friend). Real cards grant several
-# distinct training bonuses (friendship %, training %, hint level, etc.) — this bot
-# collapses those into a single "Support Bonus" number to keep the loot box simple.
+_SUPPORT_RARITY_WEIGHTS = {"SSR": 3, "SR": 15, "R": 82}
+_PAID_SUPPORT_WEIGHTS = {"SSR": 6, "SR": 24, "R": 70}
 
-_SUPPORT_RARITY_WEIGHTS = {"SSR": 3, "SR": 18, "R": 79}
 _SUPPORT_RARITY_COLORS  = {"SSR": 0xFF4500, "SR": 0x9B59B6, "R": 0x3498DB}
 _SUPPORT_RARITY_EMOJI   = {"SSR": "🔶", "SR": "🔷", "R": "⬜"}
 _SUPPORT_TYPE_EMOJI     = {"Speed": "⚡", "Stamina": "❤️", "Power": "💪", "Guts": "🔥", "Wit": "🧠", "Friend": "🤝"}
@@ -143,16 +133,15 @@ async def _support_save_inventory(user_id: int, data: dict):
     inv_global[str(user_id)] = data
     await global_save_section(_SUPPORT_GLOBAL_SECTION, inv_global)
 
-_SUPPORT_LOOTBOX_TIERS = {
-    "basic":   {"label": "🎁 Basic Support Box",   "emoji": "🎁", "cost": 1_500,   "color": 0x3498DB, "weights": {"SSR": 3,  "SR": 18, "R": 79}, "flavor": "Same odds as the real Support Card Scout."},
-    "premium": {"label": "💎 Premium Support Box", "emoji": "💎", "cost": 6_000,   "color": 0x9B59B6, "weights": {"SSR": 10, "SR": 35, "R": 55}, "flavor": "Noticeably better SR/SSR odds."},
-    "elite":   {"label": "🏆 Elite Support Box",   "emoji": "🏆", "cost": 18_000,  "color": 0xFF4500, "weights": {"SSR": 25, "SR": 45, "R": 30}, "flavor": "SSR pulls start getting common."},
-    "legend":  {"label": "👑 Legend Support Box",  "emoji": "👑", "cost": 50_000,  "color": 0xFFD700, "weights": {"SSR": 50, "SR": 45, "R": 5},  "flavor": "Mostly SR/SSR support cards."},
-    "divine":  {"label": "✨ Divine Support Box",  "emoji": "✨", "cost": 150_000, "color": 0xFFFFFF, "weights": {"SSR": 80, "SR": 20, "R": 0},  "flavor": "Guaranteed SR or better, heavy odds on SSR."},
-}
+def _support_roll(weights_override: dict | None = None, min_rarity: str = "R") -> dict:
+    w = dict(weights_override or _SUPPORT_RARITY_WEIGHTS)
+    
+    if min_rarity == "SR":
+        w["R"] = 0
+    elif min_rarity == "SSR":
+        w["R"] = 0
+        w["SR"] = 0
 
-def _support_roll(weights_override: dict | None = None) -> dict:
-    w = weights_override or _SUPPORT_RARITY_WEIGHTS
     valid = {r for r, wt in w.items() if wt > 0}
     filtered = [c for c in _SUPPORT_POOL if c[2] in valid]
     weights = [w[c[2]] for c in filtered]
@@ -181,61 +170,198 @@ bot = UmamusumeBot()
 tree = bot.tree
 install_error_handler(tree)
 
-# ─────────────────────────────  Uma commands  ─────────────────────────────
+# ─────────────────────────────  Currency Commands  ─────────────────────────────
 
-@tree.command(name="lootbox_shop", description="🎁 View Umamusume loot box prices and odds")
-async def lootbox_shop(interaction: discord.Interaction):
+@tree.command(name="convert", description="🪙 Convert Sayories into Haru-Urara-Coins")
+@app_commands.describe(amount="Amount of coins to buy", coin_type="Which coin to buy (Paid or Free)")
+@app_commands.choices(coin_type=[app_commands.Choice(name="Free Haru-Urara-Coin (1 Sayories)", value="free"), app_commands.Choice(name="Paid Haru-Urara-Coin (100 Sayories)", value="paid")])
+async def convert_cmd(interaction: discord.Interaction, amount: int, coin_type: str):
     if not await dm_check(interaction): return
-    embed = (EmbedBuilder(color=Palette.PRIMARY)
-        .title("🎁 Umamusume Loot Box Shop")
-        .description("Pick a box with `/lootbox <tier>`. Higher tiers cost more and improve Star odds."))
-    for key, tier in _UMA_LOOTBOX_TIERS.items():
-        odds = " • ".join(f"{rarity} `{weight:g}%`" for rarity, weight in tier["weights"].items() if weight > 0)
-        embed.field(tier["label"], f"Cost: **{tier['cost']:,} Sayories**\n{tier['flavor']}\n{odds}", inline=False)
-    await interaction.response.send_message(embed=embed.branded("Umamusume").build())
-
-@tree.command(name="lootbox", description="🎁 Open an Umamusume loot box!")
-@app_commands.describe(tier="Which box to open — higher tier = better odds & higher cost")
-@app_commands.choices(tier=[app_commands.Choice(name="🎁 Basic     —   2,000 Sayories", value="basic"), app_commands.Choice(name="💎 Premium  —   8,000 Sayories", value="premium"), app_commands.Choice(name="🏆 Elite    —  25,000 Sayories", value="elite"), app_commands.Choice(name="👑 Legend   —  75,000 Sayories", value="legend"), app_commands.Choice(name="✨ Divine   — 200,000 Sayories", value="divine")])
-async def lootbox(interaction: discord.Interaction, tier: str = "basic"):
-    if not await dm_check(interaction): return
-    t = _UMA_LOOTBOX_TIERS[tier]; cost = t["cost"]
+    if amount <= 0:
+        return await interaction.response.send_message("❌ Amount must be positive.", ephemeral=True)
+    
+    cost_per_coin = 100 if coin_type == "paid" else 1
+    total_cost = amount * cost_per_coin
+    
     bal = await g_eco_get(interaction.user.id)
-    if bal < cost: return await interaction.response.send_message(f"❌ You need **{cost:,} Sayories** to open a **{t['label']}** (you have {bal:,}).", ephemeral=True)
-    await g_eco_add(interaction.user.id, -cost)
-
-    embed = (EmbedBuilder(color=t["color"]).title("🏟️ STARTING GATE LOCKED").description(f"```\n┌────────────────────────────────────────┐\n│  {t['emoji']} OPENING: {t['label']:<26} │\n│                                        │\n│       🎌 CONNECTING TO TRACK...        │\n│                                        │\n└────────────────────────────────────────┘\n```\n✨ *Awakening the spirit of a hidden Uma...*").build())
+    if bal < total_cost:
+        return await interaction.response.send_message(f"❌ You need **{total_cost:,} Sayories** to buy {amount:,} {coin_type.capitalize()} Haru-Urara-Coins. (You have {bal:,})", ephemeral=True)
+    
+    # Process transaction
+    await g_eco_add(interaction.user.id, -total_cost)
+    if coin_type == "paid":
+        f, p = await g_haru_add(interaction.user.id, 0, amount)
+    else:
+        f, p = await g_haru_add(interaction.user.id, amount, 0)
+        
+    embed = (EmbedBuilder(color=Palette.SUCCESS)
+        .title("🪙 Currency Converted!")
+        .description(f"Successfully converted **{total_cost:,} Sayories** into **{amount:,} {coin_type.capitalize()} Haru-Urara-Coins**!")
+        .fields(
+            ("Free Haru-Urara-Coins", f"`{f:,}`"),
+            ("Paid Haru-Urara-Coins", f"`{p:,}`"),
+            ("Remaining Sayories", f"`{bal - total_cost:,}`")
+        ).build())
     await interaction.response.send_message(embed=embed)
-    await asyncio.sleep(1.5)
 
-    uma = _uma_roll(weights_override=t["weights"])
+@tree.command(name="balance", description="🪙 Check your Haru-Urara-Coins and Sayories")
+async def balance_cmd(interaction: discord.Interaction):
+    if not await dm_check(interaction): return
+    bal = await g_eco_get(interaction.user.id)
+    f, p = await g_haru_get(interaction.user.id)
+    
+    embed = (EmbedBuilder(color=Palette.PRIMARY)
+        .title("💰 Wallet Balance")
+        .fields(
+            ("Free Haru-Urara-Coins", f"`{f:,}`"),
+            ("Paid Haru-Urara-Coins", f"`{p:,}`"),
+            ("Sayories", f"`{bal:,}`")
+        ).build())
+    await interaction.response.send_message(embed=embed)
+
+# ─────────────────────────────  Pull Commands  ─────────────────────────────
+
+@tree.command(name="pull_trainee", description="🐴 Pull for Trainee Umamusume")
+@app_commands.describe(banner="Use Free or Paid Haru-Urara-Coins?", amount="Pull 1 or 10 times?")
+@app_commands.choices(banner=[app_commands.Choice(name="Free Banner (Free Coins)", value="free"), app_commands.Choice(name="Premium Banner (Paid Coins)", value="paid")])
+@app_commands.choices(amount=[app_commands.Choice(name="1 Pull (150 Coins)", value=1), app_commands.Choice(name="10 Pull (1,500 Coins) - Guaranteed Rarity!", value=10)])
+async def pull_trainee_cmd(interaction: discord.Interaction, banner: str, amount: int):
+    if not await dm_check(interaction): return
+    cost = 150 * amount
+    
+    f, p = await g_haru_get(interaction.user.id)
+    if banner == "free":
+        if f < cost: return await interaction.response.send_message(f"❌ You need {cost:,} Free Haru-Urara-Coins (You have {f:,}).", ephemeral=True)
+        await g_haru_add(interaction.user.id, -cost, 0)
+        weights = _UMA_RARITY_WEIGHTS
+        guaranteed_rarity = "2-Star" # Free 10-pull guarantees 2-Star (SR equivalent)
+    else:
+        if p < cost: return await interaction.response.send_message(f"❌ You need {cost:,} Paid Haru-Urara-Coins (You have {p:,}).", ephemeral=True)
+        await g_haru_add(interaction.user.id, 0, -cost)
+        weights = _PAID_UMA_WEIGHTS
+        guaranteed_rarity = "3-Star" # Paid 10-pull guarantees 3-Star (SSR equivalent)
+
+    await interaction.response.defer()
+    
+    # Generate Pulls
+    pulls = []
+    for i in range(amount):
+        min_rarity = "1-Star"
+        if amount == 10 and i == 9: # 10th pull is guaranteed
+            min_rarity = guaranteed_rarity
+        pulls.append(_uma_roll(weights_override=weights, min_rarity=min_rarity))
+
+    # Save to Inventory
     inv = await _uma_get_inventory(interaction.user.id)
-    inv.setdefault("umas", []).append(uma)
+    inv.setdefault("umas", []).extend(pulls)
     await _uma_save_inventory(interaction.user.id, inv)
 
-    color = _UMA_RARITY_COLORS[uma["rarity"]]; remoji = _UMA_RARITY_EMOJI[uma["rarity"]]
-    is_top = uma["rarity"] == "3-Star"
+    if amount == 1:
+        uma = pulls[0]
+        color = _UMA_RARITY_COLORS[uma["rarity"]]; remoji = _UMA_RARITY_EMOJI[uma["rarity"]]
+        is_top = uma["rarity"] == "3-Star"
+        top_text = '## 🎊 **3-STAR PULL!!!** 🎊\n' if is_top else ''
+        embed = (EmbedBuilder(color=color)
+            .title(f"{remoji} UNLOCKED: {uma['name']}  [{uma['rarity']}]")
+            .description(f"{top_text}\n>>> *A new Uma has joined your team!*")
+            .fields(("⚡ Speed", f"`{uma['speed']}`"), ("❤️ Stamina", f"`{uma['stamina']}`"), ("💪 Power", f"`{uma['power']}`"), ("🧠 Wit", f"`{uma.get('wit', 70)}`"), ("🔥 Guts", f"`{uma.get('guts', 70)}`"), ("🆔 Uma ID", f"`{uma['id']}`"))
+            .build())
+        img = _uma_image(uma)
+        if img: embed.set_image(url=img)
+        await interaction.followup.send(content="## 🌸 THE GATES BURST OPEN... A NEW UMA APPEARS! 🌸", embed=embed)
+    else:
+        # 10 Pull Summary
+        embed = EmbedBuilder(color=0xFFD700).title("🌸 10-Pull Trainee Results!").description("You pulled 10 Trainees from the Gacha!")
+        
+        # Sort so highest rarities are at the top of the summary list
+        pulls_sorted = sorted(pulls, key=lambda u: ({"3-Star": 0, "2-Star": 1, "1-Star": 2}.get(u["rarity"], 3)))
+        
+        desc = ""
+        best_uma = pulls_sorted[0]
+        for u in pulls_sorted:
+            remoji = _UMA_RARITY_EMOJI[u["rarity"]]
+            desc += f"{remoji} **{u['name']}** `[{u['rarity']}]`\n"
+            
+        embed.description = desc
+        img = _uma_image(best_uma)
+        if img: embed.set_thumbnail(url=img)
+        embed.footer(f"Highlighting {best_uma['name']}!")
+        
+        await interaction.followup.send(embed=embed.build())
 
-    top_text = '## 🎊 **3-STAR PULL!!!** 🎊\n' if is_top else ''
-    reveal_embed = (EmbedBuilder(color=color)
-        .title(f"{remoji} UNLOCKED: {uma['name']}  [{uma['rarity']}]")
-        .description(f"{top_text}\n>>> *A new Uma has joined your team!*")
-        .fields(("⚡ Speed", f"`{uma['speed']}`"), ("❤️ Stamina", f"`{uma['stamina']}`"), ("💪 Power", f"`{uma['power']}`"), ("🧠 Wit", f"`{uma.get('wit', 70)}`"), ("🔥 Guts", f"`{uma.get('guts', 70)}`"), ("🆔 Uma ID", f"`{uma['id']}`"))
-        .field(f"{t['emoji']} Box Used", f"**{t['label']}** — {cost:,} Sayories", inline=False)
-        .build())
-    img = _uma_image(uma)
-    if img: reveal_embed.set_image(url=img)
-    reveal_embed.set_author(name=interaction.user.display_name, icon_url=interaction.user.display_avatar.url)
-    reveal_embed.set_footer(text=f"Cost: {cost:,} Sayories • Remaining: {bal - cost:,} 🪙")
+@tree.command(name="pull_support", description="🎴 Pull for Support Cards")
+@app_commands.describe(banner="Use Free or Paid Haru-Urara-Coins?", amount="Pull 1 or 10 times?")
+@app_commands.choices(banner=[app_commands.Choice(name="Free Banner (Free Coins)", value="free"), app_commands.Choice(name="Premium Banner (Paid Coins)", value="paid")])
+@app_commands.choices(amount=[app_commands.Choice(name="1 Pull (150 Coins)", value=1), app_commands.Choice(name="10 Pull (1,500 Coins) - Guaranteed Rarity!", value=10)])
+async def pull_support_cmd(interaction: discord.Interaction, banner: str, amount: int):
+    if not await dm_check(interaction): return
+    cost = 150 * amount
+    
+    f, p = await g_haru_get(interaction.user.id)
+    if banner == "free":
+        if f < cost: return await interaction.response.send_message(f"❌ You need {cost:,} Free Haru-Urara-Coins (You have {f:,}).", ephemeral=True)
+        await g_haru_add(interaction.user.id, -cost, 0)
+        weights = _SUPPORT_RARITY_WEIGHTS
+        guaranteed_rarity = "SR" 
+    else:
+        if p < cost: return await interaction.response.send_message(f"❌ You need {cost:,} Paid Haru-Urara-Coins (You have {p:,}).", ephemeral=True)
+        await g_haru_add(interaction.user.id, 0, -cost)
+        weights = _PAID_SUPPORT_WEIGHTS
+        guaranteed_rarity = "SSR"
 
-    await interaction.edit_original_response(content="## 🌸 THE GATES BURST OPEN... A NEW UMA APPEARS! 🌸", embed=reveal_embed)
+    await interaction.response.defer()
+    
+    pulls = []
+    for i in range(amount):
+        min_rarity = "R"
+        if amount == 10 and i == 9: 
+            min_rarity = guaranteed_rarity
+        pulls.append(_support_roll(weights_override=weights, min_rarity=min_rarity))
+
+    inv = await _support_get_inventory(interaction.user.id)
+    inv.setdefault("cards", []).extend(pulls)
+    await _support_save_inventory(interaction.user.id, inv)
+
+    if amount == 1:
+        card = pulls[0]
+        color = _SUPPORT_RARITY_COLORS[card["rarity"]]; remoji = _SUPPORT_RARITY_EMOJI[card["rarity"]]; temoji = _SUPPORT_TYPE_EMOJI[card["type"]]
+        is_top = card["rarity"] == "SSR"
+        top_text = '## 🎊 **SSR PULL!!!** 🎊\n' if is_top else ''
+        embed = (EmbedBuilder(color=color)
+            .title(f"{remoji} UNLOCKED: {card['name']}  [{temoji} {card['type']} / {card['rarity']}]")
+            .description(f"{top_text}\n>>> *{card['flavor']}*")
+            .fields(("📊 Support Bonus", f"`{card['bonus']}`"), ("🆔 Card ID", f"`{card['id']}`"))
+            .build())
+        img = _support_image(card)
+        if img: embed.set_image(url=img)
+        await interaction.followup.send(content="## 🎴 A NEW SUPPORTER JOINS YOUR DECK! 🎴", embed=embed)
+    else:
+        embed = EmbedBuilder(color=0xFF4500).title("🎴 10-Pull Support Results!").description("You pulled 10 Support Cards from the Gacha!")
+        
+        pulls_sorted = sorted(pulls, key=lambda c: ({"SSR": 0, "SR": 1, "R": 2}.get(c["rarity"], 3)))
+        
+        desc = ""
+        best_card = pulls_sorted[0]
+        for c in pulls_sorted:
+            remoji = _SUPPORT_RARITY_EMOJI[c["rarity"]]
+            temoji = _SUPPORT_TYPE_EMOJI[c["type"]]
+            desc += f"{remoji} **{c['name']}** `[{temoji} {c['type']} / {c['rarity']}]`\n"
+            
+        embed.description = desc
+        img = _support_image(best_card)
+        if img: embed.set_thumbnail(url=img)
+        embed.footer(f"Highlighting {best_card['name']}!")
+        
+        await interaction.followup.send(embed=embed.build())
+
+# ─────────────────────────────  Uma commands  ─────────────────────────────
 
 @tree.command(name="uma_inventory", description="🐴 View your Umamusume collection (paginated with images)")
 async def uma_inventory(interaction: discord.Interaction):
     if not await dm_check(interaction): return
     inv = await _uma_get_inventory(interaction.user.id)
     umas = inv.get("umas", [])
-    if not umas: return await interaction.response.send_message("🎁 You have no Umamusume! Open a `/lootbox` to get started.", ephemeral=True)
+    if not umas: return await interaction.response.send_message("🎁 You have no Umamusume! Run `/pull_trainee` to get started.", ephemeral=True)
 
     rarity_order = {"3-Star": 0, "2-Star": 1, "1-Star": 2}
     umas_sorted = sorted(umas, key=lambda u: (rarity_order.get(u.get("rarity", "1-Star"), 3), -_uma_power_score(u)))
@@ -274,7 +400,7 @@ async def uma_view(interaction: discord.Interaction, uma_id: str):
     if img: embed.set_image(url=img)
     await interaction.response.send_message(embed=embed)
 
-@tree.command(name="uma_fastsell", description="⚡ Instantly sell your Uma for the minimum price")
+@tree.command(name="uma_fastsell", description="⚡ Instantly sell your Uma for Haru-Urara-Coins")
 @app_commands.describe(uma_id="The Uma ID to sell (from /uma_inventory)")
 async def uma_fastsell(interaction: discord.Interaction, uma_id: str):
     if not await dm_check(interaction): return
@@ -282,75 +408,27 @@ async def uma_fastsell(interaction: discord.Interaction, uma_id: str):
     uma = next((u for u in inv.get("umas", []) if u["id"] == uma_id), None)
     if not uma: return await interaction.response.send_message("❌ Uma not found.", ephemeral=True)
 
-    base = {"3-Star": 3000, "2-Star": 900, "1-Star": 150}.get(uma.get("rarity", "1-Star"), 80)
-    total = (uma.get("speed", 0) + uma.get("stamina", 0) + uma.get("power", 0) + uma.get("wit", 70) + uma.get("guts", 70))
-    sell_price = base + (total // 5)
-
-    confirmed = await ask_confirm(interaction, EmbedBuilder(color=Palette.WARNING).title("⚡ Fast Sell Uma").description(f"Are you sure you want to sell **{uma['name']}** [{uma['rarity']}]?\n\n💰 You'll receive: **{sell_price:,} Sayories** (minimum price)\n⚡ **Pwr Score:** `{_uma_power_score(uma)}`\n\n⚠️ **This cannot be undone!**").image(_uma_image(uma)).build(), confirm_label=f"Sell for {sell_price:,}")
+    # Convert base values into Free Haru-Urara-Coins instead of Sayories
+    base = {"3-Star": 30, "2-Star": 9, "1-Star": 1}.get(uma.get("rarity", "1-Star"), 1)
+    
+    confirmed = await ask_confirm(interaction, EmbedBuilder(color=Palette.WARNING).title("⚡ Fast Sell Uma").description(f"Are you sure you want to sell **{uma['name']}** [{uma['rarity']}]?\n\n💰 You'll receive: **{base:,} Free Haru-Urara-Coins**\n⚡ **Pwr Score:** `{_uma_power_score(uma)}`\n\n⚠️ **This cannot be undone!**").image(_uma_image(uma)).build(), confirm_label=f"Sell for {base:,} Coins")
     if not confirmed: return
 
     inv["umas"] = [u for u in inv["umas"] if u["id"] != uma_id]
     await _uma_save_inventory(interaction.user.id, inv)
-    new_bal = await g_eco_add(interaction.user.id, sell_price)
+    f, p = await g_haru_add(interaction.user.id, base, 0)
 
-    embed = (EmbedBuilder(color=Palette.SUCCESS).title("⚡ Uma Sold!").description(f"**{uma['name']}** [{uma['rarity']}] has been sold!\n\n💰 You received: **{sell_price:,} Sayories**\n💵 New balance: **{new_bal:,} Sayories**").thumbnail(interaction.user.display_avatar.url).footer("Tip: /lootbox opens another box when you're ready • Barm assistant 🐴").build())
+    embed = (EmbedBuilder(color=Palette.SUCCESS).title("⚡ Uma Sold!").description(f"**{uma['name']}** [{uma['rarity']}] has been sold!\n\n💰 You received: **{base:,} Free Haru-Urara-Coins**\n💵 New Free Coins balance: **{f:,}**").thumbnail(interaction.user.display_avatar.url).build())
     await interaction.followup.send(embed=embed)
 
 # ─────────────────────────────  Support Card commands  ─────────────────────────────
-
-@tree.command(name="support_shop", description="🎴 View Support Card loot box prices and odds")
-async def support_shop(interaction: discord.Interaction):
-    if not await dm_check(interaction): return
-    embed = (EmbedBuilder(color=Palette.PRIMARY)
-        .title("🎴 Support Card Shop")
-        .description("Pick a box with `/support_lootbox <tier>`. Support Cards train your Umas but can't be raced themselves — a separate pool from `/lootbox`."))
-    for key, tier in _SUPPORT_LOOTBOX_TIERS.items():
-        odds = " • ".join(f"{rarity} `{weight:g}%`" for rarity, weight in tier["weights"].items() if weight > 0)
-        embed.field(tier["label"], f"Cost: **{tier['cost']:,} Sayories**\n{tier['flavor']}\n{odds}", inline=False)
-    await interaction.response.send_message(embed=embed.branded("Umamusume").build())
-
-@tree.command(name="support_lootbox", description="🎴 Open a Support Card loot box!")
-@app_commands.describe(tier="Which box to open — higher tier = better odds & higher cost")
-@app_commands.choices(tier=[app_commands.Choice(name="🎁 Basic     —   1,500 Sayories", value="basic"), app_commands.Choice(name="💎 Premium  —   6,000 Sayories", value="premium"), app_commands.Choice(name="🏆 Elite    —  18,000 Sayories", value="elite"), app_commands.Choice(name="👑 Legend   —  50,000 Sayories", value="legend"), app_commands.Choice(name="✨ Divine   — 150,000 Sayories", value="divine")])
-async def support_lootbox(interaction: discord.Interaction, tier: str = "basic"):
-    if not await dm_check(interaction): return
-    t = _SUPPORT_LOOTBOX_TIERS[tier]; cost = t["cost"]
-    bal = await g_eco_get(interaction.user.id)
-    if bal < cost: return await interaction.response.send_message(f"❌ You need **{cost:,} Sayories** to open a **{t['label']}** (you have {bal:,}).", ephemeral=True)
-    await g_eco_add(interaction.user.id, -cost)
-
-    embed = (EmbedBuilder(color=t["color"]).title("🎴 SUPPORT DESK OPENING").description(f"```\n┌────────────────────────────────────────┐\n│  {t['emoji']} OPENING: {t['label']:<26} │\n│                                        │\n│      📋 REVIEWING CANDIDATES...        │\n│                                        │\n└────────────────────────────────────────┘\n```\n✨ *A new supporter steps forward...*").build())
-    await interaction.response.send_message(embed=embed)
-    await asyncio.sleep(1.5)
-
-    card = _support_roll(weights_override=t["weights"])
-    inv = await _support_get_inventory(interaction.user.id)
-    inv.setdefault("cards", []).append(card)
-    await _support_save_inventory(interaction.user.id, inv)
-
-    color = _SUPPORT_RARITY_COLORS[card["rarity"]]; remoji = _SUPPORT_RARITY_EMOJI[card["rarity"]]; temoji = _SUPPORT_TYPE_EMOJI[card["type"]]
-    is_top = card["rarity"] == "SSR"
-
-    top_text = '## 🎊 **SSR PULL!!!** 🎊\n' if is_top else ''
-    reveal_embed = (EmbedBuilder(color=color)
-        .title(f"{remoji} UNLOCKED: {card['name']}  [{temoji} {card['type']} / {card['rarity']}]")
-        .description(f"{top_text}\n>>> *{card['flavor']}*")
-        .fields(("📊 Support Bonus", f"`{card['bonus']}`"), ("🆔 Card ID", f"`{card['id']}`"))
-        .field(f"{t['emoji']} Box Used", f"**{t['label']}** — {cost:,} Sayories", inline=False)
-        .build())
-    img = _support_image(card)
-    if img: reveal_embed.set_image(url=img)
-    reveal_embed.set_author(name=interaction.user.display_name, icon_url=interaction.user.display_avatar.url)
-    reveal_embed.set_footer(text=f"Cost: {cost:,} Sayories • Remaining: {bal - cost:,} 🪙")
-
-    await interaction.edit_original_response(content="## 🎴 A NEW SUPPORTER JOINS YOUR DECK! 🎴", embed=reveal_embed)
 
 @tree.command(name="support_inventory", description="🎴 View your Support Card collection (paginated with images)")
 async def support_inventory(interaction: discord.Interaction):
     if not await dm_check(interaction): return
     inv = await _support_get_inventory(interaction.user.id)
     cards = inv.get("cards", [])
-    if not cards: return await interaction.response.send_message("🎴 You have no Support Cards! Open a `/support_lootbox` to get started.", ephemeral=True)
+    if not cards: return await interaction.response.send_message("🎴 You have no Support Cards! Run `/pull_support` to get started.", ephemeral=True)
 
     rarity_order = {"SSR": 0, "SR": 1, "R": 2}
     cards_sorted = sorted(cards, key=lambda c: (rarity_order.get(c.get("rarity", "R"), 3), -c.get("bonus", 0)))
@@ -387,7 +465,7 @@ async def support_view(interaction: discord.Interaction, card_id: str):
     if img: embed.set_image(url=img)
     await interaction.response.send_message(embed=embed)
 
-@tree.command(name="support_fastsell", description="⚡ Instantly sell your Support Card for the minimum price")
+@tree.command(name="support_fastsell", description="⚡ Instantly sell your Support Card for Haru-Urara-Coins")
 @app_commands.describe(card_id="The Card ID to sell (from /support_inventory)")
 async def support_fastsell(interaction: discord.Interaction, card_id: str):
     if not await dm_check(interaction): return
@@ -395,25 +473,24 @@ async def support_fastsell(interaction: discord.Interaction, card_id: str):
     card = next((c for c in inv.get("cards", []) if c["id"] == card_id), None)
     if not card: return await interaction.response.send_message("❌ Support Card not found.", ephemeral=True)
 
-    base = {"SSR": 2500, "SR": 800, "R": 150}.get(card.get("rarity", "R"), 80)
-    sell_price = base + (card.get("bonus", 0) * 10)
+    base = {"SSR": 25, "SR": 8, "R": 1}.get(card.get("rarity", "R"), 1)
 
-    confirmed = await ask_confirm(interaction, EmbedBuilder(color=Palette.WARNING).title("⚡ Fast Sell Support Card").description(f"Are you sure you want to sell **{card['name']}** [{card['type']} / {card['rarity']}]?\n\n💰 You'll receive: **{sell_price:,} Sayories** (minimum price)\n\n⚠️ **This cannot be undone!**").image(_support_image(card)).build(), confirm_label=f"Sell for {sell_price:,}")
+    confirmed = await ask_confirm(interaction, EmbedBuilder(color=Palette.WARNING).title("⚡ Fast Sell Support Card").description(f"Are you sure you want to sell **{card['name']}** [{card['type']} / {card['rarity']}]?\n\n💰 You'll receive: **{base:,} Free Haru-Urara-Coins**\n\n⚠️ **This cannot be undone!**").image(_support_image(card)).build(), confirm_label=f"Sell for {base:,} Coins")
     if not confirmed: return
 
     inv["cards"] = [c for c in inv["cards"] if c["id"] != card_id]
     await _support_save_inventory(interaction.user.id, inv)
-    new_bal = await g_eco_add(interaction.user.id, sell_price)
+    f, p = await g_haru_add(interaction.user.id, base, 0)
 
-    embed = (EmbedBuilder(color=Palette.SUCCESS).title("⚡ Support Card Sold!").description(f"**{card['name']}** [{card['rarity']}] has been sold!\n\n💰 You received: **{sell_price:,} Sayories**\n💵 New balance: **{new_bal:,} Sayories**").thumbnail(interaction.user.display_avatar.url).footer("Tip: /support_lootbox opens another box when you're ready • Barm assistant 🐴").build())
+    embed = (EmbedBuilder(color=Palette.SUCCESS).title("⚡ Support Card Sold!").description(f"**{card['name']}** [{card['rarity']}] has been sold!\n\n💰 You received: **{base:,} Free Haru-Urara-Coins**\n💵 New Free Coins balance: **{f:,}**").thumbnail(interaction.user.display_avatar.url).build())
     await interaction.followup.send(embed=embed)
 
 @tree.command(name="help", description="Show all Umamusume bot commands")
 async def help_cmd(interaction: discord.Interaction):
-    embed = build_help_embed("umamusume", "Collect Umas and Support Cards with the shared Sayories economy.", {
-        "🎁 Uma Gacha": ["`/lootbox_shop` — prices and odds", "`/lootbox <tier>` — open a box"],
+    embed = build_help_embed("umamusume", "Use your Haru-Urara-Coins to pull Umas and Support Cards!", {
+        "🪙 Currency": ["`/convert` — buy Haru-Urara-Coins", "`/balance` — check your wallets"],
+        "🎁 Pulls (Gacha)": ["`/pull_trainee` — Pull 1 or 10 Umas", "`/pull_support` — Pull 1 or 10 Support Cards"],
         "🐴 Uma Collection": ["`/uma_inventory` — paginated collection", "`/uma_view <uma_id>` — inspect one Uma", "`/uma_fastsell <uma_id>` — sell one Uma instantly"],
-        "🎴 Support Gacha": ["`/support_shop` — prices and odds", "`/support_lootbox <tier>` — open a box"],
         "📇 Support Collection": ["`/support_inventory` — paginated collection", "`/support_view <card_id>` — inspect one card", "`/support_fastsell <card_id>` — sell one card instantly"],
     })
     await interaction.response.send_message(embed=embed)
