@@ -168,7 +168,7 @@ document.addEventListener('DOMContentLoaded', () => {
                         umasGrid.appendChild(card);
                     });
                 } else {
-                    renderEmptyState('umas-grid', 'fa-horse', 'No trainees yet — try <code>/lootbox</code> to recruit one!');
+                    renderEmptyState('umas-grid', 'fa-horse', 'No trainees yet — try <code>/pull_trainee</code> to recruit one!');
                 }
             }
         } catch (e) {

@@ -3,10 +3,12 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Barm Assistant Pro — Your premium Discord bot management dashboard.">
     <title>Barm Assistant Pro</title>
-    <link rel="stylesheet" href="/static/style.css?v=3.0">
+    <link rel="stylesheet" href="/static/style.css?v=4.0">
     <!-- Google Fonts -->
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700;800&display=swap" rel="stylesheet">
     <!-- FontAwesome -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <!-- CodeMirror for Code Editing -->
@@ -49,6 +51,10 @@
                 <div class="nav-brand">
                     <i class="fa-solid fa-robot"></i> Barm OS
                 </div>
+                <div class="profile-header nav-profile">
+                    <img id="profile-img" src="" class="profile-avatar" alt="Profile">
+                    <span class="profile-name" id="profile-name">User</span>
+                </div>
                 <div class="tabs nav-tabs" role="tablist" aria-label="Dashboard Tabs">
                     <button class="tab-btn active" data-target="stats-tab" role="tab" aria-selected="true" aria-controls="stats-tab"><i class="fa-solid fa-user"></i> My Stats</button>
                     <button class="tab-btn" data-target="leaderboard-tab" role="tab" aria-selected="false" aria-controls="leaderboard-tab"><i class="fa-solid fa-trophy"></i> Leaderboards</button>
@@ -75,12 +81,9 @@
                 
                 <!-- Stats Tab -->
                 <div id="stats-tab" class="tab-content active">
-                    <div class="profile-header">
-                        <img id="profile-img" src="" class="profile-avatar">
-                        <div>
-                            <h2 class="profile-name" id="profile-name">User</h2>
-                            <p class="section-desc">View your global economy and stats</p>
-                        </div>
+                    <div class="section-header">
+                        <h2><i class="fa-solid fa-chart-line"></i> Dashboard Overview</h2>
+                        <p class="section-desc">Your global economy and stats at a glance.</p>
                     </div>
                     <div class="stats-grid">
                         <div class="stat-card gold glow-effect">
@@ -117,17 +120,17 @@
                         <h2><i class="fa-solid fa-trophy"></i> Global Leaderboards</h2>
                         <p class="section-desc">See who reigns supreme in the Barm ecosystem.</p>
                     </div>
-                    <div class="leaderboard-container" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 2rem;">
-                        <div class="leaderboard-panel glass-panel" style="padding: 1.5rem; border-top: 4px solid #FFD700;">
-                            <h3 style="margin-top:0; text-align:center; color:#FFD700;"><i class="fa-solid fa-coins"></i> Top Sayories</h3>
-                            <ul id="lb-sayories" style="list-style: none; padding: 0; margin: 0;">
-                                <li style="text-align:center; color:#aaa; padding: 1rem;">Loading...</li>
+                    <div class="leaderboard-container">
+                        <div class="leaderboard-panel glass-panel gold">
+                            <h3><i class="fa-solid fa-coins"></i> Top Sayories</h3>
+                            <ul id="lb-sayories">
+                                <li class="leaderboard-row">Loading...</li>
                             </ul>
                         </div>
-                        <div class="leaderboard-panel glass-panel" style="padding: 1.5rem; border-top: 4px solid #FF69B4;">
-                            <h3 style="margin-top:0; text-align:center; color:#FF69B4;"><i class="fa-solid fa-quote-right"></i> Top Quote Stars</h3>
-                            <ul id="lb-quotes" style="list-style: none; padding: 0; margin: 0;">
-                                <li style="text-align:center; color:#aaa; padding: 1rem;">Loading...</li>
+                        <div class="leaderboard-panel glass-panel pink">
+                            <h3><i class="fa-solid fa-quote-right"></i> Top Quote Stars</h3>
+                            <ul id="lb-quotes">
+                                <li class="leaderboard-row">Loading...</li>
                             </ul>
                         </div>
                     </div>
@@ -139,8 +142,8 @@
                         <h2><i class="fa-solid fa-quote-left"></i> My Quotes History</h2>
                         <p class="section-desc">A permanent history of every time you've been quoted!</p>
                     </div>
-                    <div id="quotes-history-container" class="glass-panel" style="padding: 1.5rem;">
-                        <div style="text-align: center; color: var(--text-secondary); padding: 2rem;">Loading quotes...</div>
+                    <div id="quotes-history-container" class="glass-panel quotes-container">
+                        <div class="empty-state"><i class="fa-solid fa-spinner fa-spin"></i><div>Loading quotes...</div></div>
                     </div>
                 </div>
 
@@ -148,10 +151,10 @@
                 <div id="umas-tab" class="tab-content">
                     <div class="section-header">
                         <h2><i class="fa-solid fa-horse-head"></i> My Uma Trainees</h2>
-                        <p class="section-desc">Your collected Umamusume from the /lootbox gacha.</p>
+                        <p class="section-desc">Your collected Umamusume from the gacha pull system.</p>
                     </div>
-                    <div id="umas-grid" style="display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 1.5rem;">
-                        <div style="grid-column: 1 / -1; text-align: center; color: #aaa; padding: 2rem;">Loading trainees...</div>
+                    <div id="umas-grid" class="umas-grid">
+                        <div class="empty-state"><i class="fa-solid fa-spinner fa-spin"></i><div>Loading trainees...</div></div>
                     </div>
                 </div>
 
@@ -231,6 +234,6 @@
     <!-- Scripts -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.13/codemirror.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.13/mode/python/python.min.js"></script>
-    <script src="/static/script.js?v=3.0"></script>
+    <script src="/static/script.js?v=4.0"></script>
 </body>
 </html>
