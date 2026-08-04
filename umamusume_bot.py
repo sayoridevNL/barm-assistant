@@ -101,27 +101,136 @@ _SUPPORT_GLOBAL_SECTION = "uma_support_inventory"
 
 # name, type, rarity, bonus, image, flavor
 _SUPPORT_POOL = [
-    ("Special Week", "Guts", "R", 25, _wiki_icon("Special_Week"), "A steady training partner who keeps morale up."),
-    ("Silence Suzuka", "Speed", "R", 25, _wiki_icon("Silence_Suzuka"), "Front-runner instincts, straight off the track."),
-    ("Tokai Teio", "Speed", "R", 22, _wiki_icon("Tokai_Teio"), "Sharp acceleration drills."),
-    ("Oguri Cap", "Power", "R", 24, _wiki_icon("Oguri_Cap"), "Grey-haired grit, built for the long haul."),
-    ("Gold Ship", "Stamina", "R", 20, _wiki_icon("Gold_Ship"), "Unorthodox methods, surprisingly effective."),
-    ("Symboli Rudolf", "Wit", "R", 23, _wiki_icon("Symboli_Rudolf"), "The Emperor's calm, calculated approach."),
-    ("Super Creek", "Stamina", "R", 26, _wiki_icon("Super_Creek"), "A shooting star of stamina know-how."),
-    ("Haru Urara", "Guts", "R", 18, _wiki_icon("Haru_Urara"), "Never wins, never quits — pure heart."),
-    ("Tazuna Hayakawa", "Friend", "R", 20, _wiki_icon("Tazuna_Hayakawa"), "Keeps the whole team's spirits up."),
-    ("Nice Nature", "Wit", "SR", 48, _wiki_icon("Nice_Nature"), "Consistently, reliably, third place."),
-    ("Seeking the Pearl", "Stamina", "SR", 50, _wiki_icon("Seeking_the_Pearl"), "Patient, methodical stamina building."),
-    ("Mejiro Ryan", "Stamina", "SR", 46, _wiki_icon("Mejiro_Ryan"), "Steady, dependable training rhythm."),
-    ("Sakura Bakushin O", "Power", "SR", 52, _wiki_icon("Sakura_Bakushin_O"), "Explosive sprint-focused drills."),
-    ("Vodka", "Guts", "SR", 49, _wiki_icon("Vodka"), "Cool confidence under pressure."),
-    ("Fine Motion", "Stamina", "SR", 51, _wiki_icon("Fine_Motion"), "Elegant, disciplined stamina work."),
-    ("Special Week", "Guts", "SSR", 80, _wiki_icon("Special_Week"), "Mood +60%, Training Effectiveness +10%."),
+    # SPEED SSR
+    ("Kitasan Black", "Speed", "SSR", 90, _wiki_icon("Kitasan_Black"), "The absolute gold standard of Speed training."),
     ("Silence Suzuka", "Speed", "SSR", 85, _wiki_icon("Silence_Suzuka"), "Friendship +35%, Initial Speed +30%."),
     ("Tokai Teio", "Speed", "SSR", 78, _wiki_icon("Tokai_Teio"), "Mood +60%, Race Bonus +10%, Fan Bonus +15%."),
-    ("Kitasan Black", "Speed", "SSR", 90, _wiki_icon("Kitasan_Black"), "The gold standard of Speed cards."),
+    ("Narita Top Road", "Speed", "SSR", 88, _wiki_icon("Narita_Top_Road"), "Powerful fan-scaling speed bonus."),
+    ("Agnes Tachyon", "Speed", "SSR", 86, _wiki_icon("Agnes_Tachyon"), "Scientific approach to incredible speed yields."),
+    ("Mihono Bourbon", "Speed", "SSR", 82, _wiki_icon("Mihono_Bourbon"), "Cyborg-like precision in front-runner drills."),
+    ("Twin Turbo", "Speed", "SSR", 80, _wiki_icon("Twin_Turbo"), "All-or-nothing extreme runaway pacing!"),
+    ("Biko Pegasus", "Speed", "SSR", 75, _wiki_icon("Biko_Pegasus"), "Heroic sprints for short-distance champions."),
+    ("Sakura Bakushin O", "Speed", "SSR", 79, _wiki_icon("Sakura_Bakushin_O"), "Bakushin! Bakushin! Bakushin!"),
+    ("Jungle Pocket", "Speed", "SSR", 92, _wiki_icon("Jungle_Pocket"), "Aggressive late-surge speed training."),
+
+    # SPEED SR
+    ("Curren Chan", "Speed", "SR", 45, _wiki_icon("Curren_Chan"), "Cute but fierce short-distance sprints."),
+    ("Eishin Flash", "Speed", "SR", 48, _wiki_icon("Eishin_Flash"), "Calculated and disciplined German engineering."),
+    ("King Halo", "Speed", "SR", 46, _wiki_icon("King_Halo"), "Royal pride in every stride."),
+    ("Sweep Tosho", "Speed", "SR", 52, _wiki_icon("Sweep_Tosho"), "Magical affinity for speed, if she feels like it."),
+    ("Shinko Windy", "Speed", "SR", 44, _wiki_icon("Shinko_Windy"), "Bite your way to the finish line!"),
+
+    # SPEED R
+    ("Special Week", "Speed", "R", 20, _wiki_icon("Special_Week"), "A steady training partner."),
+    ("Silence Suzuka", "Speed", "R", 25, _wiki_icon("Silence_Suzuka"), "Front-runner instincts."),
+    ("Tokai Teio", "Speed", "R", 22, _wiki_icon("Tokai_Teio"), "Sharp acceleration drills."),
+    ("Mejiro McQueen", "Speed", "R", 21, _wiki_icon("Mejiro_McQueen"), "Graceful form correction."),
+
+    # STAMINA SSR
+    ("Super Creek", "Stamina", "SSR", 89, _wiki_icon("Super_Creek"), "A shooting star of stamina know-how and heals."),
+    ("Mejiro McQueen", "Stamina", "SSR", 85, _wiki_icon("Mejiro_McQueen"), "The absolute ruler of long distances."),
+    ("Satono Diamond", "Stamina", "SSR", 84, _wiki_icon("Satono_Diamond"), "Flawless diamond-tier stamina conditioning."),
+    ("Seiun Sky", "Stamina", "SSR", 78, _wiki_icon("Seiun_Sky"), "Trickster pacing for stamina preservation."),
+    ("Manhattan Cafe", "Stamina", "SSR", 76, _wiki_icon("Manhattan_Cafe"), "Quiet endurance in the shadow of the pack."),
+    ("Tamamo Cross", "Stamina", "SSR", 81, _wiki_icon("Tamamo_Cross"), "Lightning fast but never runs out of breath!"),
+    ("Zenno Rob Roy", "Stamina", "SSR", 79, _wiki_icon("Zenno_Rob_Roy"), "Endurance built through heroic tales."),
+    ("Rice Shower", "Stamina", "SSR", 82, _wiki_icon("Rice_Shower"), "The blue rose assassin's grueling long runs."),
+
+    # STAMINA SR
+    ("Mejiro Ryan", "Stamina", "SR", 46, _wiki_icon("Mejiro_Ryan"), "Muscle training for long races!"),
+    ("Manhattan Cafe", "Stamina", "SR", 48, _wiki_icon("Manhattan_Cafe"), "A coffee break to restore stamina."),
+    ("Mayano Top Gun", "Stamina", "SR", 50, _wiki_icon("Mayano_Top_Gun"), "Taking off for an endless flight."),
+    ("Zenno Rob Roy", "Stamina", "SR", 45, _wiki_icon("Zenno_Rob_Roy"), "Reading pacing strategies from books."),
+    ("Biwa Hayahide", "Stamina", "SR", 44, _wiki_icon("Biwa_Hayahide"), "Calculated stamina management."),
+
+    # STAMINA R
+    ("Gold Ship", "Stamina", "R", 20, _wiki_icon("Gold_Ship"), "Unorthodox methods, surprisingly effective."),
+    ("Super Creek", "Stamina", "R", 26, _wiki_icon("Super_Creek"), "Gentle stamina care."),
+    ("Mejiro Ryan", "Stamina", "R", 21, _wiki_icon("Mejiro_Ryan"), "Basic weightlifting."),
+
+    # POWER SSR
+    ("Vodka", "Power", "SSR", 87, _wiki_icon("Vodka"), "Straight up raw, unadulterated horsepower."),
+    ("Oguri Cap", "Power", "SSR", 85, _wiki_icon("Oguri_Cap"), "Grey-haired grit, built for the long haul."),
     ("El Condor Pasa", "Power", "SSR", 82, _wiki_icon("El_Condor_Pasa"), "Dirt Master, Mile King skill access."),
-    ("Mr. C.B.", "Wit", "SSR", 79, _wiki_icon("Mr._C.B."), "Sharp, versatile Wit training."),
+    ("Yaeno Muteki", "Power", "SSR", 81, _wiki_icon("Yaeno_Muteki"), "Martial arts incorporated into turf power."),
+    ("Smart Falcon", "Power", "SSR", 79, _wiki_icon("Smart_Falcon"), "Idol power on the dirt track!"),
+    ("Symboli Kris S", "Power", "SSR", 88, _wiki_icon("Symboli_Kris_S"), "Commanding presence and explosive power."),
+    ("Marvelous Sunday", "Power", "SSR", 77, _wiki_icon("Marvelous_Sunday"), "Marvelous! Maximum energy!"),
+    ("Agnes Digital", "Power", "SSR", 80, _wiki_icon("Agnes_Digital"), "Oshi power transcends turf and dirt!"),
+
+    # POWER SR
+    ("Vodka", "Power", "SR", 49, _wiki_icon("Vodka"), "Cool confidence under pressure."),
+    ("Agnes Digital", "Power", "SR", 51, _wiki_icon("Agnes_Digital"), "Otaku passion fueling power output."),
+    ("Mihono Bourbon", "Power", "SR", 48, _wiki_icon("Mihono_Bourbon"), "Cyborg-tier leg strength drills."),
+    ("Biwa Hayahide", "Power", "SR", 47, _wiki_icon("Biwa_Hayahide"), "Logic dictates maximum power."),
+    ("Daitaku Helios", "Power", "SR", 45, _wiki_icon("Daitaku_Helios"), "Party hard, run harder!"),
+    ("Hishi Amazon", "Power", "SR", 46, _wiki_icon("Hishi_Amazon"), "Fierce amazonian power."),
+
+    # POWER R
+    ("Oguri Cap", "Power", "R", 24, _wiki_icon("Oguri_Cap"), "Heavy eating, heavy lifting."),
+    ("Vodka", "Power", "R", 23, _wiki_icon("Vodka"), "Revving the engine."),
+    ("El Condor Pasa", "Power", "R", 22, _wiki_icon("El_Condor_Pasa"), "Basic dirt conditioning."),
+
+    # GUTS SSR
+    ("Haru Urara", "Guts", "SSR", 80, _wiki_icon("Haru_Urara"), "Never wins, never quits — pure heart and soul."),
+    ("Special Week", "Guts", "SSR", 82, _wiki_icon("Special_Week"), "Mood +60%, Training Effectiveness +10%."),
+    ("Ikuno Dictus", "Guts", "SSR", 79, _wiki_icon("Ikuno_Dictus"), "Iron-willed determination to never get injured."),
+    ("Matikane Fukukitaru", "Guts", "SSR", 75, _wiki_icon("Matikane_Fukukitaru"), "Luck is a stat, right? Right?!"),
+    ("Bamboo Memory", "Guts", "SSR", 78, _wiki_icon("Bamboo_Memory"), "Strict discipline and unyielding guts!"),
+    ("Mejiro Palmer", "Guts", "SSR", 81, _wiki_icon("Mejiro_Palmer"), "Running away from expectations takes guts."),
+    ("Sirius Symboli", "Guts", "SSR", 85, _wiki_icon("Sirius_Symboli"), "Overwhelming charisma and willpower."),
+
+    # GUTS SR
+    ("Special Week", "Guts", "SR", 48, _wiki_icon("Special_Week"), "Keep eating, keep running!"),
+    ("Mejiro Dober", "Guts", "SR", 47, _wiki_icon("Mejiro_Dober"), "Shy but surprisingly resilient."),
+    ("Air Groove", "Guts", "SR", 50, _wiki_icon("Air_Groove"), "The Empress tolerates no weakness."),
+    ("Yuki No Bijin", "Guts", "SR", 45, _wiki_icon("Yuki_No_Bijin"), "City guts from a country girl."),
+
+    # GUTS R
+    ("Haru Urara", "Guts", "R", 18, _wiki_icon("Haru_Urara"), "Never wins, never quits."),
+    ("Special Week", "Guts", "R", 25, _wiki_icon("Special_Week"), "A steady training partner who keeps morale up."),
+    ("Air Groove", "Guts", "R", 22, _wiki_icon("Air_Groove"), "Strict oversight."),
+
+    # WIT SSR
+    ("Fine Motion", "Wit", "SSR", 91, _wiki_icon("Fine_Motion"), "Elegant, disciplined stamina work and genius intellect."),
+    ("Mr. C.B.", "Wit", "SSR", 88, _wiki_icon("Mr._C.B."), "Sharp, versatile Wit training."),
+    ("Nice Nature", "Wit", "SSR", 84, _wiki_icon("Nice_Nature"), "Consistently reading the race perfectly (for 3rd)."),
+    ("Mejiro Ramonu", "Wit", "SSR", 92, _wiki_icon("Mejiro_Ramonu"), "The pinnacle of triple tiara intelligence."),
+    ("Seiun Sky", "Wit", "SSR", 83, _wiki_icon("Seiun_Sky"), "Lazy but incredibly cunning race tactics."),
+    ("Agnes Tachyon", "Wit", "SSR", 81, _wiki_icon("Agnes_Tachyon"), "Calculating the exact formula for victory."),
+    ("Yukino Bijin", "Wit", "SSR", 77, _wiki_icon("Yukino_Bijin"), "Sharp intuition despite her sweet demeanor."),
+    ("Mejiro Ardan", "Wit", "SSR", 82, _wiki_icon("Mejiro_Ardan"), "Fragile glass legs, unbreakable glass mind."),
+
+    # WIT SR
+    ("Nice Nature", "Wit", "SR", 48, _wiki_icon("Nice_Nature"), "Consistently, reliably, third place."),
+    ("Mejiro Dober", "Wit", "SR", 49, _wiki_icon("Mejiro_Dober"), "Observing the competition carefully."),
+    ("Fuji Kiseki", "Wit", "SR", 51, _wiki_icon("Fuji_Kiseki"), "Dazzling tricks on the track."),
+    ("Agnes Tachyon", "Wit", "SR", 50, _wiki_icon("Agnes_Tachyon"), "Testing a new glowing potion..."),
+    ("Marvelous Sunday", "Wit", "SR", 47, _wiki_icon("Marvelous_Sunday"), "Marvelously outsmarting the pack!"),
+
+    # WIT R
+    ("Symboli Rudolf", "Wit", "R", 23, _wiki_icon("Symboli_Rudolf"), "The Emperor's calm, calculated approach."),
+    ("Nice Nature", "Wit", "R", 21, _wiki_icon("Nice_Nature"), "Reading the room."),
+    ("Agnes Tachyon", "Wit", "R", 24, _wiki_icon("Agnes_Tachyon"), "Science rules."),
+
+    # FRIEND SSR
+    ("Tazuna Hayakawa", "Friend", "SSR", 85, _wiki_icon("Tazuna_Hayakawa"), "The ultimate secretary. Restores energy perfectly."),
+    ("Riko Kashimoto", "Friend", "SSR", 83, _wiki_icon("Riko_Kashimoto"), "Strict director but yields immense stamina/guts."),
+    ("Light Hello", "Friend", "SSR", 86, _wiki_icon("Light_Hello"), "Cheerfully manages your Grand Live schedule."),
+    ("Tsurugi Ryoka", "Friend", "SSR", 88, _wiki_icon("Tsurugi_Ryoka"), "URA staff ready to boost your training."),
+    ("Mei Suruga", "Friend", "SSR", 89, _wiki_icon("Mei_Suruga"), "L'Arc project's passionate supporter."),
+    ("Aoi Kiryu", "Friend", "SSR", 82, _wiki_icon("Aoi_Kiryu"), "The seasoned reporter with all the scoops."),
+
+    # FRIEND SR / R
+    ("Aoi Kiryu", "Friend", "SR", 45, _wiki_icon("Aoi_Kiryu"), "Always chasing the next big article."),
+    ("Tazuna Hayakawa", "Friend", "R", 20, _wiki_icon("Tazuna_Hayakawa"), "Keeps the whole team's spirits up."),
+
+    # GROUP SSR
+    ("Sirius Symboli & Friends", "Group", "SSR", 90, _wiki_icon("Sirius_Symboli"), "The whole crew on a wild night out!"),
+    ("Team Sirius", "Group", "SSR", 92, _wiki_icon("Special_Week"), "The bonds of Team Sirius power you forward."),
+    ("Team Spica", "Group", "SSR", 91, _wiki_icon("Silence_Suzuka"), "The chaotic energy of Team Spica!"),
+    ("Three Goddesses", "Group", "SSR", 95, _wiki_icon("Goddess"), "Divine guidance from the ancestral deities."),
+    ("Team Canopus", "Group", "SSR", 88, _wiki_icon("Nice_Nature"), "Never give up, Canopus is here!"),
 ]
 
 async def _support_get_inventory(user_id: int) -> dict:
