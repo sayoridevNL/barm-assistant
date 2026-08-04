@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Barm Assistant Pro</title>
-    <link rel="stylesheet" href="/static/style.css?v=2.0">
+    <link rel="stylesheet" href="/static/style.css?v=3.0">
     <!-- Google Fonts -->
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <!-- FontAwesome -->
@@ -49,6 +49,15 @@
                 <div class="nav-brand">
                     <i class="fa-solid fa-robot"></i> Barm OS
                 </div>
+                <div class="tabs nav-tabs" role="tablist" aria-label="Dashboard Tabs">
+                    <button class="tab-btn active" data-target="stats-tab" role="tab" aria-selected="true" aria-controls="stats-tab"><i class="fa-solid fa-user"></i> My Stats</button>
+                    <button class="tab-btn" data-target="leaderboard-tab" role="tab" aria-selected="false" aria-controls="leaderboard-tab"><i class="fa-solid fa-trophy"></i> Leaderboards</button>
+                    <button class="tab-btn" data-target="umas-tab" role="tab" aria-selected="false" aria-controls="umas-tab"><i class="fa-solid fa-horse-head"></i> Trainees</button>
+                    <button class="tab-btn" data-target="quotes-tab" role="tab" aria-selected="false" aria-controls="quotes-tab"><i class="fa-solid fa-quote-left"></i> Quotes</button>
+                    <button class="tab-btn admin-only" data-target="fleet-tab" role="tab" aria-selected="false" aria-controls="fleet-tab"><i class="fa-solid fa-server"></i> Fleet</button>
+                    <button class="tab-btn admin-only" data-target="broadcast-tab" role="tab" aria-selected="false" aria-controls="broadcast-tab"><i class="fa-solid fa-bullhorn"></i> Broadcast</button>
+                    <button class="tab-btn admin-only" data-target="dev-tab" role="tab" aria-selected="false" aria-controls="dev-tab"><i class="fa-solid fa-code"></i> Console</button>
+                </div>
                 <div class="nav-actions">
                     <div class="status-pill global-status">
                         <div class="pulse-dot"></div> System Online
@@ -63,15 +72,6 @@
             </nav>
 
             <main class="dashboard-content">
-                <div class="tabs" role="tablist" aria-label="Dashboard Tabs">
-                    <button class="tab-btn active" data-target="stats-tab" role="tab" aria-selected="true" aria-controls="stats-tab"><i class="fa-solid fa-user"></i> My Stats</button>
-                    <button class="tab-btn" data-target="leaderboard-tab" role="tab" aria-selected="false" aria-controls="leaderboard-tab"><i class="fa-solid fa-trophy"></i> Leaderboards</button>
-                    <button class="tab-btn" data-target="umas-tab" role="tab" aria-selected="false" aria-controls="umas-tab"><i class="fa-solid fa-horse-head"></i> My Uma Trainees</button>
-                    <button class="tab-btn" data-target="quotes-tab" role="tab" aria-selected="false" aria-controls="quotes-tab"><i class="fa-solid fa-quote-left"></i> My Quotes</button>
-                    <button class="tab-btn admin-only" data-target="fleet-tab" role="tab" aria-selected="false" aria-controls="fleet-tab"><i class="fa-solid fa-server"></i> Fleet Command</button>
-                    <button class="tab-btn admin-only" data-target="broadcast-tab" role="tab" aria-selected="false" aria-controls="broadcast-tab"><i class="fa-solid fa-bullhorn"></i> Global Broadcast</button>
-                    <button class="tab-btn admin-only" data-target="dev-tab" role="tab" aria-selected="false" aria-controls="dev-tab"><i class="fa-solid fa-code"></i> Developer Console</button>
-                </div>
                 
                 <!-- Stats Tab -->
                 <div id="stats-tab" class="tab-content active">
@@ -231,6 +231,6 @@
     <!-- Scripts -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.13/codemirror.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.13/mode/python/python.min.js"></script>
-    <script src="/static/script.js?v=2.0"></script>
+    <script src="/static/script.js?v=3.0"></script>
 </body>
 </html>
