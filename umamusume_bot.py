@@ -270,24 +270,23 @@ async def pull_trainee_cmd(interaction: discord.Interaction, banner: str, amount
         if img: embed.set_image(url=img)
         await interaction.followup.send(content="## 🌸 THE GATES BURST OPEN... A NEW UMA APPEARS! 🌸", embed=embed)
     else:
-        # 10 Pull Summary
-        embed = EmbedBuilder(color=0xFFD700).title("🌸 10-Pull Trainee Results!").description("You pulled 10 Trainees from the Gacha!")
-        
-        # Sort so highest rarities are at the top of the summary list
+        embeds = []
         pulls_sorted = sorted(pulls, key=lambda u: ({"3-Star": 0, "2-Star": 1, "1-Star": 2}.get(u["rarity"], 3)))
         
-        desc = ""
-        best_uma = pulls_sorted[0]
-        for u in pulls_sorted:
-            remoji = _UMA_RARITY_EMOJI[u["rarity"]]
-            desc += f"{remoji} **{u['name']}** `[{u['rarity']}]`\n"
+        for i, uma in enumerate(pulls_sorted):
+            color = _UMA_RARITY_COLORS[uma["rarity"]]
+            remoji = _UMA_RARITY_EMOJI[uma["rarity"]]
             
-        embed.description = desc
-        img = _uma_image(best_uma)
-        if img: embed.thumbnail(img)
-        embed.footer(f"Highlighting {best_uma['name']}!")
-        
-        await interaction.followup.send(embed=embed.build())
+            embed = (EmbedBuilder(color=color)
+                .title(f"{remoji} {uma['name']} [{uma['rarity']}]")
+                .description(f"⚡`{uma['speed']}` ❤️`{uma['stamina']}` 💪`{uma['power']}` 🧠`{uma.get('wit', 70)}` 🔥`{uma.get('guts', 70)}`")
+                .build())
+            
+            img = _uma_image(uma)
+            if img: embed.set_thumbnail(url=img)
+            embeds.append(embed)
+            
+        await interaction.followup.send(content="## 🌸 10-PULL TRAINEE RESULTS 🌸", embeds=embeds)
 
 @tree.command(name="pull_support", description="🎴 Pull for Support Cards")
 @app_commands.describe(banner="Use Free or Paid Haru-Urara-Coins?", amount="Pull 1 or 10 times?")
@@ -336,23 +335,24 @@ async def pull_support_cmd(interaction: discord.Interaction, banner: str, amount
         if img: embed.set_image(url=img)
         await interaction.followup.send(content="## 🎴 A NEW SUPPORTER JOINS YOUR DECK! 🎴", embed=embed)
     else:
-        embed = EmbedBuilder(color=0xFF4500).title("🎴 10-Pull Support Results!").description("You pulled 10 Support Cards from the Gacha!")
-        
+        embeds = []
         pulls_sorted = sorted(pulls, key=lambda c: ({"SSR": 0, "SR": 1, "R": 2}.get(c["rarity"], 3)))
         
-        desc = ""
-        best_card = pulls_sorted[0]
-        for c in pulls_sorted:
-            remoji = _SUPPORT_RARITY_EMOJI[c["rarity"]]
-            temoji = _SUPPORT_TYPE_EMOJI[c["type"]]
-            desc += f"{remoji} **{c['name']}** `[{temoji} {c['type']} / {c['rarity']}]`\n"
+        for i, card in enumerate(pulls_sorted):
+            color = _SUPPORT_RARITY_COLORS[card["rarity"]]
+            remoji = _SUPPORT_RARITY_EMOJI[card["rarity"]]
+            temoji = _SUPPORT_TYPE_EMOJI[card["type"]]
             
-        embed.description = desc
-        img = _support_image(best_card)
-        if img: embed.thumbnail(img)
-        embed.footer(f"Highlighting {best_card['name']}!")
-        
-        await interaction.followup.send(embed=embed.build())
+            embed = (EmbedBuilder(color=color)
+                .title(f"{remoji} {card['name']} [{temoji} {card['type']} / {card['rarity']}]")
+                .description(f"📊 Support Bonus: `{card['bonus']}`")
+                .build())
+                
+            img = _support_image(card)
+            if img: embed.set_thumbnail(url=img)
+            embeds.append(embed)
+            
+        await interaction.followup.send(content="## 🎴 10-PULL SUPPORT RESULTS 🎴", embeds=embeds)
 
 # ─────────────────────────────  Uma commands  ─────────────────────────────
 

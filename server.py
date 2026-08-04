@@ -170,6 +170,7 @@ def user_stats():
     free_haru_coins = user_eco.get('free_haru_coins', 0)
     paid_haru_coins = user_eco.get('paid_haru_coins', 0)
     user_umas = get_global_section_sync('uma_inventory').get(user_id, {}).get('umas', [])
+    user_support = get_global_section_sync('support_inventory').get(user_id, {}).get('cards', [])
     
     return jsonify({
         'user_id': user_id,
@@ -182,7 +183,9 @@ def user_stats():
             'free_haru_coins': free_haru_coins,
             'paid_haru_coins': paid_haru_coins,
             'umamusume': len(user_umas),
-            'umas_list': user_umas
+            'umas_list': user_umas,
+            'support_cards': len(user_support),
+            'support_cards_list': user_support
         }
     })
 

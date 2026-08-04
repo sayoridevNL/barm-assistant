@@ -171,6 +171,50 @@ document.addEventListener('DOMContentLoaded', () => {
                     renderEmptyState('umas-grid', 'fa-horse', 'No trainees yet — try <code>/pull_trainee</code> to recruit one!');
                 }
             }
+
+            // Support Cards
+            if (data.stats.support_cards_list) {
+                const supportGrid = document.getElementById('support-grid');
+                if (supportGrid) {
+                    supportGrid.innerHTML = '';
+                    if (data.stats.support_cards_list.length > 0) {
+                        data.stats.support_cards_list.forEach(card => {
+                            const imgUrl = card.image ? (card.image.includes('?') ? card.image + '&_cb=' + Date.now() : card.image + '?_cb=' + Date.now()) : '';
+                            const rarityClass = card.rarity || "R";
+                            
+                            const cardEl = document.createElement('div');
+                            cardEl.className = `uma-card rarity-${rarityClass}`;
+                            
+                            let imgHtml = imgUrl ? `<div class="uma-img-wrapper"><img src="${imgUrl}" alt="${card.name}"></div>` : '';
+                            
+                            let typeEmoji = '🏃';
+                            if (card.type === 'Speed') typeEmoji = '👟';
+                            if (card.type === 'Stamina') typeEmoji = '❤️';
+                            if (card.type === 'Power') typeEmoji = '💪';
+                            if (card.type === 'Guts') typeEmoji = '🔥';
+                            if (card.type === 'Wit') typeEmoji = '🧠';
+                            if (card.type === 'Friend') typeEmoji = '🤝';
+                            if (card.type === 'Group') typeEmoji = '👥';
+
+                            cardEl.innerHTML = `
+                                ${imgHtml}
+                                <div class="uma-card-header">
+                                    <h3>${card.name}</h3>
+                                    <span class="rarity-badge">${card.rarity}</span>
+                                </div>
+                                <div class="uma-stats" style="grid-template-columns: 1fr;">
+                                    <div><i class="fa-solid fa-tag"></i> Type: ${typeEmoji} ${card.type}</div>
+                                    <div><i class="fa-solid fa-chart-bar"></i> Bonus: <strong>${card.bonus}</strong></div>
+                                    <div style="margin-top: 0.5rem; font-size: 0.8rem; font-style: italic;">"${card.flavor}"</div>
+                                </div>
+                            `;
+                            supportGrid.appendChild(cardEl);
+                        });
+                    } else {
+                        renderEmptyState('support-grid', 'fa-clone', 'No support cards yet — try <code>/pull_support</code> to recruit one!');
+                    }
+                }
+            }
         } catch (e) {
             console.error('Failed to fetch user stats:', e);
             renderEmptyState('umas-grid', 'fa-triangle-exclamation', 'Failed to load trainees.');
