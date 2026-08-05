@@ -96,7 +96,7 @@ _PAID_SUPPORT_WEIGHTS = {"SSR": 3, "SR": 12, "R": 85}
 
 _SUPPORT_RARITY_COLORS  = {"SSR": 0xFF4500, "SR": 0x9B59B6, "R": 0x3498DB}
 _SUPPORT_RARITY_EMOJI   = {"SSR": "🔶", "SR": "🔷", "R": "⬜"}
-_SUPPORT_TYPE_EMOJI     = {"Speed": "⚡", "Stamina": "❤️", "Power": "💪", "Guts": "🔥", "Wit": "🧠", "Friend": "🤝"}
+_SUPPORT_TYPE_EMOJI     = {"Speed": "⚡", "Stamina": "❤️", "Power": "💪", "Guts": "🔥", "Wit": "🧠", "Friend": "🤝", "Group": "👥"}
 _SUPPORT_GLOBAL_SECTION = "uma_support_inventory"
 
 import json
