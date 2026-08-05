@@ -1,0 +1,4889 @@
+[
+  {
+    "id": 10001,
+    "name": "[Tracen Academy] Special Week",
+    "character_name": "Special Week",
+    "card_title": "Tracen Academy",
+    "rarity": "R",
+    "type": "Guts",
+    "image_url": "https://umamusu.wiki/w/thumb.php?f=Support_Card_10001_Card.png&width=100"
+  },
+  {
+    "id": 10002,
+    "name": "[Tracen Academy] Silence Suzuka",
+    "character_name": "Silence Suzuka",
+    "card_title": "Tracen Academy",
+    "rarity": "R",
+    "type": "Speed",
+    "image_url": "https://umamusu.wiki/w/thumb.php?f=Support_Card_10002_Card.png&width=100"
+  },
+  {
+    "id": 10003,
+    "name": "[Tracen Academy] Tokai Teio",
+    "character_name": "Tokai Teio",
+    "card_title": "Tracen Academy",
+    "rarity": "R",
+    "type": "Speed",
+    "image_url": "https://umamusu.wiki/w/thumb.php?f=Support_Card_10003_Card.png&width=100"
+  },
+  {
+    "id": 10004,
+    "name": "[Tracen Academy] Maruzensky",
+    "character_name": "Maruzensky",
+    "card_title": "Tracen Academy",
+    "rarity": "R",
+    "type": "Speed",
+    "image_url": "https://umamusu.wiki/w/thumb.php?f=Support_Card_10004_Card.png&width=100"
+  },
+  {
+    "id": 10005,
+    "name": "[Tracen Academy] Oguri Cap",
+    "character_name": "Oguri Cap",
+    "card_title": "Tracen Academy",
+    "rarity": "R",
+    "type": "Power",
+    "image_url": "https://umamusu.wiki/w/thumb.php?f=Support_Card_10005_Card.png&width=100"
+  },
+  {
+    "id": 10006,
+    "name": "[Tracen Academy] Gold Ship",
+    "character_name": "Gold Ship",
+    "card_title": "Tracen Academy",
+    "rarity": "R",
+    "type": "Stamina",
+    "image_url": "https://umamusu.wiki/w/thumb.php?f=Support_Card_10006_Card.png&width=100"
+  },
+  {
+    "id": 10007,
+    "name": "[Tracen Academy] Vodka",
+    "character_name": "Vodka",
+    "card_title": "Tracen Academy",
+    "rarity": "R",
+    "type": "Power",
+    "image_url": "https://umamusu.wiki/w/thumb.php?f=Support_Card_10007_Card.png&width=100"
+  },
+  {
+    "id": 10008,
+    "name": "[Tracen Academy] Taiki Shuttle",
+    "character_name": "Taiki Shuttle",
+    "card_title": "Tracen Academy",
+    "rarity": "R",
+    "type": "Speed",
+    "image_url": "https://umamusu.wiki/w/thumb.php?f=Support_Card_10008_Card.png&width=100"
+  },
+  {
+    "id": 10009,
+    "name": "[Tracen Academy] Grass Wonder",
+    "character_name": "Grass Wonder",
+    "card_title": "Tracen Academy",
+    "rarity": "R",
+    "type": "Guts",
+    "image_url": "https://umamusu.wiki/w/thumb.php?f=Support_Card_10009_Card.png&width=100"
+  },
+  {
+    "id": 10010,
+    "name": "[Tracen Academy] Mejiro McQueen",
+    "character_name": "Mejiro McQueen",
+    "card_title": "Tracen Academy",
+    "rarity": "R",
+    "type": "Stamina",
+    "image_url": "https://umamusu.wiki/w/thumb.php?f=Support_Card_10010_Card.png&width=100"
+  },
+  {
+    "id": 10011,
+    "name": "[Tracen Academy] El Condor Pasa",
+    "character_name": "El Condor Pasa",
+    "card_title": "Tracen Academy",
+    "rarity": "R",
+    "type": "Power",
+    "image_url": "https://umamusu.wiki/w/thumb.php?f=Support_Card_10011_Card.png&width=100"
+  },
+  {
+    "id": 10012,
+    "name": "[Tracen Academy] T.M. Opera O",
+    "character_name": "T.M. Opera O",
+    "card_title": "Tracen Academy",
+    "rarity": "R",
+    "type": "Stamina",
+    "image_url": "https://umamusu.wiki/w/thumb.php?f=Support_Card_10012_Card.png&width=100"
+  },
+  {
+    "id": 10013,
+    "name": "[Tracen Academy] Symboli Rudolf",
+    "character_name": "Symboli Rudolf",
+    "card_title": "Tracen Academy",
+    "rarity": "R",
+    "type": "Wit",
+    "image_url": "https://umamusu.wiki/w/thumb.php?f=Support_Card_10013_Card.png&width=100"
+  },
+  {
+    "id": 10014,
+    "name": "[Tracen Academy] Seiun Sky",
+    "character_name": "Seiun Sky",
+    "card_title": "Tracen Academy",
+    "rarity": "R",
+    "type": "Stamina",
+    "image_url": "https://umamusu.wiki/w/thumb.php?f=Support_Card_10014_Card.png&width=100"
+  },
+  {
+    "id": 10015,
+    "name": "[Tracen Academy] Rice Shower",
+    "character_name": "Rice Shower",
+    "card_title": "Tracen Academy",
+    "rarity": "R",
+    "type": "Stamina",
+    "image_url": "https://umamusu.wiki/w/thumb.php?f=Support_Card_10015_Card.png&width=100"
+  },
+  {
+    "id": 10016,
+    "name": "[Tracen Academy] Winning Ticket",
+    "character_name": "Winning Ticket",
+    "card_title": "Tracen Academy",
+    "rarity": "R",
+    "type": "Guts",
+    "image_url": "https://umamusu.wiki/w/thumb.php?f=Support_Card_10016_Card.png&width=100"
+  },
+  {
+    "id": 10017,
+    "name": "[Tracen Academy] Gold City",
+    "character_name": "Gold City",
+    "card_title": "Tracen Academy",
+    "rarity": "R",
+    "type": "Speed",
+    "image_url": "https://umamusu.wiki/w/thumb.php?f=Support_Card_10017_Card.png&width=100"
+  },
+  {
+    "id": 10018,
+    "name": "[Tracen Academy] Sakura Bakushin O",
+    "character_name": "Sakura Bakushin O",
+    "card_title": "Tracen Academy",
+    "rarity": "R",
+    "type": "Speed",
+    "image_url": "https://umamusu.wiki/w/thumb.php?f=Support_Card_10018_Card.png&width=100"
+  },
+  {
+    "id": 10019,
+    "name": "[Tracen Academy] Super Creek",
+    "character_name": "Super Creek",
+    "card_title": "Tracen Academy",
+    "rarity": "R",
+    "type": "Stamina",
+    "image_url": "https://umamusu.wiki/w/thumb.php?f=Support_Card_10019_Card.png&width=100"
+  },
+  {
+    "id": 10020,
+    "name": "[Tracen Academy] Haru Urara",
+    "character_name": "Haru Urara",
+    "card_title": "Tracen Academy",
+    "rarity": "R",
+    "type": "Guts",
+    "image_url": "https://umamusu.wiki/w/thumb.php?f=Support_Card_10020_Card.png&width=100"
+  },
+  {
+    "id": 10021,
+    "name": "[Tracen Academy] Tazuna Hayakawa",
+    "character_name": "Tazuna Hayakawa",
+    "card_title": "Tracen Academy",
+    "rarity": "R",
+    "type": "Pal",
+    "image_url": "https://umamusu.wiki/w/thumb.php?f=Support_Card_10021_Card.png&width=100"
+  },
+  {
+    "id": 10022,
+    "name": "[Tracen Academy] Kiryuin Aoi",
+    "character_name": "Kiryuin Aoi",
+    "card_title": "Tracen Academy",
+    "rarity": "R",
+    "type": "Pal",
+    "image_url": "https://umamusu.wiki/w/thumb.php?f=Support_Card_10022_Card.png&width=100"
+  },
+  {
+    "id": 10023,
+    "name": "[Tracen Academy] Daiwa Scarlet",
+    "character_name": "Daiwa Scarlet",
+    "card_title": "Tracen Academy",
+    "rarity": "R",
+    "type": "Wit",
+    "image_url": "https://umamusu.wiki/w/thumb.php?f=Support_Card_10023_Card.png&width=100"
+  },
+  {
+    "id": 10024,
+    "name": "[Tracen Academy] Hishi Amazon",
+    "character_name": "Hishi Amazon",
+    "card_title": "Tracen Academy",
+    "rarity": "R",
+    "type": "Power",
+    "image_url": "https://umamusu.wiki/w/thumb.php?f=Support_Card_10024_Card.png&width=100"
+  },
+  {
+    "id": 10025,
+    "name": "[Tracen Academy] Air Groove",
+    "character_name": "Air Groove",
+    "card_title": "Tracen Academy",
+    "rarity": "R",
+    "type": "Guts",
+    "image_url": "https://umamusu.wiki/w/thumb.php?f=Support_Card_10025_Card.png&width=100"
+  },
+  {
+    "id": 10026,
+    "name": "[Tracen Academy] Agnes Digital",
+    "character_name": "Agnes Digital",
+    "card_title": "Tracen Academy",
+    "rarity": "R",
+    "type": "Power",
+    "image_url": "https://umamusu.wiki/w/thumb.php?f=Support_Card_10026_Card.png&width=100"
+  },
+  {
+    "id": 10027,
+    "name": "[Tracen Academy] Tamamo Cross",
+    "character_name": "Tamamo Cross",
+    "card_title": "Tracen Academy",
+    "rarity": "R",
+    "type": "Stamina",
+    "image_url": "https://umamusu.wiki/w/thumb.php?f=Support_Card_10027_Card.png&width=100"
+  },
+  {
+    "id": 10028,
+    "name": "[Tracen Academy] Fine Motion",
+    "character_name": "Fine Motion",
+    "card_title": "Tracen Academy",
+    "rarity": "R",
+    "type": "Wit",
+    "image_url": "https://umamusu.wiki/w/thumb.php?f=Support_Card_10028_Card.png&width=100"
+  },
+  {
+    "id": 10029,
+    "name": "[Tracen Academy] Biwa Hayahide",
+    "character_name": "Biwa Hayahide",
+    "card_title": "Tracen Academy",
+    "rarity": "R",
+    "type": "Power",
+    "image_url": "https://umamusu.wiki/w/thumb.php?f=Support_Card_10029_Card.png&width=100"
+  },
+  {
+    "id": 10030,
+    "name": "[Tracen Academy] Mayano Top Gun",
+    "character_name": "Mayano Top Gun",
+    "card_title": "Tracen Academy",
+    "rarity": "R",
+    "type": "Stamina",
+    "image_url": "https://umamusu.wiki/w/thumb.php?f=Support_Card_10030_Card.png&width=100"
+  },
+  {
+    "id": 10031,
+    "name": "[Tracen Academy] Manhattan Cafe",
+    "character_name": "Manhattan Cafe",
+    "card_title": "Tracen Academy",
+    "rarity": "R",
+    "type": "Stamina",
+    "image_url": "https://umamusu.wiki/w/thumb.php?f=Support_Card_10031_Card.png&width=100"
+  },
+  {
+    "id": 10032,
+    "name": "[Tracen Academy] Mihono Bourbon",
+    "character_name": "Mihono Bourbon",
+    "card_title": "Tracen Academy",
+    "rarity": "R",
+    "type": "Power",
+    "image_url": "https://umamusu.wiki/w/thumb.php?f=Support_Card_10032_Card.png&width=100"
+  },
+  {
+    "id": 10033,
+    "name": "[Tracen Academy] Mejiro Ryan",
+    "character_name": "Mejiro Ryan",
+    "card_title": "Tracen Academy",
+    "rarity": "R",
+    "type": "Power",
+    "image_url": "https://umamusu.wiki/w/thumb.php?f=Support_Card_10033_Card.png&width=100"
+  },
+  {
+    "id": 10034,
+    "name": "[Tracen Academy] Yukino Bijin",
+    "character_name": "Yukino Bijin",
+    "card_title": "Tracen Academy",
+    "rarity": "R",
+    "type": "Guts",
+    "image_url": "https://umamusu.wiki/w/thumb.php?f=Support_Card_10034_Card.png&width=100"
+  },
+  {
+    "id": 10035,
+    "name": "[Tracen Academy] Ines Fujin",
+    "character_name": "Ines Fujin",
+    "card_title": "Tracen Academy",
+    "rarity": "R",
+    "type": "Guts",
+    "image_url": "https://umamusu.wiki/w/thumb.php?f=Support_Card_10035_Card.png&width=100"
+  },
+  {
+    "id": 10036,
+    "name": "[Tracen Academy] Agnes Tachyon",
+    "character_name": "Agnes Tachyon",
+    "card_title": "Tracen Academy",
+    "rarity": "R",
+    "type": "Wit",
+    "image_url": "https://umamusu.wiki/w/thumb.php?f=Support_Card_10036_Card.png&width=100"
+  },
+  {
+    "id": 10037,
+    "name": "[Tracen Academy] Air Shakur",
+    "character_name": "Air Shakur",
+    "card_title": "Tracen Academy",
+    "rarity": "R",
+    "type": "Wit",
+    "image_url": "https://umamusu.wiki/w/thumb.php?f=Support_Card_10037_Card.png&width=100"
+  },
+  {
+    "id": 10038,
+    "name": "[Tracen Academy] Eishin Flash",
+    "character_name": "Eishin Flash",
+    "card_title": "Tracen Academy",
+    "rarity": "R",
+    "type": "Speed",
+    "image_url": "https://umamusu.wiki/w/thumb.php?f=Support_Card_10038_Card.png&width=100"
+  },
+  {
+    "id": 10039,
+    "name": "[Tracen Academy] Smart Falcon",
+    "character_name": "Smart Falcon",
+    "card_title": "Tracen Academy",
+    "rarity": "R",
+    "type": "Power",
+    "image_url": "https://umamusu.wiki/w/thumb.php?f=Support_Card_10039_Card.png&width=100"
+  },
+  {
+    "id": 10040,
+    "name": "[Tracen Academy] Narita Taishin",
+    "character_name": "Narita Taishin",
+    "card_title": "Tracen Academy",
+    "rarity": "R",
+    "type": "Speed",
+    "image_url": "https://umamusu.wiki/w/thumb.php?f=Support_Card_10040_Card.png&width=100"
+  },
+  {
+    "id": 10041,
+    "name": "[Tracen Academy] Nishino Flower",
+    "character_name": "Nishino Flower",
+    "card_title": "Tracen Academy",
+    "rarity": "R",
+    "type": "Speed",
+    "image_url": "https://umamusu.wiki/w/thumb.php?f=Support_Card_10041_Card.png&width=100"
+  },
+  {
+    "id": 10042,
+    "name": "[Tracen Academy] Biko Pegasus",
+    "character_name": "Biko Pegasus",
+    "card_title": "Tracen Academy",
+    "rarity": "R",
+    "type": "Speed",
+    "image_url": "https://umamusu.wiki/w/thumb.php?f=Support_Card_10042_Card.png&width=100"
+  },
+  {
+    "id": 10043,
+    "name": "[Tracen Academy] Marvelous Sunday",
+    "character_name": "Marvelous Sunday",
+    "card_title": "Tracen Academy",
+    "rarity": "R",
+    "type": "Wit",
+    "image_url": "https://umamusu.wiki/w/thumb.php?f=Support_Card_10043_Card.png&width=100"
+  },
+  {
+    "id": 10044,
+    "name": "[Tracen Academy] Matikanefukukitaru",
+    "character_name": "Matikanefukukitaru",
+    "card_title": "Tracen Academy",
+    "rarity": "R",
+    "type": "Wit",
+    "image_url": "https://umamusu.wiki/w/thumb.php?f=Support_Card_10044_Card.png&width=100"
+  },
+  {
+    "id": 10045,
+    "name": "[Tracen Academy] Meisho Doto",
+    "character_name": "Meisho Doto",
+    "card_title": "Tracen Academy",
+    "rarity": "R",
+    "type": "Guts",
+    "image_url": "https://umamusu.wiki/w/thumb.php?f=Support_Card_10045_Card.png&width=100"
+  },
+  {
+    "id": 10046,
+    "name": "[Tracen Academy] Mejiro Dober",
+    "character_name": "Mejiro Dober",
+    "card_title": "Tracen Academy",
+    "rarity": "R",
+    "type": "Wit",
+    "image_url": "https://umamusu.wiki/w/thumb.php?f=Support_Card_10046_Card.png&width=100"
+  },
+  {
+    "id": 10047,
+    "name": "[Tracen Academy] Nice Nature",
+    "character_name": "Nice Nature",
+    "card_title": "Tracen Academy",
+    "rarity": "R",
+    "type": "Guts",
+    "image_url": "https://umamusu.wiki/w/thumb.php?f=Support_Card_10047_Card.png&width=100"
+  },
+  {
+    "id": 10048,
+    "name": "[Tracen Academy] King Halo",
+    "character_name": "King Halo",
+    "card_title": "Tracen Academy",
+    "rarity": "R",
+    "type": "Speed",
+    "image_url": "https://umamusu.wiki/w/thumb.php?f=Support_Card_10048_Card.png&width=100"
+  },
+  {
+    "id": 10049,
+    "name": "[Tracen Academy] Fuji Kiseki",
+    "character_name": "Fuji Kiseki",
+    "card_title": "Tracen Academy",
+    "rarity": "R",
+    "type": "Wit",
+    "image_url": "https://umamusu.wiki/w/thumb.php?f=Support_Card_10049_Card.png&width=100"
+  },
+  {
+    "id": 10050,
+    "name": "[Tracen Academy] Sweep Tosho",
+    "character_name": "Sweep Tosho",
+    "card_title": "Tracen Academy",
+    "rarity": "R",
+    "type": "Speed",
+    "image_url": "https://umamusu.wiki/w/thumb.php?f=Support_Card_10050_Card.png&width=100"
+  },
+  {
+    "id": 10051,
+    "name": "[Tracen Academy] Twin Turbo",
+    "character_name": "Twin Turbo",
+    "card_title": "Tracen Academy",
+    "rarity": "R",
+    "type": "Speed",
+    "image_url": "https://umamusu.wiki/w/thumb.php?f=Support_Card_10051_Card.png&width=100"
+  },
+  {
+    "id": 10052,
+    "name": "[Tracen Academy] Daitaku Helios",
+    "character_name": "Daitaku Helios",
+    "card_title": "Tracen Academy",
+    "rarity": "R",
+    "type": "Power",
+    "image_url": "https://umamusu.wiki/w/thumb.php?f=Support_Card_10052_Card.png&width=100"
+  },
+  {
+    "id": 10053,
+    "name": "[Tracen Academy] Ikuno Dictus",
+    "character_name": "Ikuno Dictus",
+    "card_title": "Tracen Academy",
+    "rarity": "R",
+    "type": "Wit",
+    "image_url": "https://umamusu.wiki/w/thumb.php?f=Support_Card_10053_Card.png&width=100"
+  },
+  {
+    "id": 10054,
+    "name": "[Tracen Academy] Mejiro Palmer",
+    "character_name": "Mejiro Palmer",
+    "card_title": "Tracen Academy",
+    "rarity": "R",
+    "type": "Guts",
+    "image_url": "https://umamusu.wiki/w/thumb.php?f=Support_Card_10054_Card.png&width=100"
+  },
+  {
+    "id": 10055,
+    "name": "[Tracen Academy] Kitasan Black",
+    "character_name": "Kitasan Black",
+    "card_title": "Tracen Academy",
+    "rarity": "R",
+    "type": "Speed",
+    "image_url": "https://umamusu.wiki/w/thumb.php?f=Support_Card_10055_Card.png&width=100"
+  },
+  {
+    "id": 10056,
+    "name": "[Tracen Academy] Satono Diamond",
+    "character_name": "Satono Diamond",
+    "card_title": "Tracen Academy",
+    "rarity": "R",
+    "type": "Stamina",
+    "image_url": "https://umamusu.wiki/w/thumb.php?f=Support_Card_10056_Card.png&width=100"
+  },
+  {
+    "id": 10057,
+    "name": "[Tracen Academy] Matikanetannhauser",
+    "character_name": "Matikanetannhauser",
+    "card_title": "Tracen Academy",
+    "rarity": "R",
+    "type": "Guts",
+    "image_url": "https://umamusu.wiki/w/thumb.php?f=Support_Card_10057_Card.png&width=100"
+  },
+  {
+    "id": 10058,
+    "name": "[Tracen Academy] Yaeno Muteki",
+    "character_name": "Yaeno Muteki",
+    "card_title": "Tracen Academy",
+    "rarity": "R",
+    "type": "Power",
+    "image_url": "https://umamusu.wiki/w/thumb.php?f=Support_Card_10058_Card.png&width=100"
+  },
+  {
+    "id": 10059,
+    "name": "[Tracen Academy] Zenno Rob Roy",
+    "character_name": "Zenno Rob Roy",
+    "card_title": "Tracen Academy",
+    "rarity": "R",
+    "type": "Stamina",
+    "image_url": "https://umamusu.wiki/w/thumb.php?f=Support_Card_10059_Card.png&width=100"
+  },
+  {
+    "id": 10060,
+    "name": "[Tracen Academy] Kashimoto Riko",
+    "character_name": "Kashimoto Riko",
+    "card_title": "Tracen Academy",
+    "rarity": "R",
+    "type": "Pal",
+    "image_url": "https://umamusu.wiki/w/thumb.php?f=Support_Card_10060_Card.png&width=100"
+  },
+  {
+    "id": 10061,
+    "name": "[Tracen Academy] Seeking the Pearl",
+    "character_name": "Seeking the Pearl",
+    "card_title": "Tracen Academy",
+    "rarity": "R",
+    "type": "Guts",
+    "image_url": "https://umamusu.wiki/w/thumb.php?f=Support_Card_10061_Card.png&width=100"
+  },
+  {
+    "id": 10062,
+    "name": "[Tracen Academy] Sakura Chiyono O",
+    "character_name": "Sakura Chiyono O",
+    "card_title": "Tracen Academy",
+    "rarity": "R",
+    "type": "Stamina",
+    "image_url": "https://umamusu.wiki/w/thumb.php?f=Support_Card_10062_Card.png&width=100"
+  },
+  {
+    "id": 10063,
+    "name": "[Tracen Academy] Kawakami Princess",
+    "character_name": "Kawakami Princess",
+    "card_title": "Tracen Academy",
+    "rarity": "R",
+    "type": "Speed",
+    "image_url": "https://umamusu.wiki/w/thumb.php?f=Support_Card_10063_Card.png&width=100"
+  },
+  {
+    "id": 10064,
+    "name": "[Tracen Academy] Hishi Akebono",
+    "character_name": "Hishi Akebono",
+    "card_title": "Tracen Academy",
+    "rarity": "R",
+    "type": "Guts",
+    "image_url": "https://umamusu.wiki/w/thumb.php?f=Support_Card_10064_Card.png&width=100"
+  },
+  {
+    "id": 10065,
+    "name": "[Tracen Academy] Bamboo Memory",
+    "character_name": "Bamboo Memory",
+    "card_title": "Tracen Academy",
+    "rarity": "R",
+    "type": "Power",
+    "image_url": "https://umamusu.wiki/w/thumb.php?f=Support_Card_10065_Card.png&width=100"
+  },
+  {
+    "id": 10066,
+    "name": "[Tracen Academy] Shinko Windy",
+    "character_name": "Shinko Windy",
+    "card_title": "Tracen Academy",
+    "rarity": "R",
+    "type": "Speed",
+    "image_url": "https://umamusu.wiki/w/thumb.php?f=Support_Card_10066_Card.png&width=100"
+  },
+  {
+    "id": 10067,
+    "name": "[Tracen Academy] Nakayama Festa",
+    "character_name": "Nakayama Festa",
+    "card_title": "Tracen Academy",
+    "rarity": "R",
+    "type": "Stamina",
+    "image_url": "https://umamusu.wiki/w/thumb.php?f=Support_Card_10067_Card.png&width=100"
+  },
+  {
+    "id": 10068,
+    "name": "[Tracen Academy] Inari One",
+    "character_name": "Inari One",
+    "card_title": "Tracen Academy",
+    "rarity": "R",
+    "type": "Power",
+    "image_url": "https://umamusu.wiki/w/thumb.php?f=Support_Card_10068_Card.png&width=100"
+  },
+  {
+    "id": 10069,
+    "name": "[Tracen Academy] Mejiro Ardan",
+    "character_name": "Mejiro Ardan",
+    "card_title": "Tracen Academy",
+    "rarity": "R",
+    "type": "Wit",
+    "image_url": "https://umamusu.wiki/w/thumb.php?f=Support_Card_10069_Card.png&width=100"
+  },
+  {
+    "id": 10070,
+    "name": "[Tracen Academy] Tosen Jordan",
+    "character_name": "Tosen Jordan",
+    "card_title": "Tracen Academy",
+    "rarity": "R",
+    "type": "Stamina",
+    "image_url": "https://umamusu.wiki/w/thumb.php?f=Support_Card_10070_Card.png&width=100"
+  },
+  {
+    "id": 10071,
+    "name": "[Tracen Academy] Sirius Symboli",
+    "character_name": "Sirius Symboli",
+    "card_title": "Tracen Academy",
+    "rarity": "R",
+    "type": "Guts",
+    "image_url": "https://umamusu.wiki/w/thumb.php?f=Support_Card_10071_Card.png&width=100"
+  },
+  {
+    "id": 10072,
+    "name": "[Tracen Academy] Narita Brian",
+    "character_name": "Narita Brian",
+    "card_title": "Tracen Academy",
+    "rarity": "R",
+    "type": "Speed",
+    "image_url": "https://umamusu.wiki/w/thumb.php?f=Support_Card_10072_Card.png&width=100"
+  },
+  {
+    "id": 10073,
+    "name": "[Tracen Academy] Curren Chan",
+    "character_name": "Curren Chan",
+    "card_title": "Tracen Academy",
+    "rarity": "R",
+    "type": "Wit",
+    "image_url": "https://umamusu.wiki/w/thumb.php?f=Support_Card_10073_Card.png&width=100"
+  },
+  {
+    "id": 10074,
+    "name": "[笹針師] Anshinzawa Sasami",
+    "character_name": "Anshinzawa Sasami",
+    "card_title": "笹針師",
+    "rarity": "R",
+    "type": "Pal",
+    "image_url": "https://umamusu.wiki/w/thumb.php?f=Support_Card_10074_Card.png&width=100"
+  },
+  {
+    "id": 10075,
+    "name": "[Tracen Academy] Admire Vega",
+    "character_name": "Admire Vega",
+    "card_title": "Tracen Academy",
+    "rarity": "R",
+    "type": "Power",
+    "image_url": "https://umamusu.wiki/w/thumb.php?f=Support_Card_10075_Card.png&width=100"
+  },
+  {
+    "id": 10076,
+    "name": "[Tracen Academy] Mejiro Bright",
+    "character_name": "Mejiro Bright",
+    "card_title": "Tracen Academy",
+    "rarity": "R",
+    "type": "Stamina",
+    "image_url": "https://umamusu.wiki/w/thumb.php?f=Support_Card_10076_Card.png&width=100"
+  },
+  {
+    "id": 10077,
+    "name": "[Tracen Academy] Narita Top Road",
+    "character_name": "Narita Top Road",
+    "card_title": "Tracen Academy",
+    "rarity": "R",
+    "type": "Speed",
+    "image_url": "https://umamusu.wiki/w/thumb.php?f=Support_Card_10077_Card.png&width=100"
+  },
+  {
+    "id": 10078,
+    "name": "[Tracen Academy] Mr. C.B.",
+    "character_name": "Mr. C.B.",
+    "card_title": "Tracen Academy",
+    "rarity": "R",
+    "type": "Wit",
+    "image_url": "https://umamusu.wiki/w/thumb.php?f=Support_Card_10078_Card.png&width=100"
+  },
+  {
+    "id": 10079,
+    "name": "[Tracen Academy] Daiichi Ruby",
+    "character_name": "Daiichi Ruby",
+    "card_title": "Tracen Academy",
+    "rarity": "R",
+    "type": "Power",
+    "image_url": "https://umamusu.wiki/w/thumb.php?f=Support_Card_10079_Card.png&width=100"
+  },
+  {
+    "id": 10080,
+    "name": "[Tracen Academy] K.S.Miracle",
+    "character_name": "K.S.Miracle",
+    "card_title": "Tracen Academy",
+    "rarity": "R",
+    "type": "Guts",
+    "image_url": "https://umamusu.wiki/w/thumb.php?f=Support_Card_10080_Card.png&width=100"
+  },
+  {
+    "id": 10081,
+    "name": "[Tracen Academy] Tsurumaru Tsuyoshi",
+    "character_name": "Tsurumaru Tsuyoshi",
+    "card_title": "Tracen Academy",
+    "rarity": "R",
+    "type": "Guts",
+    "image_url": "https://umamusu.wiki/w/thumb.php?f=Support_Card_10081_Card.png&width=100"
+  },
+  {
+    "id": 10082,
+    "name": "[Tracen Academy] Symboli Kris S",
+    "character_name": "Symboli Kris S",
+    "card_title": "Tracen Academy",
+    "rarity": "R",
+    "type": "Stamina",
+    "image_url": "https://umamusu.wiki/w/thumb.php?f=Support_Card_10082_Card.png&width=100"
+  },
+  {
+    "id": 10083,
+    "name": "[Event Producer] Light Hello",
+    "character_name": "Light Hello",
+    "card_title": "Event Producer",
+    "rarity": "R",
+    "type": "Pal",
+    "image_url": "https://umamusu.wiki/w/thumb.php?f=Support_Card_10083_Card.png&width=100"
+  },
+  {
+    "id": 10084,
+    "name": "[Tracen Academy] Tanino Gimlet",
+    "character_name": "Tanino Gimlet",
+    "card_title": "Tracen Academy",
+    "rarity": "R",
+    "type": "Power",
+    "image_url": "https://umamusu.wiki/w/thumb.php?f=Support_Card_10084_Card.png&width=100"
+  },
+  {
+    "id": 10085,
+    "name": "[Tracen Academy] Sakura Laurel",
+    "character_name": "Sakura Laurel",
+    "card_title": "Tracen Academy",
+    "rarity": "R",
+    "type": "Stamina",
+    "image_url": "https://umamusu.wiki/w/thumb.php?f=Support_Card_10085_Card.png&width=100"
+  },
+  {
+    "id": 10086,
+    "name": "[Tracen Academy] Yamanin Zephyr",
+    "character_name": "Yamanin Zephyr",
+    "card_title": "Tracen Academy",
+    "rarity": "R",
+    "type": "Guts",
+    "image_url": "https://umamusu.wiki/w/thumb.php?f=Support_Card_10086_Card.png&width=100"
+  },
+  {
+    "id": 10087,
+    "name": "[Tracen Academy] Aston Machan",
+    "character_name": "Aston Machan",
+    "card_title": "Tracen Academy",
+    "rarity": "R",
+    "type": "Speed",
+    "image_url": "https://umamusu.wiki/w/thumb.php?f=Support_Card_10087_Card.png&width=100"
+  },
+  {
+    "id": 10088,
+    "name": "[Tracen Academy] Mejiro Ramonu",
+    "character_name": "Mejiro Ramonu",
+    "card_title": "Tracen Academy",
+    "rarity": "R",
+    "type": "Wit",
+    "image_url": "https://umamusu.wiki/w/thumb.php?f=Support_Card_10088_Card.png&width=100"
+  },
+  {
+    "id": 10089,
+    "name": "[Tracen Academy] Jungle Pocket",
+    "character_name": "Jungle Pocket",
+    "card_title": "Tracen Academy",
+    "rarity": "R",
+    "type": "Speed",
+    "image_url": "https://umamusu.wiki/w/thumb.php?f=Support_Card_10089_Card.png&width=100"
+  },
+  {
+    "id": 10090,
+    "name": "[Tracen Academy] Hokko Tarumae",
+    "character_name": "Hokko Tarumae",
+    "card_title": "Tracen Academy",
+    "rarity": "R",
+    "type": "Stamina",
+    "image_url": "https://umamusu.wiki/w/thumb.php?f=Support_Card_10090_Card.png&width=100"
+  },
+  {
+    "id": 10091,
+    "name": "[Tracen Academy] Katsuragi Ace",
+    "character_name": "Katsuragi Ace",
+    "card_title": "Tracen Academy",
+    "rarity": "R",
+    "type": "Speed",
+    "image_url": "https://umamusu.wiki/w/thumb.php?f=Support_Card_10091_Card.png&width=100"
+  },
+  {
+    "id": 10092,
+    "name": "[Tracen Academy] Copano Rickey",
+    "character_name": "Copano Rickey",
+    "card_title": "Tracen Academy",
+    "rarity": "R",
+    "type": "Guts",
+    "image_url": "https://umamusu.wiki/w/thumb.php?f=Support_Card_10092_Card.png&width=100"
+  },
+  {
+    "id": 10093,
+    "name": "[Tracen Academy] Wonder Acute",
+    "character_name": "Wonder Acute",
+    "card_title": "Tracen Academy",
+    "rarity": "R",
+    "type": "Power",
+    "image_url": "https://umamusu.wiki/w/thumb.php?f=Support_Card_10093_Card.png&width=100"
+  },
+  {
+    "id": 10094,
+    "name": "[URA職員] Satake Mei",
+    "character_name": "Satake Mei",
+    "card_title": "URA職員",
+    "rarity": "R",
+    "type": "Pal",
+    "image_url": "https://umamusu.wiki/w/thumb.php?f=Support_Card_10094_Card.png&width=100"
+  },
+  {
+    "id": 10095,
+    "name": "[Tracen Academy] Tap Dance City",
+    "character_name": "Tap Dance City",
+    "card_title": "Tracen Academy",
+    "rarity": "R",
+    "type": "Guts",
+    "image_url": "https://umamusu.wiki/w/thumb.php?f=Support_Card_10095_Card.png&width=100"
+  },
+  {
+    "id": 10096,
+    "name": "[Tracen Academy] Still in Love",
+    "character_name": "Still in Love",
+    "card_title": "Tracen Academy",
+    "rarity": "R",
+    "type": "Speed",
+    "image_url": "https://umamusu.wiki/w/thumb.php?f=Support_Card_10096_Card.png&width=100"
+  },
+  {
+    "id": 10097,
+    "name": "[Tracen Academy] Verxina",
+    "character_name": "Verxina",
+    "card_title": "Tracen Academy",
+    "rarity": "R",
+    "type": "Guts",
+    "image_url": "https://umamusu.wiki/w/thumb.php?f=Support_Card_10097_Card.png&width=100"
+  },
+  {
+    "id": 10098,
+    "name": "[Tracen Academy] Sounds of Earth",
+    "character_name": "Sounds of Earth",
+    "card_title": "Tracen Academy",
+    "rarity": "R",
+    "type": "Stamina",
+    "image_url": "https://umamusu.wiki/w/thumb.php?f=Support_Card_10098_Card.png&width=100"
+  },
+  {
+    "id": 10099,
+    "name": "[Tracen Academy] Vivlos",
+    "character_name": "Vivlos",
+    "card_title": "Tracen Academy",
+    "rarity": "R",
+    "type": "Guts",
+    "image_url": "https://umamusu.wiki/w/thumb.php?f=Support_Card_10099_Card.png&width=100"
+  },
+  {
+    "id": 10100,
+    "name": "[Tracen Academy] Royce and Royce",
+    "character_name": "Royce and Royce",
+    "card_title": "Tracen Academy",
+    "rarity": "R",
+    "type": "Power",
+    "image_url": "https://umamusu.wiki/w/thumb.php?f=Support_Card_10100_Card.png&width=100"
+  },
+  {
+    "id": 10101,
+    "name": "[Tracen Academy] Duramente",
+    "character_name": "Duramente",
+    "card_title": "Tracen Academy",
+    "rarity": "R",
+    "type": "Speed",
+    "image_url": "https://umamusu.wiki/w/thumb.php?f=Support_Card_10101_Card.png&width=100"
+  },
+  {
+    "id": 10102,
+    "name": "[Tracen Academy] North Flight",
+    "character_name": "North Flight",
+    "card_title": "Tracen Academy",
+    "rarity": "R",
+    "type": "Wit",
+    "image_url": "https://umamusu.wiki/w/thumb.php?f=Support_Card_10102_Card.png&width=100"
+  },
+  {
+    "id": 10103,
+    "name": "[Tracen Academy] Orfevre",
+    "character_name": "Orfevre",
+    "card_title": "Tracen Academy",
+    "rarity": "R",
+    "type": "Guts",
+    "image_url": "https://umamusu.wiki/w/thumb.php?f=Support_Card_10103_Card.png&width=100"
+  },
+  {
+    "id": 10104,
+    "name": "[プロデューサー] Tsurugi Ryoka",
+    "character_name": "Tsurugi Ryoka",
+    "card_title": "プロデューサー",
+    "rarity": "R",
+    "type": "Pal",
+    "image_url": "https://umamusu.wiki/w/thumb.php?f=Support_Card_10104_Card.png&width=100"
+  },
+  {
+    "id": 10105,
+    "name": "[Tracen Academy] Cheval Grand",
+    "character_name": "Cheval Grand",
+    "card_title": "Tracen Academy",
+    "rarity": "R",
+    "type": "Stamina",
+    "image_url": "https://umamusu.wiki/w/thumb.php?f=Support_Card_10105_Card.png&width=100"
+  },
+  {
+    "id": 10106,
+    "name": "[Tracen Academy] Neo Universe",
+    "character_name": "Neo Universe",
+    "card_title": "Tracen Academy",
+    "rarity": "R",
+    "type": "Wit",
+    "image_url": "https://umamusu.wiki/w/thumb.php?f=Support_Card_10106_Card.png&width=100"
+  },
+  {
+    "id": 10107,
+    "name": "[Tracen Academy] Hishi Miracle",
+    "character_name": "Hishi Miracle",
+    "card_title": "Tracen Academy",
+    "rarity": "R",
+    "type": "Stamina",
+    "image_url": "https://umamusu.wiki/w/thumb.php?f=Support_Card_10107_Card.png&width=100"
+  },
+  {
+    "id": 10108,
+    "name": "[Tracen Academy] Dantsu Flame",
+    "character_name": "Dantsu Flame",
+    "card_title": "Tracen Academy",
+    "rarity": "R",
+    "type": "Wit",
+    "image_url": "https://umamusu.wiki/w/thumb.php?f=Support_Card_10108_Card.png&width=100"
+  },
+  {
+    "id": 10109,
+    "name": "[Tracen Academy] Director Akikawa",
+    "character_name": "Director Akikawa",
+    "card_title": "Tracen Academy",
+    "rarity": "R",
+    "type": "Pal",
+    "image_url": "https://umamusu.wiki/w/thumb.php?f=Support_Card_10109_Card.png&width=100"
+  },
+  {
+    "id": 10110,
+    "name": "[Tracen Academy] Espoir City",
+    "character_name": "Espoir City",
+    "card_title": "Tracen Academy",
+    "rarity": "R",
+    "type": "Power",
+    "image_url": "https://umamusu.wiki/w/thumb.php?f=Support_Card_10110_Card.png&width=100"
+  },
+  {
+    "id": 10111,
+    "name": "[Tracen Academy] Bubble Gum Fellow",
+    "character_name": "Bubble Gum Fellow",
+    "card_title": "Tracen Academy",
+    "rarity": "R",
+    "type": "Speed",
+    "image_url": "https://umamusu.wiki/w/thumb.php?f=Support_Card_10111_Card.png&width=100"
+  },
+  {
+    "id": 10113,
+    "name": "[Tracen Academy] Gentildonna",
+    "character_name": "Gentildonna",
+    "card_title": "Tracen Academy",
+    "rarity": "R",
+    "type": "Speed",
+    "image_url": "https://umamusu.wiki/w/thumb.php?f=Support_Card_10113_Card.png&width=100"
+  },
+  {
+    "id": 10114,
+    "name": "[Tracen Academy] Rhein Kraft",
+    "character_name": "Rhein Kraft",
+    "card_title": "Tracen Academy",
+    "rarity": "R",
+    "type": "Guts",
+    "image_url": "https://umamusu.wiki/w/thumb.php?f=Support_Card_10114_Card.png&width=100"
+  },
+  {
+    "id": 10115,
+    "name": "[Tracen Academy] Cesario",
+    "character_name": "Cesario",
+    "card_title": "Tracen Academy",
+    "rarity": "R",
+    "type": "Wit",
+    "image_url": "https://umamusu.wiki/w/thumb.php?f=Support_Card_10115_Card.png&width=100"
+  },
+  {
+    "id": 10116,
+    "name": "[Tracen Academy] Blast Onepiece",
+    "character_name": "Blast Onepiece",
+    "card_title": "Tracen Academy",
+    "rarity": "R",
+    "type": "Guts",
+    "image_url": "https://umamusu.wiki/w/thumb.php?f=Support_Card_10116_Card.png&width=100"
+  },
+  {
+    "id": 10117,
+    "name": "[Tracen Academy] No Reason",
+    "character_name": "No Reason",
+    "card_title": "Tracen Academy",
+    "rarity": "R",
+    "type": "Guts",
+    "image_url": "https://umamusu.wiki/w/thumb.php?f=Support_Card_10117_Card.png&width=100"
+  },
+  {
+    "id": 10118,
+    "name": "[Tracen Academy] Buena Vista",
+    "character_name": "Buena Vista",
+    "card_title": "Tracen Academy",
+    "rarity": "R",
+    "type": "Guts",
+    "image_url": "https://umamusu.wiki/w/thumb.php?f=Support_Card_10118_Card.png&width=100"
+  },
+  {
+    "id": 10119,
+    "name": "[Tracen Academy] Dream Journey",
+    "character_name": "Dream Journey",
+    "card_title": "Tracen Academy",
+    "rarity": "R",
+    "type": "Speed",
+    "image_url": "https://umamusu.wiki/w/thumb.php?f=Support_Card_10119_Card.png&width=100"
+  },
+  {
+    "id": 10120,
+    "name": "[Tracen Academy] Daring Tact",
+    "character_name": "Daring Tact",
+    "card_title": "Tracen Academy",
+    "rarity": "R",
+    "type": "Wit",
+    "image_url": "https://umamusu.wiki/w/thumb.php?f=Support_Card_10120_Card.png&width=100"
+  },
+  {
+    "id": 10121,
+    "name": "[Tracen Academy] Daring Heart",
+    "character_name": "Daring Heart",
+    "card_title": "Tracen Academy",
+    "rarity": "R",
+    "type": "Power",
+    "image_url": "https://umamusu.wiki/w/thumb.php?f=Support_Card_10121_Card.png&width=100"
+  },
+  {
+    "id": 10122,
+    "name": "[Tracen Academy] Almond Eye",
+    "character_name": "Almond Eye",
+    "card_title": "Tracen Academy",
+    "rarity": "R",
+    "type": "Speed",
+    "image_url": "https://umamusu.wiki/w/thumb.php?f=Support_Card_10122_Card.png&width=100"
+  },
+  {
+    "id": 10123,
+    "name": "[Tracen Academy] Lucky Lilac",
+    "character_name": "Lucky Lilac",
+    "card_title": "Tracen Academy",
+    "rarity": "R",
+    "type": "Wit",
+    "image_url": "https://umamusu.wiki/w/thumb.php?f=Support_Card_10123_Card.png&width=100"
+  },
+  {
+    "id": 10124,
+    "name": "[Tracen Academy] Gran Alegria",
+    "character_name": "Gran Alegria",
+    "card_title": "Tracen Academy",
+    "rarity": "R",
+    "type": "Power",
+    "image_url": "https://umamusu.wiki/w/thumb.php?f=Support_Card_10124_Card.png&width=100"
+  },
+  {
+    "id": 10125,
+    "name": "[Tracen Academy] Transcend",
+    "character_name": "Transcend",
+    "card_title": "Tracen Academy",
+    "rarity": "R",
+    "type": "Guts",
+    "image_url": "https://umamusu.wiki/w/thumb.php?f=Support_Card_10125_Card.png&width=100"
+  },
+  {
+    "id": 10126,
+    "name": "[Tracen Academy] Curren Bouquetd'or",
+    "character_name": "Curren Bouquetd'or",
+    "card_title": "Tracen Academy",
+    "rarity": "R",
+    "type": "Stamina",
+    "image_url": "https://umamusu.wiki/w/thumb.php?f=Support_Card_10126_Card.png&width=100"
+  },
+  {
+    "id": 10127,
+    "name": "[Tracen Academy] Air Messiah",
+    "character_name": "Air Messiah",
+    "card_title": "Tracen Academy",
+    "rarity": "R",
+    "type": "Wit",
+    "image_url": "https://umamusu.wiki/w/thumb.php?f=Support_Card_10127_Card.png&width=100"
+  },
+  {
+    "id": 10128,
+    "name": "[無人島PJ責任者] Tucker Bryne",
+    "character_name": "Tucker Bryne",
+    "card_title": "無人島PJ責任者",
+    "rarity": "R",
+    "type": "Pal",
+    "image_url": "https://umamusu.wiki/w/thumb.php?f=Support_Card_10128_Card.png&width=100"
+  },
+  {
+    "id": 10129,
+    "name": "[トレセン学園] Fusaichi Pandora",
+    "character_name": "Fusaichi Pandora",
+    "card_title": "トレセン学園",
+    "rarity": "R",
+    "type": "Speed",
+    "image_url": "https://umamusu.wiki/w/thumb.php?f=Support_Card_10129_Card.png&width=100"
+  },
+  {
+    "id": 10131,
+    "name": "[Tracen Academy] Win Variation",
+    "character_name": "Win Variation",
+    "card_title": "Tracen Academy",
+    "rarity": "R",
+    "type": "Wit",
+    "image_url": "https://umamusu.wiki/w/thumb.php?f=Support_Card_10131_Card.png&width=100"
+  },
+  {
+    "id": 10132,
+    "name": "[Tracen Academy] Stay Gold",
+    "character_name": "Stay Gold",
+    "card_title": "Tracen Academy",
+    "rarity": "R",
+    "type": "Guts",
+    "image_url": "https://umamusu.wiki/w/thumb.php?f=Support_Card_10132_Card.png&width=100"
+  },
+  {
+    "id": 10133,
+    "name": "[Tracen Academy] Admire Groove",
+    "character_name": "Admire Groove",
+    "card_title": "Tracen Academy",
+    "rarity": "R",
+    "type": "Speed",
+    "image_url": "https://umamusu.wiki/w/thumb.php?f=Support_Card_10133_Card.png&width=100"
+  },
+  {
+    "id": 10134,
+    "name": "[Tracen Academy] Chrono Genesis",
+    "character_name": "Chrono Genesis",
+    "card_title": "Tracen Academy",
+    "rarity": "R",
+    "type": "Wit",
+    "image_url": "https://umamusu.wiki/w/thumb.php?f=Support_Card_10134_Card.png&width=100"
+  },
+  {
+    "id": 10135,
+    "name": "[Tracen Academy] Calstone Light O",
+    "character_name": "Calstone Light O",
+    "card_title": "Tracen Academy",
+    "rarity": "R",
+    "type": "Speed",
+    "image_url": "https://umamusu.wiki/w/thumb.php?f=Support_Card_10135_Card.png&width=100"
+  },
+  {
+    "id": 10136,
+    "name": "[Tracen Academy] Durandal",
+    "character_name": "Durandal",
+    "card_title": "Tracen Academy",
+    "rarity": "R",
+    "type": "Wit",
+    "image_url": "https://umamusu.wiki/w/thumb.php?f=Support_Card_10136_Card.png&width=100"
+  },
+  {
+    "id": 10137,
+    "name": "[トレセン学園] Sakura Chitose O",
+    "character_name": "Sakura Chitose O",
+    "card_title": "トレセン学園",
+    "rarity": "R",
+    "type": "Speed",
+    "image_url": "https://umamusu.wiki/w/thumb.php?f=Support_Card_10137_Card.png&width=100"
+  },
+  {
+    "id": 10138,
+    "name": "[ゆこま旅館女将] Kiyoko Hoshina",
+    "character_name": "Kiyoko Hoshina",
+    "card_title": "ゆこま旅館女将",
+    "rarity": "R",
+    "type": "Pal",
+    "image_url": "https://umamusu.wiki/w/thumb.php?f=Support_Card_10138_Card.png&width=100"
+  },
+  {
+    "id": 10139,
+    "name": "[トレセン学園] Fenomeno",
+    "character_name": "Fenomeno",
+    "card_title": "トレセン学園",
+    "rarity": "R",
+    "type": "Stamina",
+    "image_url": "https://umamusu.wiki/w/thumb.php?f=Support_Card_10139_Card.png&width=100"
+  },
+  {
+    "id": 10140,
+    "name": "[トレセン学園] Forever Young",
+    "character_name": "Forever Young",
+    "card_title": "トレセン学園",
+    "rarity": "R",
+    "type": "Wit",
+    "image_url": "https://umamusu.wiki/w/thumb.php?f=Support_Card_10140_Card.png&width=100"
+  },
+  {
+    "id": 10141,
+    "name": "[『DREAMS』責任者] Casino Drive",
+    "character_name": "Casino Drive",
+    "card_title": "『DREAMS』責任者",
+    "rarity": "R",
+    "type": "Pal",
+    "image_url": "https://umamusu.wiki/w/thumb.php?f=Support_Card_10141_Card.png&width=100"
+  },
+  {
+    "id": 10142,
+    "name": "[トレセン学園] Red Desire",
+    "character_name": "Red Desire",
+    "card_title": "トレセン学園",
+    "rarity": "R",
+    "type": "Guts",
+    "image_url": "https://umamusu.wiki/w/thumb.php?f=Support_Card_10142_Card.png&width=100"
+  },
+  {
+    "id": 10143,
+    "name": "[トレセン学園] Victoire Pisa",
+    "character_name": "Victoire Pisa",
+    "card_title": "トレセン学園",
+    "rarity": "R",
+    "type": "Speed",
+    "image_url": "https://umamusu.wiki/w/thumb.php?f=Support_Card_10143_Card.png&width=100"
+  },
+  {
+    "id": 10144,
+    "name": "[トレセン学園] Marche Lorraine",
+    "character_name": "Marche Lorraine",
+    "card_title": "トレセン学園",
+    "rarity": "R",
+    "type": "Speed",
+    "image_url": "https://umamusu.wiki/w/thumb.php?f=Support_Card_10144_Card.png&width=100"
+  },
+  {
+    "id": 20001,
+    "name": "[Well, Look Who's Home] Fuji Kiseki",
+    "character_name": "Fuji Kiseki",
+    "card_title": "Well, Look Who's Home",
+    "rarity": "SR",
+    "type": "Wit",
+    "image_url": "https://umamusu.wiki/w/thumb.php?f=Support_Card_20001_Card.png&width=100"
+  },
+  {
+    "id": 20002,
+    "name": "[Nothing Hard Work Can't Solve!] Daiwa Scarlet",
+    "character_name": "Daiwa Scarlet",
+    "card_title": "Nothing Hard Work Can't Solve!",
+    "rarity": "SR",
+    "type": "Wit",
+    "image_url": "https://umamusu.wiki/w/thumb.php?f=Support_Card_20002_Card.png&width=100"
+  },
+  {
+    "id": 20003,
+    "name": "[Reach the Top!] Hishi Amazon",
+    "character_name": "Hishi Amazon",
+    "card_title": "Reach the Top!",
+    "rarity": "SR",
+    "type": "Power",
+    "image_url": "https://umamusu.wiki/w/thumb.php?f=Support_Card_20003_Card.png&width=100"
+  },
+  {
+    "id": 20004,
+    "name": "[Nothing Escapes the Vice Prez] Air Groove",
+    "character_name": "Air Groove",
+    "card_title": "Nothing Escapes the Vice Prez",
+    "rarity": "SR",
+    "type": "Guts",
+    "image_url": "https://umamusu.wiki/w/thumb.php?f=Support_Card_20004_Card.png&width=100"
+  },
+  {
+    "id": 20005,
+    "name": "[Digital's Recharge Station] Agnes Digital",
+    "character_name": "Agnes Digital",
+    "card_title": "Digital's Recharge Station",
+    "rarity": "SR",
+    "type": "Power",
+    "image_url": "https://umamusu.wiki/w/thumb.php?f=Support_Card_20005_Card.png&width=100"
+  },
+  {
+    "id": 20006,
+    "name": "[Trial Initiation] Biwa Hayahide",
+    "character_name": "Biwa Hayahide",
+    "card_title": "Trial Initiation",
+    "rarity": "SR",
+    "type": "Power",
+    "image_url": "https://umamusu.wiki/w/thumb.php?f=Support_Card_20006_Card.png&width=100"
+  },
+  {
+    "id": 20007,
+    "name": "[Cute + Cute = ?] Mayano Top Gun",
+    "character_name": "Mayano Top Gun",
+    "card_title": "Cute + Cute = ?",
+    "rarity": "SR",
+    "type": "Stamina",
+    "image_url": "https://umamusu.wiki/w/thumb.php?f=Support_Card_20007_Card.png&width=100"
+  },
+  {
+    "id": 20008,
+    "name": "[My Solo Drawn to Raindrop Drums] Manhattan Cafe",
+    "character_name": "Manhattan Cafe",
+    "card_title": "My Solo Drawn to Raindrop Drums",
+    "rarity": "SR",
+    "type": "Stamina",
+    "image_url": "https://umamusu.wiki/w/thumb.php?f=Support_Card_20008_Card.png&width=100"
+  },
+  {
+    "id": 20009,
+    "name": "[Pal-Assisted Training] Mihono Bourbon",
+    "character_name": "Mihono Bourbon",
+    "card_title": "Pal-Assisted Training",
+    "rarity": "SR",
+    "type": "Power",
+    "image_url": "https://umamusu.wiki/w/thumb.php?f=Support_Card_20009_Card.png&width=100"
+  },
+  {
+    "id": 20010,
+    "name": "[On and Off the Court] Mejiro Ryan",
+    "character_name": "Mejiro Ryan",
+    "card_title": "On and Off the Court",
+    "rarity": "SR",
+    "type": "Power",
+    "image_url": "https://umamusu.wiki/w/thumb.php?f=Support_Card_20010_Card.png&width=100"
+  },
+  {
+    "id": 20011,
+    "name": "[City Girl 101] Yukino Bijin",
+    "character_name": "Yukino Bijin",
+    "card_title": "City Girl 101",
+    "rarity": "SR",
+    "type": "Guts",
+    "image_url": "https://umamusu.wiki/w/thumb.php?f=Support_Card_20011_Card.png&width=100"
+  },
+  {
+    "id": 20012,
+    "name": "[Experimental Studies on Subject A] Agnes Tachyon",
+    "character_name": "Agnes Tachyon",
+    "card_title": "Experimental Studies on Subject A",
+    "rarity": "SR",
+    "type": "Wit",
+    "image_url": "https://umamusu.wiki/w/thumb.php?f=Support_Card_20012_Card.png&width=100"
+  },
+  {
+    "id": 20013,
+    "name": "[5:00 a.m.—Right on Schedule] Eishin Flash",
+    "character_name": "Eishin Flash",
+    "card_title": "5:00 a.m.—Right on Schedule",
+    "rarity": "SR",
+    "type": "Speed",
+    "image_url": "https://umamusu.wiki/w/thumb.php?f=Support_Card_20013_Card.png&width=100"
+  },
+  {
+    "id": 20014,
+    "name": "[Poolside High Tides] Narita Taishin",
+    "character_name": "Narita Taishin",
+    "card_title": "Poolside High Tides",
+    "rarity": "SR",
+    "type": "Speed",
+    "image_url": "https://umamusu.wiki/w/thumb.php?f=Support_Card_20014_Card.png&width=100"
+  },
+  {
+    "id": 20015,
+    "name": "[A Marvelous ☆ Plan] Marvelous Sunday",
+    "character_name": "Marvelous Sunday",
+    "card_title": "A Marvelous ☆ Plan",
+    "rarity": "SR",
+    "type": "Wit",
+    "image_url": "https://umamusu.wiki/w/thumb.php?f=Support_Card_20015_Card.png&width=100"
+  },
+  {
+    "id": 20016,
+    "name": "[Fate's Forecast] Matikanefukukitaru",
+    "character_name": "Matikanefukukitaru",
+    "card_title": "Fate's Forecast",
+    "rarity": "SR",
+    "type": "Wit",
+    "image_url": "https://umamusu.wiki/w/thumb.php?f=Support_Card_20016_Card.png&width=100"
+  },
+  {
+    "id": 20017,
+    "name": "[Fighting for Fortune] Meisho Doto",
+    "character_name": "Meisho Doto",
+    "card_title": "Fighting for Fortune",
+    "rarity": "SR",
+    "type": "Guts",
+    "image_url": "https://umamusu.wiki/w/thumb.php?f=Support_Card_20017_Card.png&width=100"
+  },
+  {
+    "id": 20018,
+    "name": "[Ignore the Stares] Mejiro Dober",
+    "character_name": "Mejiro Dober",
+    "card_title": "Ignore the Stares",
+    "rarity": "SR",
+    "type": "Wit",
+    "image_url": "https://umamusu.wiki/w/thumb.php?f=Support_Card_20018_Card.png&width=100"
+  },
+  {
+    "id": 20019,
+    "name": "[It's Just Water] Nice Nature",
+    "character_name": "Nice Nature",
+    "card_title": "It's Just Water",
+    "rarity": "SR",
+    "type": "Guts",
+    "image_url": "https://umamusu.wiki/w/thumb.php?f=Support_Card_20019_Card.png&width=100"
+  },
+  {
+    "id": 20020,
+    "name": "[First-Rate Plan] King Halo",
+    "character_name": "King Halo",
+    "card_title": "First-Rate Plan",
+    "rarity": "SR",
+    "type": "Speed",
+    "image_url": "https://umamusu.wiki/w/thumb.php?f=Support_Card_20020_Card.png&width=100"
+  },
+  {
+    "id": 20021,
+    "name": "[Trainers' Teamwork] Kiryuin Aoi",
+    "character_name": "Kiryuin Aoi",
+    "card_title": "Trainers' Teamwork",
+    "rarity": "SR",
+    "type": "Pal",
+    "image_url": "https://umamusu.wiki/w/thumb.php?f=Support_Card_20021_Card.png&width=100"
+  },
+  {
+    "id": 20022,
+    "name": "[これがウチらのいか焼きや！] Tamamo Cross",
+    "character_name": "Tamamo Cross",
+    "card_title": "これがウチらのいか焼きや！",
+    "rarity": "SR",
+    "type": "Guts",
+    "image_url": "https://umamusu.wiki/w/thumb.php?f=Support_Card_20022_Card.png&width=100"
+  },
+  {
+    "id": 20023,
+    "name": "[Lamplit Training of a Witch-to-Be] Sweep Tosho",
+    "character_name": "Sweep Tosho",
+    "card_title": "Lamplit Training of a Witch-to-Be",
+    "rarity": "SR",
+    "type": "Speed",
+    "image_url": "https://umamusu.wiki/w/thumb.php?f=Support_Card_20023_Card.png&width=100"
+  },
+  {
+    "id": 20024,
+    "name": "[Let's Get This Party Lit!] Daitaku Helios",
+    "character_name": "Daitaku Helios",
+    "card_title": "Let's Get This Party Lit!",
+    "rarity": "SR",
+    "type": "Power",
+    "image_url": "https://umamusu.wiki/w/thumb.php?f=Support_Card_20024_Card.png&width=100"
+  },
+  {
+    "id": 20025,
+    "name": "[Never Skip Warm-Ups] Ikuno Dictus",
+    "character_name": "Ikuno Dictus",
+    "card_title": "Never Skip Warm-Ups",
+    "rarity": "SR",
+    "type": "Wit",
+    "image_url": "https://umamusu.wiki/w/thumb.php?f=Support_Card_20025_Card.png&width=100"
+  },
+  {
+    "id": 20026,
+    "name": "[Messing Around] Nice Nature",
+    "character_name": "Nice Nature",
+    "card_title": "Messing Around",
+    "rarity": "SR",
+    "type": "Wit",
+    "image_url": "https://umamusu.wiki/w/thumb.php?f=Support_Card_20026_Card.png&width=100"
+  },
+  {
+    "id": 20027,
+    "name": "[Lifting Your Spirits] Nishino Flower",
+    "character_name": "Nishino Flower",
+    "card_title": "Lifting Your Spirits",
+    "rarity": "SR",
+    "type": "Power",
+    "image_url": "https://umamusu.wiki/w/thumb.php?f=Support_Card_20027_Card.png&width=100"
+  },
+  {
+    "id": 20028,
+    "name": "[The Perfect Book for You] Zenno Rob Roy",
+    "character_name": "Zenno Rob Roy",
+    "card_title": "The Perfect Book for You",
+    "rarity": "SR",
+    "type": "Stamina",
+    "image_url": "https://umamusu.wiki/w/thumb.php?f=Support_Card_20028_Card.png&width=100"
+  },
+  {
+    "id": 20029,
+    "name": "[The World's My Oyster] Seeking the Pearl",
+    "character_name": "Seeking the Pearl",
+    "card_title": "The World's My Oyster",
+    "rarity": "SR",
+    "type": "Guts",
+    "image_url": "https://umamusu.wiki/w/thumb.php?f=Support_Card_20029_Card.png&width=100"
+  },
+  {
+    "id": 20030,
+    "name": "[You Earned It!] Ines Fujin",
+    "character_name": "Ines Fujin",
+    "card_title": "You Earned It!",
+    "rarity": "SR",
+    "type": "Wit",
+    "image_url": "https://umamusu.wiki/w/thumb.php?f=Support_Card_20030_Card.png&width=100"
+  },
+  {
+    "id": 20031,
+    "name": "[///WARNING GATE///] Shinko Windy",
+    "character_name": "Shinko Windy",
+    "card_title": "///WARNING GATE///",
+    "rarity": "SR",
+    "type": "Speed",
+    "image_url": "https://umamusu.wiki/w/thumb.php?f=Support_Card_20031_Card.png&width=100"
+  },
+  {
+    "id": 20032,
+    "name": "[泥濘一笑、真っつぐに] Inari One",
+    "character_name": "Inari One",
+    "card_title": "泥濘一笑、真っつぐに",
+    "rarity": "SR",
+    "type": "Power",
+    "image_url": "https://umamusu.wiki/w/thumb.php?f=Support_Card_20032_Card.png&width=100"
+  },
+  {
+    "id": 20033,
+    "name": "[Mud-Caked Compañero] El Condor Pasa",
+    "character_name": "El Condor Pasa",
+    "card_title": "Mud-Caked Compañero",
+    "rarity": "SR",
+    "type": "Speed",
+    "image_url": "https://umamusu.wiki/w/thumb.php?f=Support_Card_20033_Card.png&width=100"
+  },
+  {
+    "id": 20034,
+    "name": "[My Heart Will Go On] Mejiro Ardan",
+    "character_name": "Mejiro Ardan",
+    "card_title": "My Heart Will Go On",
+    "rarity": "SR",
+    "type": "Wit",
+    "image_url": "https://umamusu.wiki/w/thumb.php?f=Support_Card_20034_Card.png&width=100"
+  },
+  {
+    "id": 20035,
+    "name": "[Turf as Nails] Tosen Jordan",
+    "character_name": "Tosen Jordan",
+    "card_title": "Turf as Nails",
+    "rarity": "SR",
+    "type": "Stamina",
+    "image_url": "https://umamusu.wiki/w/thumb.php?f=Support_Card_20035_Card.png&width=100"
+  },
+  {
+    "id": 20036,
+    "name": "[救いはあるよっ♪] Mejiro Palmer",
+    "character_name": "Mejiro Palmer",
+    "card_title": "救いはあるよっ♪",
+    "rarity": "SR",
+    "type": "Stamina",
+    "image_url": "https://umamusu.wiki/w/thumb.php?f=Support_Card_20036_Card.png&width=100"
+  },
+  {
+    "id": 20037,
+    "name": "[Grma, Ramen ♪] Fine Motion",
+    "character_name": "Fine Motion",
+    "card_title": "Grma, Ramen ♪",
+    "rarity": "SR",
+    "type": "Power",
+    "image_url": "https://umamusu.wiki/w/thumb.php?f=Support_Card_20037_Card.png&width=100"
+  },
+  {
+    "id": 20038,
+    "name": "[The Brightest Star Shines On] Sirius Symboli",
+    "character_name": "Sirius Symboli",
+    "card_title": "The Brightest Star Shines On",
+    "rarity": "SR",
+    "type": "Guts",
+    "image_url": "https://umamusu.wiki/w/thumb.php?f=Support_Card_20038_Card.png&width=100"
+  },
+  {
+    "id": 20039,
+    "name": "[An Annoying Supervisor] Vodka",
+    "character_name": "Vodka",
+    "card_title": "An Annoying Supervisor",
+    "rarity": "SR",
+    "type": "Speed",
+    "image_url": "https://umamusu.wiki/w/thumb.php?f=Support_Card_20039_Card.png&width=100"
+  },
+  {
+    "id": 20040,
+    "name": "[鼓動が速まるクールダウン] Mejiro Ryan",
+    "character_name": "Mejiro Ryan",
+    "card_title": "鼓動が速まるクールダウン",
+    "rarity": "SR",
+    "type": "Stamina",
+    "image_url": "https://umamusu.wiki/w/thumb.php?f=Support_Card_20040_Card.png&width=100"
+  },
+  {
+    "id": 20041,
+    "name": "[一等星を目指して] Admire Vega",
+    "character_name": "Admire Vega",
+    "card_title": "一等星を目指して",
+    "rarity": "SR",
+    "type": "Guts",
+    "image_url": "https://umamusu.wiki/w/thumb.php?f=Support_Card_20041_Card.png&width=100"
+  },
+  {
+    "id": 20042,
+    "name": "[響け！模範的あいさつ！] Sakura Bakushin O",
+    "character_name": "Sakura Bakushin O",
+    "card_title": "響け！模範的あいさつ！",
+    "rarity": "SR",
+    "type": "Power",
+    "image_url": "https://umamusu.wiki/w/thumb.php?f=Support_Card_20042_Card.png&width=100"
+  },
+  {
+    "id": 20043,
+    "name": "[1日の終わりに] Special Week",
+    "character_name": "Special Week",
+    "card_title": "1日の終わりに",
+    "rarity": "SR",
+    "type": "Power",
+    "image_url": "https://umamusu.wiki/w/thumb.php?f=Support_Card_20043_Card.png&width=100"
+  },
+  {
+    "id": 20044,
+    "name": "[Cozy Cute Memory ♪] Curren Chan",
+    "character_name": "Curren Chan",
+    "card_title": "Cozy Cute Memory ♪",
+    "rarity": "SR",
+    "type": "Speed",
+    "image_url": "https://umamusu.wiki/w/thumb.php?f=Support_Card_20044_Card.png&width=100"
+  },
+  {
+    "id": 20045,
+    "name": "[ギリギリ!?UMA♡DOL] Smart Falcon",
+    "character_name": "Smart Falcon",
+    "card_title": "ギリギリ!?UMA♡DOL",
+    "rarity": "SR",
+    "type": "Guts",
+    "image_url": "https://umamusu.wiki/w/thumb.php?f=Support_Card_20045_Card.png&width=100"
+  },
+  {
+    "id": 20046,
+    "name": "[おてんば魔女、修行中。] Sweep Tosho",
+    "character_name": "Sweep Tosho",
+    "card_title": "おてんば魔女、修行中。",
+    "rarity": "SR",
+    "type": "Wit",
+    "image_url": "https://umamusu.wiki/w/thumb.php?f=Support_Card_20046_Card.png&width=100"
+  },
+  {
+    "id": 20047,
+    "name": "[Step! Smile! Wink!] Tokai Teio",
+    "character_name": "Tokai Teio",
+    "card_title": "Step! Smile! Wink!",
+    "rarity": "SR",
+    "type": "Stamina",
+    "image_url": "https://umamusu.wiki/w/thumb.php?f=Support_Card_20047_Card.png&width=100"
+  },
+  {
+    "id": 20048,
+    "name": "[I Love You... Dear Food] Oguri Cap",
+    "character_name": "Oguri Cap",
+    "card_title": "I Love You... Dear Food",
+    "rarity": "SR",
+    "type": "Guts",
+    "image_url": "https://umamusu.wiki/w/thumb.php?f=Support_Card_20048_Card.png&width=100"
+  },
+  {
+    "id": 20049,
+    "name": "[金色を目指して] Gold City",
+    "character_name": "Gold City",
+    "card_title": "金色を目指して",
+    "rarity": "SR",
+    "type": "Wit",
+    "image_url": "https://umamusu.wiki/w/thumb.php?f=Support_Card_20049_Card.png&width=100"
+  },
+  {
+    "id": 20050,
+    "name": "[ゆるっと、まにまに] Seiun Sky",
+    "character_name": "Seiun Sky",
+    "card_title": "ゆるっと、まにまに",
+    "rarity": "SR",
+    "type": "Wit",
+    "image_url": "https://umamusu.wiki/w/thumb.php?f=Support_Card_20050_Card.png&width=100"
+  },
+  {
+    "id": 20051,
+    "name": "[The 3rd MIRACLE] K.S.Miracle",
+    "character_name": "K.S.Miracle",
+    "card_title": "The 3rd MIRACLE",
+    "rarity": "SR",
+    "type": "Guts",
+    "image_url": "https://umamusu.wiki/w/thumb.php?f=Support_Card_20051_Card.png&width=100"
+  },
+  {
+    "id": 20052,
+    "name": "[『フレフレ、ツヨシ！』] Tsurumaru Tsuyoshi",
+    "character_name": "Tsurumaru Tsuyoshi",
+    "card_title": "『フレフレ、ツヨシ！』",
+    "rarity": "SR",
+    "type": "Guts",
+    "image_url": "https://umamusu.wiki/w/thumb.php?f=Support_Card_20052_Card.png&width=100"
+  },
+  {
+    "id": 20053,
+    "name": "[ストップ、委員長！] Narita Top Road",
+    "character_name": "Narita Top Road",
+    "card_title": "ストップ、委員長！",
+    "rarity": "SR",
+    "type": "Power",
+    "image_url": "https://umamusu.wiki/w/thumb.php?f=Support_Card_20053_Card.png&width=100"
+  },
+  {
+    "id": 20054,
+    "name": "[偉大なるフォトグラフィーア] T.M. Opera O",
+    "character_name": "T.M. Opera O",
+    "card_title": "偉大なるフォトグラフィーア",
+    "rarity": "SR",
+    "type": "Stamina",
+    "image_url": "https://umamusu.wiki/w/thumb.php?f=Support_Card_20054_Card.png&width=100"
+  },
+  {
+    "id": 20055,
+    "name": "[添付ファイル、温めますか？] Aston Machan",
+    "character_name": "Aston Machan",
+    "card_title": "添付ファイル、温めますか？",
+    "rarity": "SR",
+    "type": "Speed",
+    "image_url": "https://umamusu.wiki/w/thumb.php?f=Support_Card_20055_Card.png&width=100"
+  },
+  {
+    "id": 20056,
+    "name": "[デッド・エンド【通せん坊】] Jungle Pocket",
+    "character_name": "Jungle Pocket",
+    "card_title": "デッド・エンド【通せん坊】",
+    "rarity": "SR",
+    "type": "Speed",
+    "image_url": "https://umamusu.wiki/w/thumb.php?f=Support_Card_20056_Card.png&width=100"
+  },
+  {
+    "id": 20057,
+    "name": "[ふわり、さらり] Mejiro Dober",
+    "character_name": "Mejiro Dober",
+    "card_title": "ふわり、さらり",
+    "rarity": "SR",
+    "type": "Guts",
+    "image_url": "https://umamusu.wiki/w/thumb.php?f=Support_Card_20057_Card.png&width=100"
+  },
+  {
+    "id": 20058,
+    "name": "[放課後、君が笑った] Symboli Rudolf",
+    "character_name": "Symboli Rudolf",
+    "card_title": "放課後、君が笑った",
+    "rarity": "SR",
+    "type": "Stamina",
+    "image_url": "https://umamusu.wiki/w/thumb.php?f=Support_Card_20058_Card.png&width=100"
+  },
+  {
+    "id": 20059,
+    "name": "[嗚呼素晴らしき甘味哉] Agnes Tachyon",
+    "character_name": "Agnes Tachyon",
+    "card_title": "嗚呼素晴らしき甘味哉",
+    "rarity": "SR",
+    "type": "Power",
+    "image_url": "https://umamusu.wiki/w/thumb.php?f=Support_Card_20059_Card.png&width=100"
+  },
+  {
+    "id": 20060,
+    "name": "[甘～い浮き輪を召し上がれ] Hishi Akebono",
+    "character_name": "Hishi Akebono",
+    "card_title": "甘～い浮き輪を召し上がれ",
+    "rarity": "SR",
+    "type": "Power",
+    "image_url": "https://umamusu.wiki/w/thumb.php?f=Support_Card_20060_Card.png&width=100"
+  },
+  {
+    "id": 20061,
+    "name": "[ゴルシ印のスペシャリテ] Gold Ship",
+    "character_name": "Gold Ship",
+    "card_title": "ゴルシ印のスペシャリテ",
+    "rarity": "SR",
+    "type": "Stamina",
+    "image_url": "https://umamusu.wiki/w/thumb.php?f=Support_Card_20061_Card.png&width=100"
+  },
+  {
+    "id": 20062,
+    "name": "[激マブ！ドライブ♪] Maruzensky",
+    "character_name": "Maruzensky",
+    "card_title": "激マブ！ドライブ♪",
+    "rarity": "SR",
+    "type": "Wit",
+    "image_url": "https://umamusu.wiki/w/thumb.php?f=Support_Card_20062_Card.png&width=100"
+  },
+  {
+    "id": 20063,
+    "name": "[夕立の向こうからのぞく] Silence Suzuka",
+    "character_name": "Silence Suzuka",
+    "card_title": "夕立の向こうからのぞく",
+    "rarity": "SR",
+    "type": "Speed",
+    "image_url": "https://umamusu.wiki/w/thumb.php?f=Support_Card_20063_Card.png&width=100"
+  },
+  {
+    "id": 20064,
+    "name": "[ラッキーの神様は早起き] Copano Rickey",
+    "character_name": "Copano Rickey",
+    "card_title": "ラッキーの神様は早起き",
+    "rarity": "SR",
+    "type": "Guts",
+    "image_url": "https://umamusu.wiki/w/thumb.php?f=Support_Card_20064_Card.png&width=100"
+  },
+  {
+    "id": 20065,
+    "name": "[よい茶の飲み置き] Grass Wonder",
+    "character_name": "Grass Wonder",
+    "card_title": "よい茶の飲み置き",
+    "rarity": "SR",
+    "type": "Power",
+    "image_url": "https://umamusu.wiki/w/thumb.php?f=Support_Card_20065_Card.png&width=100"
+  },
+  {
+    "id": 20066,
+    "name": "[お助け大将と小さな魔女] Kitasan Black",
+    "character_name": "Kitasan Black",
+    "card_title": "お助け大将と小さな魔女",
+    "rarity": "SR",
+    "type": "Stamina",
+    "image_url": "https://umamusu.wiki/w/thumb.php?f=Support_Card_20066_Card.png&width=100"
+  },
+  {
+    "id": 20067,
+    "name": "[あまえんぼNight] Taiki Shuttle",
+    "character_name": "Taiki Shuttle",
+    "card_title": "あまえんぼNight",
+    "rarity": "SR",
+    "type": "Wit",
+    "image_url": "https://umamusu.wiki/w/thumb.php?f=Support_Card_20067_Card.png&width=100"
+  },
+  {
+    "id": 20068,
+    "name": "[とびっきりの金メダル] Nice Nature",
+    "character_name": "Nice Nature",
+    "card_title": "とびっきりの金メダル",
+    "rarity": "SR",
+    "type": "Stamina",
+    "image_url": "https://umamusu.wiki/w/thumb.php?f=Support_Card_20068_Card.png&width=100"
+  },
+  {
+    "id": 20069,
+    "name": "[あくもー退散！？] Matikanetannhauser",
+    "character_name": "Matikanetannhauser",
+    "card_title": "あくもー退散！？",
+    "rarity": "SR",
+    "type": "Speed",
+    "image_url": "https://umamusu.wiki/w/thumb.php?f=Support_Card_20069_Card.png&width=100"
+  },
+  {
+    "id": 20070,
+    "name": "[長姉は大変？] Verxina",
+    "character_name": "Verxina",
+    "card_title": "長姉は大変？",
+    "rarity": "SR",
+    "type": "Guts",
+    "image_url": "https://umamusu.wiki/w/thumb.php?f=Support_Card_20070_Card.png&width=100"
+  },
+  {
+    "id": 20071,
+    "name": "[『最強』は作れる！] Royce and Royce",
+    "character_name": "Royce and Royce",
+    "card_title": "『最強』は作れる！",
+    "rarity": "SR",
+    "type": "Power",
+    "image_url": "https://umamusu.wiki/w/thumb.php?f=Support_Card_20071_Card.png&width=100"
+  },
+  {
+    "id": 20072,
+    "name": "[ギャラルホルンを磨き上げよ] Tanino Gimlet",
+    "character_name": "Tanino Gimlet",
+    "card_title": "ギャラルホルンを磨き上げよ",
+    "rarity": "SR",
+    "type": "Wit",
+    "image_url": "https://umamusu.wiki/w/thumb.php?f=Support_Card_20072_Card.png&width=100"
+  },
+  {
+    "id": 20073,
+    "name": "[Time flies] Tosen Jordan",
+    "character_name": "Tosen Jordan",
+    "card_title": "Time flies",
+    "rarity": "SR",
+    "type": "Speed",
+    "image_url": "https://umamusu.wiki/w/thumb.php?f=Support_Card_20073_Card.png&width=100"
+  },
+  {
+    "id": 20074,
+    "name": "[護るべきは無垢の瞳] Yaeno Muteki",
+    "character_name": "Yaeno Muteki",
+    "card_title": "護るべきは無垢の瞳",
+    "rarity": "SR",
+    "type": "Stamina",
+    "image_url": "https://umamusu.wiki/w/thumb.php?f=Support_Card_20074_Card.png&width=100"
+  },
+  {
+    "id": 20075,
+    "name": "[Cheers!] Tap Dance City",
+    "character_name": "Tap Dance City",
+    "card_title": "Cheers!",
+    "rarity": "SR",
+    "type": "Guts",
+    "image_url": "https://umamusu.wiki/w/thumb.php?f=Support_Card_20075_Card.png&width=100"
+  },
+  {
+    "id": 20076,
+    "name": "[道端フィードバック] Air Shakur",
+    "character_name": "Air Shakur",
+    "card_title": "道端フィードバック",
+    "rarity": "SR",
+    "type": "Power",
+    "image_url": "https://umamusu.wiki/w/thumb.php?f=Support_Card_20076_Card.png&width=100"
+  },
+  {
+    "id": 20077,
+    "name": "[ぬりぬりシェイプアップ！] Dantsu Flame",
+    "character_name": "Dantsu Flame",
+    "card_title": "ぬりぬりシェイプアップ！",
+    "rarity": "SR",
+    "type": "Wit",
+    "image_url": "https://umamusu.wiki/w/thumb.php?f=Support_Card_20077_Card.png&width=100"
+  },
+  {
+    "id": 20078,
+    "name": "[お守りパワーで福徳円満！] Matikanefukukitaru",
+    "character_name": "Matikanefukukitaru",
+    "card_title": "お守りパワーで福徳円満！",
+    "rarity": "SR",
+    "type": "Speed",
+    "image_url": "https://umamusu.wiki/w/thumb.php?f=Support_Card_20078_Card.png&width=100"
+  },
+  {
+    "id": 20079,
+    "name": "[みんなにグッドマーベラス☆] Marvelous Sunday",
+    "character_name": "Marvelous Sunday",
+    "card_title": "みんなにグッドマーベラス☆",
+    "rarity": "SR",
+    "type": "Guts",
+    "image_url": "https://umamusu.wiki/w/thumb.php?f=Support_Card_20079_Card.png&width=100"
+  },
+  {
+    "id": 20080,
+    "name": "[君の花衣] Sakura Laurel",
+    "character_name": "Sakura Laurel",
+    "card_title": "君の花衣",
+    "rarity": "SR",
+    "type": "Wit",
+    "image_url": "https://umamusu.wiki/w/thumb.php?f=Support_Card_20080_Card.png&width=100"
+  },
+  {
+    "id": 20081,
+    "name": "[お任せ！オートクチュール] North Flight",
+    "character_name": "North Flight",
+    "card_title": "お任せ！オートクチュール",
+    "rarity": "SR",
+    "type": "Power",
+    "image_url": "https://umamusu.wiki/w/thumb.php?f=Support_Card_20081_Card.png&width=100"
+  },
+  {
+    "id": 20082,
+    "name": "[先陣スプラッシュ！] Bubble Gum Fellow",
+    "character_name": "Bubble Gum Fellow",
+    "card_title": "先陣スプラッシュ！",
+    "rarity": "SR",
+    "type": "Speed",
+    "image_url": "https://umamusu.wiki/w/thumb.php?f=Support_Card_20082_Card.png&width=100"
+  },
+  {
+    "id": 20083,
+    "name": "[月下麗人] Mejiro Ramonu",
+    "character_name": "Mejiro Ramonu",
+    "card_title": "月下麗人",
+    "rarity": "SR",
+    "type": "Stamina",
+    "image_url": "https://umamusu.wiki/w/thumb.php?f=Support_Card_20083_Card.png&width=100"
+  },
+  {
+    "id": 20084,
+    "name": "[喜びの咲く刻] Lucky Lilac",
+    "character_name": "Lucky Lilac",
+    "card_title": "喜びの咲く刻",
+    "rarity": "SR",
+    "type": "Wit",
+    "image_url": "https://umamusu.wiki/w/thumb.php?f=Support_Card_20084_Card.png&width=100"
+  },
+  {
+    "id": 20085,
+    "name": "[メロンなささやき] Mejiro McQueen",
+    "character_name": "Mejiro McQueen",
+    "card_title": "メロンなささやき",
+    "rarity": "SR",
+    "type": "Guts",
+    "image_url": "https://umamusu.wiki/w/thumb.php?f=Support_Card_20085_Card.png&width=100"
+  },
+  {
+    "id": 20086,
+    "name": "[『しあわせの青いバラ』] Rice Shower",
+    "character_name": "Rice Shower",
+    "card_title": "『しあわせの青いバラ』",
+    "rarity": "SR",
+    "type": "Speed",
+    "image_url": "https://umamusu.wiki/w/thumb.php?f=Support_Card_20086_Card.png&width=100"
+  },
+  {
+    "id": 20087,
+    "name": "[Daring Music] Daring Heart",
+    "character_name": "Daring Heart",
+    "card_title": "Daring Music",
+    "rarity": "SR",
+    "type": "Power",
+    "image_url": "https://umamusu.wiki/w/thumb.php?f=Support_Card_20087_Card.png&width=100"
+  },
+  {
+    "id": 20088,
+    "name": "[一輪ずつ、喜びを束ねて] Curren Bouquetd'or",
+    "character_name": "Curren Bouquetd'or",
+    "card_title": "一輪ずつ、喜びを束ねて",
+    "rarity": "SR",
+    "type": "Stamina",
+    "image_url": "https://umamusu.wiki/w/thumb.php?f=Support_Card_20088_Card.png&width=100"
+  },
+  {
+    "id": 20089,
+    "name": "[私たちのプリンセス流儀] Kawakami Princess",
+    "character_name": "Kawakami Princess",
+    "card_title": "私たちのプリンセス流儀",
+    "rarity": "SR",
+    "type": "Guts",
+    "image_url": "https://umamusu.wiki/w/thumb.php?f=Support_Card_20089_Card.png&width=100"
+  },
+  {
+    "id": 20090,
+    "name": "[ニャンともイカすヒーローさ] Biko Pegasus",
+    "character_name": "Biko Pegasus",
+    "card_title": "ニャンともイカすヒーローさ",
+    "rarity": "SR",
+    "type": "Wit",
+    "image_url": "https://umamusu.wiki/w/thumb.php?f=Support_Card_20090_Card.png&width=100"
+  },
+  {
+    "id": 20091,
+    "name": "[静寂を煎じ] Sakura Chitose O",
+    "character_name": "Sakura Chitose O",
+    "card_title": "静寂を煎じ",
+    "rarity": "SR",
+    "type": "Speed",
+    "image_url": "https://umamusu.wiki/w/thumb.php?f=Support_Card_20091_Card.png&width=100"
+  },
+  {
+    "id": 20092,
+    "name": "[続け故郷へ、けっぱり道！] Hokko Tarumae",
+    "character_name": "Hokko Tarumae",
+    "card_title": "続け故郷へ、けっぱり道！",
+    "rarity": "SR",
+    "type": "Power",
+    "image_url": "https://umamusu.wiki/w/thumb.php?f=Support_Card_20092_Card.png&width=100"
+  },
+  {
+    "id": 20093,
+    "name": "[ぬくもりフォー・ユー] Mejiro Dober",
+    "character_name": "Mejiro Dober",
+    "card_title": "ぬくもりフォー・ユー",
+    "rarity": "SR",
+    "type": "Speed",
+    "image_url": "https://umamusu.wiki/w/thumb.php?f=Support_Card_20093_Card.png&width=100"
+  },
+  {
+    "id": 20094,
+    "name": "[私たちのアイディアノート] Satono Diamond",
+    "character_name": "Satono Diamond",
+    "card_title": "私たちのアイディアノート",
+    "rarity": "SR",
+    "type": "Stamina",
+    "image_url": "https://umamusu.wiki/w/thumb.php?f=Support_Card_20094_Card.png&width=100"
+  },
+  {
+    "id": 20095,
+    "name": "[Fervent Yearning] Red Desire",
+    "character_name": "Red Desire",
+    "card_title": "Fervent Yearning",
+    "rarity": "SR",
+    "type": "Guts",
+    "image_url": "https://umamusu.wiki/w/thumb.php?f=Support_Card_20095_Card.png&width=100"
+  },
+  {
+    "id": 20096,
+    "name": "[Sushi-Go-Round!] Taiki Shuttle",
+    "character_name": "Taiki Shuttle",
+    "card_title": "Sushi-Go-Round!",
+    "rarity": "SR",
+    "type": "Guts",
+    "image_url": "https://umamusu.wiki/w/thumb.php?f=Support_Card_20096_Card.png&width=100"
+  },
+  {
+    "id": 20097,
+    "name": "[温もりの一皿、召し上がれ♪] Super Creek",
+    "character_name": "Super Creek",
+    "card_title": "温もりの一皿、召し上がれ♪",
+    "rarity": "SR",
+    "type": "Power",
+    "image_url": "https://umamusu.wiki/w/thumb.php?f=Support_Card_20097_Card.png&width=100"
+  },
+  {
+    "id": 20098,
+    "name": "[そびえ立つ背中] Hishi Amazon",
+    "character_name": "Hishi Amazon",
+    "card_title": "そびえ立つ背中",
+    "rarity": "SR",
+    "type": "Wit",
+    "image_url": "https://umamusu.wiki/w/thumb.php?f=Support_Card_20098_Card.png&width=100"
+  },
+  {
+    "id": 20099,
+    "name": "[夕映えに身をゆだねて] Mejiro Ardan",
+    "character_name": "Mejiro Ardan",
+    "card_title": "夕映えに身をゆだねて",
+    "rarity": "SR",
+    "type": "Stamina",
+    "image_url": "https://umamusu.wiki/w/thumb.php?f=Support_Card_20099_Card.png&width=100"
+  },
+  {
+    "id": 20100,
+    "name": "[瞬光] Calstone Light O",
+    "character_name": "Calstone Light O",
+    "card_title": "瞬光",
+    "rarity": "SR",
+    "type": "Speed",
+    "image_url": "https://umamusu.wiki/w/thumb.php?f=Support_Card_20100_Card.png&width=100"
+  },
+  {
+    "id": 30001,
+    "name": "[The Brightest Star in Japan!] Special Week",
+    "character_name": "Special Week",
+    "card_title": "The Brightest Star in Japan!",
+    "rarity": "SSR",
+    "type": "Guts",
+    "image_url": "https://umamusu.wiki/w/thumb.php?f=Support_Card_30001_Card.png&width=100"
+  },
+  {
+    "id": 30002,
+    "name": "[Beyond This Shining Moment] Silence Suzuka",
+    "character_name": "Silence Suzuka",
+    "card_title": "Beyond This Shining Moment",
+    "rarity": "SSR",
+    "type": "Speed",
+    "image_url": "https://umamusu.wiki/w/thumb.php?f=Support_Card_30002_Card.png&width=100"
+  },
+  {
+    "id": 30003,
+    "name": "[Dream Big!] Tokai Teio",
+    "character_name": "Tokai Teio",
+    "card_title": "Dream Big!",
+    "rarity": "SSR",
+    "type": "Speed",
+    "image_url": "https://umamusu.wiki/w/thumb.php?f=Support_Card_30003_Card.png&width=100"
+  },
+  {
+    "id": 30004,
+    "name": "[Breakaway Battleship] Gold Ship",
+    "character_name": "Gold Ship",
+    "card_title": "Breakaway Battleship",
+    "rarity": "SSR",
+    "type": "Stamina",
+    "image_url": "https://umamusu.wiki/w/thumb.php?f=Support_Card_30004_Card.png&width=100"
+  },
+  {
+    "id": 30005,
+    "name": "[Wild Rider] Vodka",
+    "character_name": "Vodka",
+    "card_title": "Wild Rider",
+    "rarity": "SSR",
+    "type": "Power",
+    "image_url": "https://umamusu.wiki/w/thumb.php?f=Support_Card_30005_Card.png&width=100"
+  },
+  {
+    "id": 30006,
+    "name": "[Fairest Fleur] Grass Wonder",
+    "character_name": "Grass Wonder",
+    "card_title": "Fairest Fleur",
+    "rarity": "SSR",
+    "type": "Guts",
+    "image_url": "https://umamusu.wiki/w/thumb.php?f=Support_Card_30006_Card.png&width=100"
+  },
+  {
+    "id": 30007,
+    "name": "[Champion's Passion] El Condor Pasa",
+    "character_name": "El Condor Pasa",
+    "card_title": "Champion's Passion",
+    "rarity": "SSR",
+    "type": "Power",
+    "image_url": "https://umamusu.wiki/w/thumb.php?f=Support_Card_30007_Card.png&width=100"
+  },
+  {
+    "id": 30008,
+    "name": "[Foolproof Plan] Seiun Sky",
+    "character_name": "Seiun Sky",
+    "card_title": "Foolproof Plan",
+    "rarity": "SSR",
+    "type": "Stamina",
+    "image_url": "https://umamusu.wiki/w/thumb.php?f=Support_Card_30008_Card.png&width=100"
+  },
+  {
+    "id": 30009,
+    "name": "[Split the Sky, White Lightning!] Tamamo Cross",
+    "character_name": "Tamamo Cross",
+    "card_title": "Split the Sky, White Lightning!",
+    "rarity": "SSR",
+    "type": "Stamina",
+    "image_url": "https://umamusu.wiki/w/thumb.php?f=Support_Card_30009_Card.png&width=100"
+  },
+  {
+    "id": 30010,
+    "name": "[Wave of Gratitude] Fine Motion",
+    "character_name": "Fine Motion",
+    "card_title": "Wave of Gratitude",
+    "rarity": "SSR",
+    "type": "Wit",
+    "image_url": "https://umamusu.wiki/w/thumb.php?f=Support_Card_30010_Card.png&width=100"
+  },
+  {
+    "id": 30011,
+    "name": "[Watch My Star Fly!] Ines Fujin",
+    "character_name": "Ines Fujin",
+    "card_title": "Watch My Star Fly!",
+    "rarity": "SSR",
+    "type": "Guts",
+    "image_url": "https://umamusu.wiki/w/thumb.php?f=Support_Card_30011_Card.png&width=100"
+  },
+  {
+    "id": 30012,
+    "name": "[BNWinner!] Winning Ticket",
+    "character_name": "Winning Ticket",
+    "card_title": "BNWinner!",
+    "rarity": "SSR",
+    "type": "Guts",
+    "image_url": "https://umamusu.wiki/w/thumb.php?f=Support_Card_30012_Card.png&width=100"
+  },
+  {
+    "id": 30013,
+    "name": "[7 More Centimeters] Air Shakur",
+    "character_name": "Air Shakur",
+    "card_title": "7 More Centimeters",
+    "rarity": "SSR",
+    "type": "Wit",
+    "image_url": "https://umamusu.wiki/w/thumb.php?f=Support_Card_30013_Card.png&width=100"
+  },
+  {
+    "id": 30014,
+    "name": "[Run(my)way] Gold City",
+    "character_name": "Gold City",
+    "card_title": "Run(my)way",
+    "rarity": "SSR",
+    "type": "Speed",
+    "image_url": "https://umamusu.wiki/w/thumb.php?f=Support_Card_30014_Card.png&width=100"
+  },
+  {
+    "id": 30015,
+    "name": "[Eat Fast! Yum Fast!] Sakura Bakushin O",
+    "character_name": "Sakura Bakushin O",
+    "card_title": "Eat Fast! Yum Fast!",
+    "rarity": "SSR",
+    "type": "Speed",
+    "image_url": "https://umamusu.wiki/w/thumb.php?f=Support_Card_30015_Card.png&width=100"
+  },
+  {
+    "id": 30016,
+    "name": "[Piece of Mind] Super Creek",
+    "character_name": "Super Creek",
+    "card_title": "Piece of Mind",
+    "rarity": "SSR",
+    "type": "Stamina",
+    "image_url": "https://umamusu.wiki/w/thumb.php?f=Support_Card_30016_Card.png&width=100"
+  },
+  {
+    "id": 30017,
+    "name": "[My Umadol Way! ☆] Smart Falcon",
+    "character_name": "Smart Falcon",
+    "card_title": "My Umadol Way! ☆",
+    "rarity": "SSR",
+    "type": "Power",
+    "image_url": "https://umamusu.wiki/w/thumb.php?f=Support_Card_30017_Card.png&width=100"
+  },
+  {
+    "id": 30018,
+    "name": "[Even the Littlest Bud] Nishino Flower",
+    "character_name": "Nishino Flower",
+    "card_title": "Even the Littlest Bud",
+    "rarity": "SSR",
+    "type": "Speed",
+    "image_url": "https://umamusu.wiki/w/thumb.php?f=Support_Card_30018_Card.png&width=100"
+  },
+  {
+    "id": 30019,
+    "name": "[Urara's Day Off!] Haru Urara",
+    "character_name": "Haru Urara",
+    "card_title": "Urara's Day Off!",
+    "rarity": "SSR",
+    "type": "Guts",
+    "image_url": "https://umamusu.wiki/w/thumb.php?f=Support_Card_30019_Card.png&width=100"
+  },
+  {
+    "id": 30020,
+    "name": "[Double Carrot Punch!] Biko Pegasus",
+    "character_name": "Biko Pegasus",
+    "card_title": "Double Carrot Punch!",
+    "rarity": "SSR",
+    "type": "Speed",
+    "image_url": "https://umamusu.wiki/w/thumb.php?f=Support_Card_30020_Card.png&width=100"
+  },
+  {
+    "id": 30021,
+    "name": "[Tracen Reception] Tazuna Hayakawa",
+    "character_name": "Tazuna Hayakawa",
+    "card_title": "Tracen Reception",
+    "rarity": "SSR",
+    "type": "Pal",
+    "image_url": "https://umamusu.wiki/w/thumb.php?f=Support_Card_30021_Card.png&width=100"
+  },
+  {
+    "id": 30022,
+    "name": "[Your Team Ace] Mejiro McQueen",
+    "character_name": "Mejiro McQueen",
+    "card_title": "Your Team Ace",
+    "rarity": "SSR",
+    "type": "Stamina",
+    "image_url": "https://umamusu.wiki/w/thumb.php?f=Support_Card_30022_Card.png&width=100"
+  },
+  {
+    "id": 30023,
+    "name": "[Showered in Joy] Rice Shower",
+    "character_name": "Rice Shower",
+    "card_title": "Showered in Joy",
+    "rarity": "SSR",
+    "type": "Stamina",
+    "image_url": "https://umamusu.wiki/w/thumb.php?f=Support_Card_30023_Card.png&width=100"
+  },
+  {
+    "id": 30024,
+    "name": "[Get Lots of Hugs for Me] Oguri Cap",
+    "character_name": "Oguri Cap",
+    "card_title": "Get Lots of Hugs for Me",
+    "rarity": "SSR",
+    "type": "Power",
+    "image_url": "https://umamusu.wiki/w/thumb.php?f=Support_Card_30024_Card.png&width=100"
+  },
+  {
+    "id": 30025,
+    "name": "[The Setting Sun and Rising Stars] Special Week",
+    "character_name": "Special Week",
+    "card_title": "The Setting Sun and Rising Stars",
+    "rarity": "SSR",
+    "type": "Speed",
+    "image_url": "https://umamusu.wiki/w/thumb.php?f=Support_Card_30025_Card.png&width=100"
+  },
+  {
+    "id": 30026,
+    "name": "[Turbo Booooost!] Twin Turbo",
+    "character_name": "Twin Turbo",
+    "card_title": "Turbo Booooost!",
+    "rarity": "SSR",
+    "type": "Speed",
+    "image_url": "https://umamusu.wiki/w/thumb.php?f=Support_Card_30026_Card.png&width=100"
+  },
+  {
+    "id": 30027,
+    "name": "[Go Ahead and Laugh] Mejiro Palmer",
+    "character_name": "Mejiro Palmer",
+    "card_title": "Go Ahead and Laugh",
+    "rarity": "SSR",
+    "type": "Guts",
+    "image_url": "https://umamusu.wiki/w/thumb.php?f=Support_Card_30027_Card.png&width=100"
+  },
+  {
+    "id": 30028,
+    "name": "[Fire at My Heels] Kitasan Black",
+    "character_name": "Kitasan Black",
+    "card_title": "Fire at My Heels",
+    "rarity": "SSR",
+    "type": "Speed",
+    "image_url": "https://umamusu.wiki/w/thumb.php?f=Support_Card_30028_Card.png&width=100"
+  },
+  {
+    "id": 30029,
+    "name": "[The Will to Overtake] Satono Diamond",
+    "character_name": "Satono Diamond",
+    "card_title": "The Will to Overtake",
+    "rarity": "SSR",
+    "type": "Stamina",
+    "image_url": "https://umamusu.wiki/w/thumb.php?f=Support_Card_30029_Card.png&width=100"
+  },
+  {
+    "id": 30030,
+    "name": "[Just Keep Going] Matikanetannhauser",
+    "character_name": "Matikanetannhauser",
+    "card_title": "Just Keep Going",
+    "rarity": "SSR",
+    "type": "Guts",
+    "image_url": "https://umamusu.wiki/w/thumb.php?f=Support_Card_30030_Card.png&width=100"
+  },
+  {
+    "id": 30031,
+    "name": "[Hometown Cheers] Yukino Bijin",
+    "character_name": "Yukino Bijin",
+    "card_title": "Hometown Cheers",
+    "rarity": "SSR",
+    "type": "Wit",
+    "image_url": "https://umamusu.wiki/w/thumb.php?f=Support_Card_30031_Card.png&width=100"
+  },
+  {
+    "id": 30032,
+    "name": "[Fiery Discipline] Yaeno Muteki",
+    "character_name": "Yaeno Muteki",
+    "card_title": "Fiery Discipline",
+    "rarity": "SSR",
+    "type": "Power",
+    "image_url": "https://umamusu.wiki/w/thumb.php?f=Support_Card_30032_Card.png&width=100"
+  },
+  {
+    "id": 30033,
+    "name": "[Dreams Do Come True!] Winning Ticket",
+    "character_name": "Winning Ticket",
+    "card_title": "Dreams Do Come True!",
+    "rarity": "SSR",
+    "type": "Power",
+    "image_url": "https://umamusu.wiki/w/thumb.php?f=Support_Card_30033_Card.png&width=100"
+  },
+  {
+    "id": 30034,
+    "name": "[Happiness Just around the Bend] Rice Shower",
+    "character_name": "Rice Shower",
+    "card_title": "Happiness Just around the Bend",
+    "rarity": "SSR",
+    "type": "Power",
+    "image_url": "https://umamusu.wiki/w/thumb.php?f=Support_Card_30034_Card.png&width=100"
+  },
+  {
+    "id": 30036,
+    "name": "[Planned Perfection] Kashimoto Riko",
+    "character_name": "Kashimoto Riko",
+    "card_title": "Planned Perfection",
+    "rarity": "SSR",
+    "type": "Pal",
+    "image_url": "https://umamusu.wiki/w/thumb.php?f=Support_Card_30036_Card.png&width=100"
+  },
+  {
+    "id": 30037,
+    "name": "[絶対皇帝] Symboli Rudolf",
+    "character_name": "Symboli Rudolf",
+    "card_title": "絶対皇帝",
+    "rarity": "SSR",
+    "type": "Guts",
+    "image_url": "https://umamusu.wiki/w/thumb.php?f=Support_Card_30037_Card.png&width=100"
+  },
+  {
+    "id": 30038,
+    "name": "[Peak Sakura Season] Sakura Chiyono O",
+    "character_name": "Sakura Chiyono O",
+    "card_title": "Peak Sakura Season",
+    "rarity": "SSR",
+    "type": "Stamina",
+    "image_url": "https://umamusu.wiki/w/thumb.php?f=Support_Card_30038_Card.png&width=100"
+  },
+  {
+    "id": 30039,
+    "name": "[Princess Bride] Kawakami Princess",
+    "character_name": "Kawakami Princess",
+    "card_title": "Princess Bride",
+    "rarity": "SSR",
+    "type": "Speed",
+    "image_url": "https://umamusu.wiki/w/thumb.php?f=Support_Card_30039_Card.png&width=100"
+  },
+  {
+    "id": 30040,
+    "name": "[Who Wants the First Bite?] Hishi Akebono",
+    "character_name": "Hishi Akebono",
+    "card_title": "Who Wants the First Bite?",
+    "rarity": "SSR",
+    "type": "Guts",
+    "image_url": "https://umamusu.wiki/w/thumb.php?f=Support_Card_30040_Card.png&width=100"
+  },
+  {
+    "id": 30041,
+    "name": "[My Thoughts, My Desires] Mejiro Dober",
+    "character_name": "Mejiro Dober",
+    "card_title": "My Thoughts, My Desires",
+    "rarity": "SSR",
+    "type": "Wit",
+    "image_url": "https://umamusu.wiki/w/thumb.php?f=Support_Card_30041_Card.png&width=100"
+  },
+  {
+    "id": 30042,
+    "name": "[Head-on Fight!] Bamboo Memory",
+    "character_name": "Bamboo Memory",
+    "card_title": "Head-on Fight!",
+    "rarity": "SSR",
+    "type": "Power",
+    "image_url": "https://umamusu.wiki/w/thumb.php?f=Support_Card_30042_Card.png&width=100"
+  },
+  {
+    "id": 30043,
+    "name": "[43, 8, 1] Nakayama Festa",
+    "character_name": "Nakayama Festa",
+    "card_title": "43, 8, 1",
+    "rarity": "SSR",
+    "type": "Stamina",
+    "image_url": "https://umamusu.wiki/w/thumb.php?f=Support_Card_30043_Card.png&width=100"
+  },
+  {
+    "id": 30044,
+    "name": "[Two Pieces] Narita Brian",
+    "character_name": "Narita Brian",
+    "card_title": "Two Pieces",
+    "rarity": "SSR",
+    "type": "Speed",
+    "image_url": "https://umamusu.wiki/w/thumb.php?f=Support_Card_30044_Card.png&width=100"
+  },
+  {
+    "id": 30045,
+    "name": "[It's All Mine!] Sweep Tosho",
+    "character_name": "Sweep Tosho",
+    "card_title": "It's All Mine!",
+    "rarity": "SSR",
+    "type": "Speed",
+    "image_url": "https://umamusu.wiki/w/thumb.php?f=Support_Card_30045_Card.png&width=100"
+  },
+  {
+    "id": 30046,
+    "name": "[Full-Blown Tantrum] Winning Ticket",
+    "character_name": "Winning Ticket",
+    "card_title": "Full-Blown Tantrum",
+    "rarity": "SSR",
+    "type": "Stamina",
+    "image_url": "https://umamusu.wiki/w/thumb.php?f=Support_Card_30046_Card.png&width=100"
+  },
+  {
+    "id": 30047,
+    "name": "[Mini☆Vacation] Daiwa Scarlet",
+    "character_name": "Daiwa Scarlet",
+    "card_title": "Mini☆Vacation",
+    "rarity": "SSR",
+    "type": "Power",
+    "image_url": "https://umamusu.wiki/w/thumb.php?f=Support_Card_30047_Card.png&width=100"
+  },
+  {
+    "id": 30048,
+    "name": "[Winning Pitch] Mejiro Ryan",
+    "character_name": "Mejiro Ryan",
+    "card_title": "Winning Pitch",
+    "rarity": "SSR",
+    "type": "Guts",
+    "image_url": "https://umamusu.wiki/w/thumb.php?f=Support_Card_30048_Card.png&width=100"
+  },
+  {
+    "id": 30052,
+    "name": "[From the Ground Up] Light Hello",
+    "character_name": "Light Hello",
+    "card_title": "From the Ground Up",
+    "rarity": "SSR",
+    "type": "Pal",
+    "image_url": "https://umamusu.wiki/w/thumb.php?f=Support_Card_30052_Card.png&width=100"
+  },
+  {
+    "id": 30053,
+    "name": "[Hands Up, Crook!] Taiki Shuttle",
+    "character_name": "Taiki Shuttle",
+    "card_title": "Hands Up, Crook!",
+    "rarity": "SSR",
+    "type": "Speed",
+    "image_url": "https://umamusu.wiki/w/thumb.php?f=Support_Card_30053_Card.png&width=100"
+  },
+  {
+    "id": 30054,
+    "name": "[Daring to Dream] Nice Nature",
+    "character_name": "Nice Nature",
+    "card_title": "Daring to Dream",
+    "rarity": "SSR",
+    "type": "Wit",
+    "image_url": "https://umamusu.wiki/w/thumb.php?f=Support_Card_30054_Card.png&width=100"
+  },
+  {
+    "id": 30055,
+    "name": "[Paint the Sky Red] Seiun Sky",
+    "character_name": "Seiun Sky",
+    "card_title": "Paint the Sky Red",
+    "rarity": "SSR",
+    "type": "Wit",
+    "image_url": "https://umamusu.wiki/w/thumb.php?f=Support_Card_30055_Card.png&width=100"
+  },
+  {
+    "id": 30056,
+    "name": "[Tonight, We Waltz] King Halo",
+    "character_name": "King Halo",
+    "card_title": "Tonight, We Waltz",
+    "rarity": "SSR",
+    "type": "Power",
+    "image_url": "https://umamusu.wiki/w/thumb.php?f=Support_Card_30056_Card.png&width=100"
+  },
+  {
+    "id": 30057,
+    "name": "[That Time I Became the Strongest] Gold Ship",
+    "character_name": "Gold Ship",
+    "card_title": "That Time I Became the Strongest",
+    "rarity": "SSR",
+    "type": "Speed",
+    "image_url": "https://umamusu.wiki/w/thumb.php?f=Support_Card_30057_Card.png&width=100"
+  },
+  {
+    "id": 30058,
+    "name": "[Regal Racers] Tokai Teio",
+    "character_name": "Tokai Teio",
+    "card_title": "Regal Racers",
+    "rarity": "SSR",
+    "type": "Power",
+    "image_url": "https://umamusu.wiki/w/thumb.php?f=Support_Card_30058_Card.png&width=100"
+  },
+  {
+    "id": 30059,
+    "name": "[Fugue of Fortune] Mihono Bourbon",
+    "character_name": "Mihono Bourbon",
+    "card_title": "Fugue of Fortune",
+    "rarity": "SSR",
+    "type": "Stamina",
+    "image_url": "https://umamusu.wiki/w/thumb.php?f=Support_Card_30059_Card.png&width=100"
+  },
+  {
+    "id": 30060,
+    "name": "[Constellation of Stars] Twin Turbo",
+    "character_name": "Twin Turbo",
+    "card_title": "Constellation of Stars",
+    "rarity": "SSR",
+    "type": "Guts",
+    "image_url": "https://umamusu.wiki/w/thumb.php?f=Support_Card_30060_Card.png&width=100"
+  },
+  {
+    "id": 30061,
+    "name": "[Our Resounding Steps] Biwa Hayahide",
+    "character_name": "Biwa Hayahide",
+    "card_title": "Our Resounding Steps",
+    "rarity": "SSR",
+    "type": "Wit",
+    "image_url": "https://umamusu.wiki/w/thumb.php?f=Support_Card_30061_Card.png&width=100"
+  },
+  {
+    "id": 30062,
+    "name": "[Winning Dream] Silence Suzuka",
+    "character_name": "Silence Suzuka",
+    "card_title": "Winning Dream",
+    "rarity": "SSR",
+    "type": "Stamina",
+    "image_url": "https://umamusu.wiki/w/thumb.php?f=Support_Card_30062_Card.png&width=100"
+  },
+  {
+    "id": 30063,
+    "name": "[Warm Heart, Soft Steps] Ikuno Dictus",
+    "character_name": "Ikuno Dictus",
+    "card_title": "Warm Heart, Soft Steps",
+    "rarity": "SSR",
+    "type": "Guts",
+    "image_url": "https://umamusu.wiki/w/thumb.php?f=Support_Card_30063_Card.png&width=100"
+  },
+  {
+    "id": 30064,
+    "name": "[Beware! Halloween Night!] Tamamo Cross",
+    "character_name": "Tamamo Cross",
+    "card_title": "Beware! Halloween Night!",
+    "rarity": "SSR",
+    "type": "Power",
+    "image_url": "https://umamusu.wiki/w/thumb.php?f=Support_Card_30064_Card.png&width=100"
+  },
+  {
+    "id": 30065,
+    "name": "[Magical Heroine] Zenno Rob Roy",
+    "character_name": "Zenno Rob Roy",
+    "card_title": "Magical Heroine",
+    "rarity": "SSR",
+    "type": "Speed",
+    "image_url": "https://umamusu.wiki/w/thumb.php?f=Support_Card_30065_Card.png&width=100"
+  },
+  {
+    "id": 30066,
+    "name": "[幽霊さんとハロウィンの魔法] Mihono Bourbon",
+    "character_name": "Mihono Bourbon",
+    "card_title": "幽霊さんとハロウィンの魔法",
+    "rarity": "SSR",
+    "type": "Wit",
+    "image_url": "https://umamusu.wiki/w/thumb.php?f=Support_Card_30066_Card.png&width=100"
+  },
+  {
+    "id": 30067,
+    "name": "[Esteemed and Adored] Heirs to the Throne",
+    "character_name": "Heirs to the Throne",
+    "card_title": "Esteemed and Adored",
+    "rarity": "SSR",
+    "type": "Group",
+    "image_url": "https://umamusu.wiki/w/thumb.php?f=Support_Card_30067_Card.png&width=100"
+  },
+  {
+    "id": 30068,
+    "name": "[Cutie Pie with Shining Eyes] Curren Chan",
+    "character_name": "Curren Chan",
+    "card_title": "Cutie Pie with Shining Eyes",
+    "rarity": "SSR",
+    "type": "Wit",
+    "image_url": "https://umamusu.wiki/w/thumb.php?f=Support_Card_30068_Card.png&width=100"
+  },
+  {
+    "id": 30069,
+    "name": "[The Whistling Arrow's Taunt] Narita Brian",
+    "character_name": "Narita Brian",
+    "card_title": "The Whistling Arrow's Taunt",
+    "rarity": "SSR",
+    "type": "Stamina",
+    "image_url": "https://umamusu.wiki/w/thumb.php?f=Support_Card_30069_Card.png&width=100"
+  },
+  {
+    "id": 30070,
+    "name": "[宵照らす奉納舞] Yukino Bijin",
+    "character_name": "Yukino Bijin",
+    "card_title": "宵照らす奉納舞",
+    "rarity": "SSR",
+    "type": "Guts",
+    "image_url": "https://umamusu.wiki/w/thumb.php?f=Support_Card_30070_Card.png&width=100"
+  },
+  {
+    "id": 30071,
+    "name": "[Make! Some! NOISE] Daitaku Helios",
+    "character_name": "Daitaku Helios",
+    "card_title": "Make! Some! NOISE",
+    "rarity": "SSR",
+    "type": "Power",
+    "image_url": "https://umamusu.wiki/w/thumb.php?f=Support_Card_30071_Card.png&width=100"
+  },
+  {
+    "id": 30072,
+    "name": "[Party Formation] Mayano Top Gun",
+    "character_name": "Mayano Top Gun",
+    "card_title": "Party Formation",
+    "rarity": "SSR",
+    "type": "Speed",
+    "image_url": "https://umamusu.wiki/w/thumb.php?f=Support_Card_30072_Card.png&width=100"
+  },
+  {
+    "id": 30073,
+    "name": "[Strict Shopper] Narita Taishin",
+    "character_name": "Narita Taishin",
+    "card_title": "Strict Shopper",
+    "rarity": "SSR",
+    "type": "Wit",
+    "image_url": "https://umamusu.wiki/w/thumb.php?f=Support_Card_30073_Card.png&width=100"
+  },
+  {
+    "id": 30074,
+    "name": "[スノウクリスタル・デイ] Marvelous Sunday",
+    "character_name": "Marvelous Sunday",
+    "card_title": "スノウクリスタル・デイ",
+    "rarity": "SSR",
+    "type": "Power",
+    "image_url": "https://umamusu.wiki/w/thumb.php?f=Support_Card_30074_Card.png&width=100"
+  },
+  {
+    "id": 30075,
+    "name": "[My Solo Spun in Spiraling Runs] Manhattan Cafe",
+    "character_name": "Manhattan Cafe",
+    "card_title": "My Solo Spun in Spiraling Runs",
+    "rarity": "SSR",
+    "type": "Stamina",
+    "image_url": "https://umamusu.wiki/w/thumb.php?f=Support_Card_30075_Card.png&width=100"
+  },
+  {
+    "id": 30076,
+    "name": "[まだ見ぬ景色を求めて] Silence Suzuka",
+    "character_name": "Silence Suzuka",
+    "card_title": "まだ見ぬ景色を求めて",
+    "rarity": "SSR",
+    "type": "Speed",
+    "image_url": "https://umamusu.wiki/w/thumb.php?f=Support_Card_30076_Card.png&width=100"
+  },
+  {
+    "id": 30077,
+    "name": "[Lucky Star in the Sky] Admire Vega",
+    "character_name": "Admire Vega",
+    "card_title": "Lucky Star in the Sky",
+    "rarity": "SSR",
+    "type": "Power",
+    "image_url": "https://umamusu.wiki/w/thumb.php?f=Support_Card_30077_Card.png&width=100"
+  },
+  {
+    "id": 30078,
+    "name": "[Touching Sleeves Is Good Luck! ♪] Matikanefukukitaru",
+    "character_name": "Matikanefukukitaru",
+    "card_title": "Touching Sleeves Is Good Luck! ♪",
+    "rarity": "SSR",
+    "type": "Speed",
+    "image_url": "https://umamusu.wiki/w/thumb.php?f=Support_Card_30078_Card.png&width=100"
+  },
+  {
+    "id": 30079,
+    "name": "[飛びも出でぬべき心地すれ] Meisho Doto",
+    "character_name": "Meisho Doto",
+    "card_title": "飛びも出でぬべき心地すれ",
+    "rarity": "SSR",
+    "type": "Stamina",
+    "image_url": "https://umamusu.wiki/w/thumb.php?f=Support_Card_30079_Card.png&width=100"
+  },
+  {
+    "id": 30080,
+    "name": "[ブスッといっとく？] Anshinzawa Sasami",
+    "character_name": "Anshinzawa Sasami",
+    "card_title": "ブスッといっとく？",
+    "rarity": "SSR",
+    "type": "Pal",
+    "image_url": "https://umamusu.wiki/w/thumb.php?f=Support_Card_30080_Card.png&width=100"
+  },
+  {
+    "id": 30081,
+    "name": "[Passing the Dream On] Team Sirius",
+    "character_name": "Team Sirius",
+    "card_title": "Passing the Dream On",
+    "rarity": "SSR",
+    "type": "Group",
+    "image_url": "https://umamusu.wiki/w/thumb.php?f=Support_Card_30081_Card.png&width=100"
+  },
+  {
+    "id": 30082,
+    "name": "[Little Cupcakes, Big Emotions] Nishino Flower",
+    "character_name": "Nishino Flower",
+    "card_title": "Little Cupcakes, Big Emotions",
+    "rarity": "SSR",
+    "type": "Wit",
+    "image_url": "https://umamusu.wiki/w/thumb.php?f=Support_Card_30082_Card.png&width=100"
+  },
+  {
+    "id": 30083,
+    "name": "[Super! Sonic! Flower Power!] Sakura Bakushin O",
+    "character_name": "Sakura Bakushin O",
+    "card_title": "Super! Sonic! Flower Power!",
+    "rarity": "SSR",
+    "type": "Guts",
+    "image_url": "https://umamusu.wiki/w/thumb.php?f=Support_Card_30083_Card.png&width=100"
+  },
+  {
+    "id": 30084,
+    "name": "[In my way] Tosen Jordan",
+    "character_name": "Tosen Jordan",
+    "card_title": "In my way",
+    "rarity": "SSR",
+    "type": "Speed",
+    "image_url": "https://umamusu.wiki/w/thumb.php?f=Support_Card_30084_Card.png&width=100"
+  },
+  {
+    "id": 30085,
+    "name": "[A Fan's Joy] Agnes Digital",
+    "character_name": "Agnes Digital",
+    "card_title": "A Fan's Joy",
+    "rarity": "SSR",
+    "type": "Power",
+    "image_url": "https://umamusu.wiki/w/thumb.php?f=Support_Card_30085_Card.png&width=100"
+  },
+  {
+    "id": 30086,
+    "name": "[Peachy Silhouette] Narita Top Road",
+    "character_name": "Narita Top Road",
+    "card_title": "Peachy Silhouette",
+    "rarity": "SSR",
+    "type": "Speed",
+    "image_url": "https://umamusu.wiki/w/thumb.php?f=Support_Card_30086_Card.png&width=100"
+  },
+  {
+    "id": 30087,
+    "name": "[リトル・バイ・リトル] Mejiro Bright",
+    "character_name": "Mejiro Bright",
+    "card_title": "リトル・バイ・リトル",
+    "rarity": "SSR",
+    "type": "Stamina",
+    "image_url": "https://umamusu.wiki/w/thumb.php?f=Support_Card_30087_Card.png&width=100"
+  },
+  {
+    "id": 30088,
+    "name": "[SPECIAL DREAMERS!!] Satono Diamond",
+    "character_name": "Satono Diamond",
+    "card_title": "SPECIAL DREAMERS!!",
+    "rarity": "SSR",
+    "type": "Wit",
+    "image_url": "https://umamusu.wiki/w/thumb.php?f=Support_Card_30088_Card.png&width=100"
+  },
+  {
+    "id": 30089,
+    "name": "[A MORE MARVELOUS WORLD! ☆] Marvelous Sunday",
+    "character_name": "Marvelous Sunday",
+    "card_title": "A MORE MARVELOUS WORLD! ☆",
+    "rarity": "SSR",
+    "type": "Guts",
+    "image_url": "https://umamusu.wiki/w/thumb.php?f=Support_Card_30089_Card.png&width=100"
+  },
+  {
+    "id": 30090,
+    "name": "[Enchaînement] Symboli Rudolf",
+    "character_name": "Symboli Rudolf",
+    "card_title": "Enchaînement",
+    "rarity": "SSR",
+    "type": "Stamina",
+    "image_url": "https://umamusu.wiki/w/thumb.php?f=Support_Card_30090_Card.png&width=100"
+  },
+  {
+    "id": 30091,
+    "name": "[Escorte Étoile] Sirius Symboli",
+    "character_name": "Sirius Symboli",
+    "card_title": "Escorte Étoile",
+    "rarity": "SSR",
+    "type": "Wit",
+    "image_url": "https://umamusu.wiki/w/thumb.php?f=Support_Card_30091_Card.png&width=100"
+  },
+  {
+    "id": 30092,
+    "name": "[mag!c number] Air Shakur",
+    "character_name": "Air Shakur",
+    "card_title": "mag!c number",
+    "rarity": "SSR",
+    "type": "Speed",
+    "image_url": "https://umamusu.wiki/w/thumb.php?f=Support_Card_30092_Card.png&width=100"
+  },
+  {
+    "id": 30093,
+    "name": "[Number 1 Outfit] Daiwa Scarlet",
+    "character_name": "Daiwa Scarlet",
+    "card_title": "Number 1 Outfit",
+    "rarity": "SSR",
+    "type": "Power",
+    "image_url": "https://umamusu.wiki/w/thumb.php?f=Support_Card_30093_Card.png&width=100"
+  },
+  {
+    "id": 30094,
+    "name": "[Make These Feelings Reach You!] Bamboo Memory",
+    "character_name": "Bamboo Memory",
+    "card_title": "Make These Feelings Reach You!",
+    "rarity": "SSR",
+    "type": "Guts",
+    "image_url": "https://umamusu.wiki/w/thumb.php?f=Support_Card_30094_Card.png&width=100"
+  },
+  {
+    "id": 30095,
+    "name": "[Cheer that Changed the World] Seeking the Pearl",
+    "character_name": "Seeking the Pearl",
+    "card_title": "Cheer that Changed the World",
+    "rarity": "SSR",
+    "type": "Speed",
+    "image_url": "https://umamusu.wiki/w/thumb.php?f=Support_Card_30095_Card.png&width=100"
+  },
+  {
+    "id": 30096,
+    "name": "[フレフレ☆プリンセス！] Kawakami Princess",
+    "character_name": "Kawakami Princess",
+    "card_title": "フレフレ☆プリンセス！",
+    "rarity": "SSR",
+    "type": "Power",
+    "image_url": "https://umamusu.wiki/w/thumb.php?f=Support_Card_30096_Card.png&width=100"
+  },
+  {
+    "id": 30097,
+    "name": "[Dear Mr. C.B.] Mr. C.B.",
+    "character_name": "Mr. C.B.",
+    "card_title": "Dear Mr. C.B.",
+    "rarity": "SSR",
+    "type": "Wit",
+    "image_url": "https://umamusu.wiki/w/thumb.php?f=Support_Card_30097_Card.png&width=100"
+  },
+  {
+    "id": 30098,
+    "name": "[Sunny Passion ♪] Haru Urara",
+    "character_name": "Haru Urara",
+    "card_title": "Sunny Passion ♪",
+    "rarity": "SSR",
+    "type": "Power",
+    "image_url": "https://umamusu.wiki/w/thumb.php?f=Support_Card_30098_Card.png&width=100"
+  },
+  {
+    "id": 30099,
+    "name": "[Beloved Orchid Bouquet] Ikuno Dictus",
+    "character_name": "Ikuno Dictus",
+    "card_title": "Beloved Orchid Bouquet",
+    "rarity": "SSR",
+    "type": "Stamina",
+    "image_url": "https://umamusu.wiki/w/thumb.php?f=Support_Card_30099_Card.png&width=100"
+  },
+  {
+    "id": 30100,
+    "name": "[あこがれの景色] Rice Shower",
+    "character_name": "Rice Shower",
+    "card_title": "あこがれの景色",
+    "rarity": "SSR",
+    "type": "Wit",
+    "image_url": "https://umamusu.wiki/w/thumb.php?f=Support_Card_30100_Card.png&width=100"
+  },
+  {
+    "id": 30101,
+    "name": "[Q≠0] Agnes Tachyon",
+    "character_name": "Agnes Tachyon",
+    "card_title": "Q≠0",
+    "rarity": "SSR",
+    "type": "Speed",
+    "image_url": "https://umamusu.wiki/w/thumb.php?f=Support_Card_30101_Card.png&width=100"
+  },
+  {
+    "id": 30102,
+    "name": "[Twinkle in Your Eyes ∞] El Condor Pasa",
+    "character_name": "El Condor Pasa",
+    "card_title": "Twinkle in Your Eyes ∞",
+    "rarity": "SSR",
+    "type": "Guts",
+    "image_url": "https://umamusu.wiki/w/thumb.php?f=Support_Card_30102_Card.png&width=100"
+  },
+  {
+    "id": 30103,
+    "name": "[Machitan☆Adventure] Matikanetannhauser",
+    "character_name": "Matikanetannhauser",
+    "card_title": "Machitan☆Adventure",
+    "rarity": "SSR",
+    "type": "Wit",
+    "image_url": "https://umamusu.wiki/w/thumb.php?f=Support_Card_30103_Card.png&width=100"
+  },
+  {
+    "id": 30104,
+    "name": "[『ロードナイトと夢の石』] Zenno Rob Roy",
+    "character_name": "Zenno Rob Roy",
+    "card_title": "『ロードナイトと夢の石』",
+    "rarity": "SSR",
+    "type": "Stamina",
+    "image_url": "https://umamusu.wiki/w/thumb.php?f=Support_Card_30104_Card.png&width=100"
+  },
+  {
+    "id": 30105,
+    "name": "[私たちと夢、掴みましょう！] Special Week",
+    "character_name": "Special Week",
+    "card_title": "私たちと夢、掴みましょう！",
+    "rarity": "SSR",
+    "type": "Guts",
+    "image_url": "https://umamusu.wiki/w/thumb.php?f=Support_Card_30105_Card.png&width=100"
+  },
+  {
+    "id": 30106,
+    "name": "[理想へ向かう青嵐] Air Groove",
+    "character_name": "Air Groove",
+    "card_title": "理想へ向かう青嵐",
+    "rarity": "SSR",
+    "type": "Power",
+    "image_url": "https://umamusu.wiki/w/thumb.php?f=Support_Card_30106_Card.png&width=100"
+  },
+  {
+    "id": 30107,
+    "name": "[Sentimental Flare ♪] Maruzensky",
+    "character_name": "Maruzensky",
+    "card_title": "Sentimental Flare ♪",
+    "rarity": "SSR",
+    "type": "Speed",
+    "image_url": "https://umamusu.wiki/w/thumb.php?f=Support_Card_30107_Card.png&width=100"
+  },
+  {
+    "id": 30108,
+    "name": "[Trusting the Dice] Nakayama Festa",
+    "character_name": "Nakayama Festa",
+    "card_title": "Trusting the Dice",
+    "rarity": "SSR",
+    "type": "Wit",
+    "image_url": "https://umamusu.wiki/w/thumb.php?f=Support_Card_30108_Card.png&width=100"
+  },
+  {
+    "id": 30109,
+    "name": "[A Good Heart Blossoms to Its Fullest] Sakura Chiyono O",
+    "character_name": "Sakura Chiyono O",
+    "card_title": "A Good Heart Blossoms to Its Fullest",
+    "rarity": "SSR",
+    "type": "Guts",
+    "image_url": "https://umamusu.wiki/w/thumb.php?f=Support_Card_30109_Card.png&width=100"
+  },
+  {
+    "id": 30110,
+    "name": "[It's on the House] Manhattan Cafe",
+    "character_name": "Manhattan Cafe",
+    "card_title": "It's on the House",
+    "rarity": "SSR",
+    "type": "Stamina",
+    "image_url": "https://umamusu.wiki/w/thumb.php?f=Support_Card_30110_Card.png&width=100"
+  },
+  {
+    "id": 30111,
+    "name": "[Teio-Oo-Oo!!!] Tokai Teio",
+    "character_name": "Tokai Teio",
+    "card_title": "Teio-Oo-Oo!!!",
+    "rarity": "SSR",
+    "type": "Wit",
+    "image_url": "https://umamusu.wiki/w/thumb.php?f=Support_Card_30111_Card.png&width=100"
+  },
+  {
+    "id": 30112,
+    "name": "[TT Ignition!] Twin Turbo",
+    "character_name": "Twin Turbo",
+    "card_title": "TT Ignition!",
+    "rarity": "SSR",
+    "type": "Guts",
+    "image_url": "https://umamusu.wiki/w/thumb.php?f=Support_Card_30112_Card.png&width=100"
+  },
+  {
+    "id": 30113,
+    "name": "[Uchronia Architect] Biwa Hayahide",
+    "character_name": "Biwa Hayahide",
+    "card_title": "Uchronia Architect",
+    "rarity": "SSR",
+    "type": "Stamina",
+    "image_url": "https://umamusu.wiki/w/thumb.php?f=Support_Card_30113_Card.png&width=100"
+  },
+  {
+    "id": 30114,
+    "name": "[嗚呼華麗ナル一族] Daiichi Ruby",
+    "character_name": "Daiichi Ruby",
+    "card_title": "嗚呼華麗ナル一族",
+    "rarity": "SSR",
+    "type": "Power",
+    "image_url": "https://umamusu.wiki/w/thumb.php?f=Support_Card_30114_Card.png&width=100"
+  },
+  {
+    "id": 30115,
+    "name": "[月下の悪魔ちゃん♪] Mejiro Palmer",
+    "character_name": "Mejiro Palmer",
+    "card_title": "月下の悪魔ちゃん♪",
+    "rarity": "SSR",
+    "type": "Stamina",
+    "image_url": "https://umamusu.wiki/w/thumb.php?f=Support_Card_30115_Card.png&width=100"
+  },
+  {
+    "id": 30116,
+    "name": "[お日さま天使ちゃん♪] Daitaku Helios",
+    "character_name": "Daitaku Helios",
+    "card_title": "お日さま天使ちゃん♪",
+    "rarity": "SSR",
+    "type": "Speed",
+    "image_url": "https://umamusu.wiki/w/thumb.php?f=Support_Card_30116_Card.png&width=100"
+  },
+  {
+    "id": 30117,
+    "name": "[とびだせ！恐怖の魔王軍] Shinko Windy",
+    "character_name": "Shinko Windy",
+    "card_title": "とびだせ！恐怖の魔王軍",
+    "rarity": "SSR",
+    "type": "Guts",
+    "image_url": "https://umamusu.wiki/w/thumb.php?f=Support_Card_30117_Card.png&width=100"
+  },
+  {
+    "id": 30118,
+    "name": "[A Win Foreshadowed] Symboli Kris S",
+    "character_name": "Symboli Kris S",
+    "card_title": "A Win Foreshadowed",
+    "rarity": "SSR",
+    "type": "Stamina",
+    "image_url": "https://umamusu.wiki/w/thumb.php?f=Support_Card_30118_Card.png&width=100"
+  },
+  {
+    "id": 30119,
+    "name": "[夜風に舞うは祈りの花] Mejiro Ardan",
+    "character_name": "Mejiro Ardan",
+    "card_title": "夜風に舞うは祈りの花",
+    "rarity": "SSR",
+    "type": "Speed",
+    "image_url": "https://umamusu.wiki/w/thumb.php?f=Support_Card_30119_Card.png&width=100"
+  },
+  {
+    "id": 30120,
+    "name": "[天まで焦がせ祈りの火] Yaeno Muteki",
+    "character_name": "Yaeno Muteki",
+    "card_title": "天まで焦がせ祈りの火",
+    "rarity": "SSR",
+    "type": "Guts",
+    "image_url": "https://umamusu.wiki/w/thumb.php?f=Support_Card_30120_Card.png&width=100"
+  },
+  {
+    "id": 30121,
+    "name": "[U & Me] Mihono Bourbon",
+    "character_name": "Mihono Bourbon",
+    "card_title": "U & Me",
+    "rarity": "SSR",
+    "type": "Speed",
+    "image_url": "https://umamusu.wiki/w/thumb.php?f=Support_Card_30121_Card.png&width=100"
+  },
+  {
+    "id": 30122,
+    "name": "[Danke schön] Eishin Flash",
+    "character_name": "Eishin Flash",
+    "card_title": "Danke schön",
+    "rarity": "SSR",
+    "type": "Speed",
+    "image_url": "https://umamusu.wiki/w/thumb.php?f=Support_Card_30122_Card.png&width=100"
+  },
+  {
+    "id": 30123,
+    "name": "[GLAD TIDINGS] Narita Brian",
+    "character_name": "Narita Brian",
+    "card_title": "GLAD TIDINGS",
+    "rarity": "SSR",
+    "type": "Power",
+    "image_url": "https://umamusu.wiki/w/thumb.php?f=Support_Card_30123_Card.png&width=100"
+  },
+  {
+    "id": 30124,
+    "name": "[Are you merry?] Air Groove",
+    "character_name": "Air Groove",
+    "card_title": "Are you merry?",
+    "rarity": "SSR",
+    "type": "Wit",
+    "image_url": "https://umamusu.wiki/w/thumb.php?f=Support_Card_30124_Card.png&width=100"
+  },
+  {
+    "id": 30125,
+    "name": "[ここからはDon't stop!] Sakura Laurel",
+    "character_name": "Sakura Laurel",
+    "card_title": "ここからはDon't stop!",
+    "rarity": "SSR",
+    "type": "Stamina",
+    "image_url": "https://umamusu.wiki/w/thumb.php?f=Support_Card_30125_Card.png&width=100"
+  },
+  {
+    "id": 30126,
+    "name": "[誰も知らない風へ] Yamanin Zephyr",
+    "character_name": "Yamanin Zephyr",
+    "card_title": "誰も知らない風へ",
+    "rarity": "SSR",
+    "type": "Guts",
+    "image_url": "https://umamusu.wiki/w/thumb.php?f=Support_Card_30126_Card.png&width=100"
+  },
+  {
+    "id": 30127,
+    "name": "[ハネ退け魔を退け願い込め] Special Week",
+    "character_name": "Special Week",
+    "card_title": "ハネ退け魔を退け願い込め",
+    "rarity": "SSR",
+    "type": "Stamina",
+    "image_url": "https://umamusu.wiki/w/thumb.php?f=Support_Card_30127_Card.png&width=100"
+  },
+  {
+    "id": 30128,
+    "name": "[気まぐれ絶佳] Sweep Tosho",
+    "character_name": "Sweep Tosho",
+    "card_title": "気まぐれ絶佳",
+    "rarity": "SSR",
+    "type": "Wit",
+    "image_url": "https://umamusu.wiki/w/thumb.php?f=Support_Card_30128_Card.png&width=100"
+  },
+  {
+    "id": 30129,
+    "name": "[遥か流るる冬夏青青] Grass Wonder",
+    "character_name": "Grass Wonder",
+    "card_title": "遥か流るる冬夏青青",
+    "rarity": "SSR",
+    "type": "Power",
+    "image_url": "https://umamusu.wiki/w/thumb.php?f=Support_Card_30129_Card.png&width=100"
+  },
+  {
+    "id": 30130,
+    "name": "[To you] K.S.Miracle",
+    "character_name": "K.S.Miracle",
+    "card_title": "To you",
+    "rarity": "SSR",
+    "type": "Guts",
+    "image_url": "https://umamusu.wiki/w/thumb.php?f=Support_Card_30130_Card.png&width=100"
+  },
+  {
+    "id": 30131,
+    "name": "[マーベラス☆ショコラSHOW] Marvelous Sunday",
+    "character_name": "Marvelous Sunday",
+    "card_title": "マーベラス☆ショコラSHOW",
+    "rarity": "SSR",
+    "type": "Speed",
+    "image_url": "https://umamusu.wiki/w/thumb.php?f=Support_Card_30131_Card.png&width=100"
+  },
+  {
+    "id": 30132,
+    "name": "[変身！ギャルソンフォーム！] Biko Pegasus",
+    "character_name": "Biko Pegasus",
+    "card_title": "変身！ギャルソンフォーム！",
+    "rarity": "SSR",
+    "type": "Power",
+    "image_url": "https://umamusu.wiki/w/thumb.php?f=Support_Card_30132_Card.png&width=100"
+  },
+  {
+    "id": 30133,
+    "name": "[フォンデンテで笑って] Hishi Akebono",
+    "character_name": "Hishi Akebono",
+    "card_title": "フォンデンテで笑って",
+    "rarity": "SSR",
+    "type": "Wit",
+    "image_url": "https://umamusu.wiki/w/thumb.php?f=Support_Card_30133_Card.png&width=100"
+  },
+  {
+    "id": 30134,
+    "name": "[燦爛] Mejiro Ramonu",
+    "character_name": "Mejiro Ramonu",
+    "card_title": "燦爛",
+    "rarity": "SSR",
+    "type": "Wit",
+    "image_url": "https://umamusu.wiki/w/thumb.php?f=Support_Card_30134_Card.png&width=100"
+  },
+  {
+    "id": 30135,
+    "name": "[掲げよ、燃え盛る灯を] Katsuragi Ace",
+    "character_name": "Katsuragi Ace",
+    "card_title": "掲げよ、燃え盛る灯を",
+    "rarity": "SSR",
+    "type": "Speed",
+    "image_url": "https://umamusu.wiki/w/thumb.php?f=Support_Card_30135_Card.png&width=100"
+  },
+  {
+    "id": 30136,
+    "name": "[Unyielding resolve] Symboli Kris S",
+    "character_name": "Symboli Kris S",
+    "card_title": "Unyielding resolve",
+    "rarity": "SSR",
+    "type": "Guts",
+    "image_url": "https://umamusu.wiki/w/thumb.php?f=Support_Card_30136_Card.png&width=100"
+  },
+  {
+    "id": 30137,
+    "name": "[永劫続く栄光へ] Darley Arabian",
+    "character_name": "Darley Arabian",
+    "card_title": "永劫続く栄光へ",
+    "rarity": "SSR",
+    "type": "Group",
+    "image_url": "https://umamusu.wiki/w/thumb.php?f=Support_Card_30137_Card.png&width=100"
+  },
+  {
+    "id": 30138,
+    "name": "[今は瞳を閉じないで] Nice Nature",
+    "character_name": "Nice Nature",
+    "card_title": "今は瞳を閉じないで",
+    "rarity": "SSR",
+    "type": "Power",
+    "image_url": "https://umamusu.wiki/w/thumb.php?f=Support_Card_30138_Card.png&width=100"
+  },
+  {
+    "id": 30139,
+    "name": "[心、夜風にさらわれて] Mejiro McQueen",
+    "character_name": "Mejiro McQueen",
+    "card_title": "心、夜風にさらわれて",
+    "rarity": "SSR",
+    "type": "Stamina",
+    "image_url": "https://umamusu.wiki/w/thumb.php?f=Support_Card_30139_Card.png&width=100"
+  },
+  {
+    "id": 30140,
+    "name": "[比翼のワルツ] Tokai Teio",
+    "character_name": "Tokai Teio",
+    "card_title": "比翼のワルツ",
+    "rarity": "SSR",
+    "type": "Speed",
+    "image_url": "https://umamusu.wiki/w/thumb.php?f=Support_Card_30140_Card.png&width=100"
+  },
+  {
+    "id": 30141,
+    "name": "[ミッション『心の栄養補給』] Mihono Bourbon",
+    "character_name": "Mihono Bourbon",
+    "card_title": "ミッション『心の栄養補給』",
+    "rarity": "SSR",
+    "type": "Wit",
+    "image_url": "https://umamusu.wiki/w/thumb.php?f=Support_Card_30141_Card.png&width=100"
+  },
+  {
+    "id": 30142,
+    "name": "[刻下、桜花爛漫] Sakura Laurel",
+    "character_name": "Sakura Laurel",
+    "card_title": "刻下、桜花爛漫",
+    "rarity": "SSR",
+    "type": "Stamina",
+    "image_url": "https://umamusu.wiki/w/thumb.php?f=Support_Card_30142_Card.png&width=100"
+  },
+  {
+    "id": 30143,
+    "name": "[たどり着いた景色] Ikuno Dictus",
+    "character_name": "Ikuno Dictus",
+    "card_title": "たどり着いた景色",
+    "rarity": "SSR",
+    "type": "Power",
+    "image_url": "https://umamusu.wiki/w/thumb.php?f=Support_Card_30143_Card.png&width=100"
+  },
+  {
+    "id": 30145,
+    "name": "[Welcome to Umayuru] Tanino Gimlet",
+    "character_name": "Tanino Gimlet",
+    "card_title": "Welcome to Umayuru",
+    "rarity": "SSR",
+    "type": "Power",
+    "image_url": "https://umamusu.wiki/w/thumb.php?f=Support_Card_30145_Card.png&width=100"
+  },
+  {
+    "id": 30146,
+    "name": "[駆けよ、駆けよ、駆けよ！！] Oguri Cap",
+    "character_name": "Oguri Cap",
+    "card_title": "駆けよ、駆けよ、駆けよ！！",
+    "rarity": "SSR",
+    "type": "Wit",
+    "image_url": "https://umamusu.wiki/w/thumb.php?f=Support_Card_30146_Card.png&width=100"
+  },
+  {
+    "id": 30147,
+    "name": "[The frontier] Jungle Pocket",
+    "character_name": "Jungle Pocket",
+    "card_title": "The frontier",
+    "rarity": "SSR",
+    "type": "Speed",
+    "image_url": "https://umamusu.wiki/w/thumb.php?f=Support_Card_30147_Card.png&width=100"
+  },
+  {
+    "id": 30148,
+    "name": "[Something Blue] Daiwa Scarlet",
+    "character_name": "Daiwa Scarlet",
+    "card_title": "Something Blue",
+    "rarity": "SSR",
+    "type": "Guts",
+    "image_url": "https://umamusu.wiki/w/thumb.php?f=Support_Card_30148_Card.png&width=100"
+  },
+  {
+    "id": 30149,
+    "name": "[オートクチュール・メモリー] Aston Machan",
+    "character_name": "Aston Machan",
+    "card_title": "オートクチュール・メモリー",
+    "rarity": "SSR",
+    "type": "Wit",
+    "image_url": "https://umamusu.wiki/w/thumb.php?f=Support_Card_30149_Card.png&width=100"
+  },
+  {
+    "id": 30150,
+    "name": "[ハート・イグニッション！！] Vodka",
+    "character_name": "Vodka",
+    "card_title": "ハート・イグニッション！！",
+    "rarity": "SSR",
+    "type": "Stamina",
+    "image_url": "https://umamusu.wiki/w/thumb.php?f=Support_Card_30150_Card.png&width=100"
+  },
+  {
+    "id": 30151,
+    "name": "[Chill chill night*] Mayano Top Gun",
+    "character_name": "Mayano Top Gun",
+    "card_title": "Chill chill night*",
+    "rarity": "SSR",
+    "type": "Power",
+    "image_url": "https://umamusu.wiki/w/thumb.php?f=Support_Card_30151_Card.png&width=100"
+  },
+  {
+    "id": 30152,
+    "name": "[All'alba vincerò!] T.M. Opera O",
+    "character_name": "T.M. Opera O",
+    "card_title": "All'alba vincerò!",
+    "rarity": "SSR",
+    "type": "Wit",
+    "image_url": "https://umamusu.wiki/w/thumb.php?f=Support_Card_30152_Card.png&width=100"
+  },
+  {
+    "id": 30153,
+    "name": "[優しい月] Gold City",
+    "character_name": "Gold City",
+    "card_title": "優しい月",
+    "rarity": "SSR",
+    "type": "Guts",
+    "image_url": "https://umamusu.wiki/w/thumb.php?f=Support_Card_30153_Card.png&width=100"
+  },
+  {
+    "id": 30154,
+    "name": "[カモメのように] Mejiro Palmer",
+    "character_name": "Mejiro Palmer",
+    "card_title": "カモメのように",
+    "rarity": "SSR",
+    "type": "Speed",
+    "image_url": "https://umamusu.wiki/w/thumb.php?f=Support_Card_30154_Card.png&width=100"
+  },
+  {
+    "id": 30155,
+    "name": "[＃夏 ＃新しい自分] Daitaku Helios",
+    "character_name": "Daitaku Helios",
+    "card_title": "＃夏 ＃新しい自分",
+    "rarity": "SSR",
+    "type": "Wit",
+    "image_url": "https://umamusu.wiki/w/thumb.php?f=Support_Card_30155_Card.png&width=100"
+  },
+  {
+    "id": 30156,
+    "name": "[ライフロング・ワンダー] Wonder Acute",
+    "character_name": "Wonder Acute",
+    "card_title": "ライフロング・ワンダー",
+    "rarity": "SSR",
+    "type": "Power",
+    "image_url": "https://umamusu.wiki/w/thumb.php?f=Support_Card_30156_Card.png&width=100"
+  },
+  {
+    "id": 30157,
+    "name": "[君と見る泡沫] Manhattan Cafe",
+    "character_name": "Manhattan Cafe",
+    "card_title": "君と見る泡沫",
+    "rarity": "SSR",
+    "type": "Wit",
+    "image_url": "https://umamusu.wiki/w/thumb.php?f=Support_Card_30157_Card.png&width=100"
+  },
+  {
+    "id": 30158,
+    "name": "[トばすぜホットサマー！] Jungle Pocket",
+    "character_name": "Jungle Pocket",
+    "card_title": "トばすぜホットサマー！",
+    "rarity": "SSR",
+    "type": "Guts",
+    "image_url": "https://umamusu.wiki/w/thumb.php?f=Support_Card_30158_Card.png&width=100"
+  },
+  {
+    "id": 30159,
+    "name": "[Seaside Bloom] Air Groove",
+    "character_name": "Air Groove",
+    "card_title": "Seaside Bloom",
+    "rarity": "SSR",
+    "type": "Speed",
+    "image_url": "https://umamusu.wiki/w/thumb.php?f=Support_Card_30159_Card.png&width=100"
+  },
+  {
+    "id": 30160,
+    "name": "[L'aubeは迫りて] Satake Mei",
+    "character_name": "Satake Mei",
+    "card_title": "L'aubeは迫りて",
+    "rarity": "SSR",
+    "type": "Pal",
+    "image_url": "https://umamusu.wiki/w/thumb.php?f=Support_Card_30160_Card.png&width=100"
+  },
+  {
+    "id": 30161,
+    "name": "[大望は飛んでいく] El Condor Pasa",
+    "character_name": "El Condor Pasa",
+    "card_title": "大望は飛んでいく",
+    "rarity": "SSR",
+    "type": "Speed",
+    "image_url": "https://umamusu.wiki/w/thumb.php?f=Support_Card_30161_Card.png&width=100"
+  },
+  {
+    "id": 30162,
+    "name": "[Precious☆Moments] Admire Vega",
+    "character_name": "Admire Vega",
+    "card_title": "Precious☆Moments",
+    "rarity": "SSR",
+    "type": "Stamina",
+    "image_url": "https://umamusu.wiki/w/thumb.php?f=Support_Card_30162_Card.png&width=100"
+  },
+  {
+    "id": 30163,
+    "name": "[鉄火場に咲く菫] Nakayama Festa",
+    "character_name": "Nakayama Festa",
+    "card_title": "鉄火場に咲く菫",
+    "rarity": "SSR",
+    "type": "Wit",
+    "image_url": "https://umamusu.wiki/w/thumb.php?f=Support_Card_30163_Card.png&width=100"
+  },
+  {
+    "id": 30164,
+    "name": "[炎々、闘志を抱き] Hishi Amazon",
+    "character_name": "Hishi Amazon",
+    "card_title": "炎々、闘志を抱き",
+    "rarity": "SSR",
+    "type": "Power",
+    "image_url": "https://umamusu.wiki/w/thumb.php?f=Support_Card_30164_Card.png&width=100"
+  },
+  {
+    "id": 30165,
+    "name": "[フォルトゥーナの喝采] Tanino Gimlet",
+    "character_name": "Tanino Gimlet",
+    "card_title": "フォルトゥーナの喝采",
+    "rarity": "SSR",
+    "type": "Stamina",
+    "image_url": "https://umamusu.wiki/w/thumb.php?f=Support_Card_30165_Card.png&width=100"
+  },
+  {
+    "id": 30166,
+    "name": "[高らかにYO-HO!] Tap Dance City",
+    "character_name": "Tap Dance City",
+    "card_title": "高らかにYO-HO!",
+    "rarity": "SSR",
+    "type": "Guts",
+    "image_url": "https://umamusu.wiki/w/thumb.php?f=Support_Card_30166_Card.png&width=100"
+  },
+  {
+    "id": 30167,
+    "name": "[Hello my clover] Fine Motion",
+    "character_name": "Fine Motion",
+    "card_title": "Hello my clover",
+    "rarity": "SSR",
+    "type": "Speed",
+    "image_url": "https://umamusu.wiki/w/thumb.php?f=Support_Card_30167_Card.png&width=100"
+  },
+  {
+    "id": 30168,
+    "name": "[波をかきわけ夢がゆく] Gold Ship",
+    "character_name": "Gold Ship",
+    "card_title": "波をかきわけ夢がゆく",
+    "rarity": "SSR",
+    "type": "Speed",
+    "image_url": "https://umamusu.wiki/w/thumb.php?f=Support_Card_30168_Card.png&width=100"
+  },
+  {
+    "id": 30169,
+    "name": "[天より遣われし微笑み] Tsurumaru Tsuyoshi",
+    "character_name": "Tsurumaru Tsuyoshi",
+    "card_title": "天より遣われし微笑み",
+    "rarity": "SSR",
+    "type": "Power",
+    "image_url": "https://umamusu.wiki/w/thumb.php?f=Support_Card_30169_Card.png&width=100"
+  },
+  {
+    "id": 30170,
+    "name": "[我が舞、巡りて] King Halo",
+    "character_name": "King Halo",
+    "card_title": "我が舞、巡りて",
+    "rarity": "SSR",
+    "type": "Guts",
+    "image_url": "https://umamusu.wiki/w/thumb.php?f=Support_Card_30170_Card.png&width=100"
+  },
+  {
+    "id": 30171,
+    "name": "[ああ、楽しや、楽しや！] Haru Urara",
+    "character_name": "Haru Urara",
+    "card_title": "ああ、楽しや、楽しや！",
+    "rarity": "SSR",
+    "type": "Power",
+    "image_url": "https://umamusu.wiki/w/thumb.php?f=Support_Card_30171_Card.png&width=100"
+  },
+  {
+    "id": 30172,
+    "name": "[かっとばせー！ですわ！？] Mejiro McQueen",
+    "character_name": "Mejiro McQueen",
+    "card_title": "かっとばせー！ですわ！？",
+    "rarity": "SSR",
+    "type": "Wit",
+    "image_url": "https://umamusu.wiki/w/thumb.php?f=Support_Card_30172_Card.png&width=100"
+  },
+  {
+    "id": 30173,
+    "name": "[大地と我らのアンサンブル] Sounds of Earth",
+    "character_name": "Sounds of Earth",
+    "card_title": "大地と我らのアンサンブル",
+    "rarity": "SSR",
+    "type": "Stamina",
+    "image_url": "https://umamusu.wiki/w/thumb.php?f=Support_Card_30173_Card.png&width=100"
+  },
+  {
+    "id": 30174,
+    "name": "[聖夜、変わるために] Mejiro Dober",
+    "character_name": "Mejiro Dober",
+    "card_title": "聖夜、変わるために",
+    "rarity": "SSR",
+    "type": "Speed",
+    "image_url": "https://umamusu.wiki/w/thumb.php?f=Support_Card_30174_Card.png&width=100"
+  },
+  {
+    "id": 30175,
+    "name": "[冬溶かす熾火] Mejiro Ramonu",
+    "character_name": "Mejiro Ramonu",
+    "card_title": "冬溶かす熾火",
+    "rarity": "SSR",
+    "type": "Power",
+    "image_url": "https://umamusu.wiki/w/thumb.php?f=Support_Card_30175_Card.png&width=100"
+  },
+  {
+    "id": 30176,
+    "name": "[選んで選んで、想いを込めて] Mejiro Ryan",
+    "character_name": "Mejiro Ryan",
+    "card_title": "選んで選んで、想いを込めて",
+    "rarity": "SSR",
+    "type": "Guts",
+    "image_url": "https://umamusu.wiki/w/thumb.php?f=Support_Card_30176_Card.png&width=100"
+  },
+  {
+    "id": 30177,
+    "name": "[会心のウイニングスマイル] Vivlos",
+    "character_name": "Vivlos",
+    "card_title": "会心のウイニングスマイル",
+    "rarity": "SSR",
+    "type": "Guts",
+    "image_url": "https://umamusu.wiki/w/thumb.php?f=Support_Card_30177_Card.png&width=100"
+  },
+  {
+    "id": 30178,
+    "name": "[血脈の胎動] Duramente",
+    "character_name": "Duramente",
+    "card_title": "血脈の胎動",
+    "rarity": "SSR",
+    "type": "Speed",
+    "image_url": "https://umamusu.wiki/w/thumb.php?f=Support_Card_30178_Card.png&width=100"
+  },
+  {
+    "id": 30179,
+    "name": "[百花の願いをこの胸に] Satono Diamond",
+    "character_name": "Satono Diamond",
+    "card_title": "百花の願いをこの胸に",
+    "rarity": "SSR",
+    "type": "Wit",
+    "image_url": "https://umamusu.wiki/w/thumb.php?f=Support_Card_30179_Card.png&width=100"
+  },
+  {
+    "id": 30180,
+    "name": "[この先も！] Kitasan Black",
+    "character_name": "Kitasan Black",
+    "card_title": "この先も！",
+    "rarity": "SSR",
+    "type": "Group",
+    "image_url": "https://umamusu.wiki/w/thumb.php?f=Support_Card_30180_Card.png&width=100"
+  },
+  {
+    "id": 30181,
+    "name": "[ウタエミンナノ] Twin Turbo",
+    "character_name": "Twin Turbo",
+    "card_title": "ウタエミンナノ",
+    "rarity": "SSR",
+    "type": "Stamina",
+    "image_url": "https://umamusu.wiki/w/thumb.php?f=Support_Card_30181_Card.png&width=100"
+  },
+  {
+    "id": 30182,
+    "name": "[白い翼は舞い戻りて] Hokko Tarumae",
+    "character_name": "Hokko Tarumae",
+    "card_title": "白い翼は舞い戻りて",
+    "rarity": "SSR",
+    "type": "Stamina",
+    "image_url": "https://umamusu.wiki/w/thumb.php?f=Support_Card_30182_Card.png&width=100"
+  },
+  {
+    "id": 30183,
+    "name": "[小さな笑顔、2つ] Winning Ticket",
+    "character_name": "Winning Ticket",
+    "card_title": "小さな笑顔、2つ",
+    "rarity": "SSR",
+    "type": "Power",
+    "image_url": "https://umamusu.wiki/w/thumb.php?f=Support_Card_30183_Card.png&width=100"
+  },
+  {
+    "id": 30184,
+    "name": "[感謝感謝！サクラ吹雪！！] Sakura Bakushin O",
+    "character_name": "Sakura Bakushin O",
+    "card_title": "感謝感謝！サクラ吹雪！！",
+    "rarity": "SSR",
+    "type": "Speed",
+    "image_url": "https://umamusu.wiki/w/thumb.php?f=Support_Card_30184_Card.png&width=100"
+  },
+  {
+    "id": 30185,
+    "name": "[ゴー・ファッショニスタ！] North Flight",
+    "character_name": "North Flight",
+    "card_title": "ゴー・ファッショニスタ！",
+    "rarity": "SSR",
+    "type": "Wit",
+    "image_url": "https://umamusu.wiki/w/thumb.php?f=Support_Card_30185_Card.png&width=100"
+  },
+  {
+    "id": 30186,
+    "name": "[Balliamo?] Gentildonna",
+    "character_name": "Gentildonna",
+    "card_title": "Balliamo?",
+    "rarity": "SSR",
+    "type": "Speed",
+    "image_url": "https://umamusu.wiki/w/thumb.php?f=Support_Card_30186_Card.png&width=100"
+  },
+  {
+    "id": 30187,
+    "name": "[只、君臨す。] Orfevre",
+    "character_name": "Orfevre",
+    "card_title": "只、君臨す。",
+    "rarity": "SSR",
+    "type": "Guts",
+    "image_url": "https://umamusu.wiki/w/thumb.php?f=Support_Card_30187_Card.png&width=100"
+  },
+  {
+    "id": 30188,
+    "name": "[共に描くキラメキ] Tsurugi Ryoka",
+    "character_name": "Tsurugi Ryoka",
+    "card_title": "共に描くキラメキ",
+    "rarity": "SSR",
+    "type": "Pal",
+    "image_url": "https://umamusu.wiki/w/thumb.php?f=Support_Card_30188_Card.png&width=100"
+  },
+  {
+    "id": 30189,
+    "name": "[2人のバウンス・シャッセ] Kitasan Black",
+    "character_name": "Kitasan Black",
+    "card_title": "2人のバウンス・シャッセ",
+    "rarity": "SSR",
+    "type": "Guts",
+    "image_url": "https://umamusu.wiki/w/thumb.php?f=Support_Card_30189_Card.png&width=100"
+  },
+  {
+    "id": 30190,
+    "name": "[激情のピッツィカ] Duramente",
+    "character_name": "Duramente",
+    "card_title": "激情のピッツィカ",
+    "rarity": "SSR",
+    "type": "Stamina",
+    "image_url": "https://umamusu.wiki/w/thumb.php?f=Support_Card_30190_Card.png&width=100"
+  },
+  {
+    "id": 30191,
+    "name": "[ブリッランテな旋律を君と] Sounds of Earth",
+    "character_name": "Sounds of Earth",
+    "card_title": "ブリッランテな旋律を君と",
+    "rarity": "SSR",
+    "type": "Power",
+    "image_url": "https://umamusu.wiki/w/thumb.php?f=Support_Card_30191_Card.png&width=100"
+  },
+  {
+    "id": 30192,
+    "name": "[とっておきのレヴェランス] Vivlos",
+    "character_name": "Vivlos",
+    "card_title": "とっておきのレヴェランス",
+    "rarity": "SSR",
+    "type": "Speed",
+    "image_url": "https://umamusu.wiki/w/thumb.php?f=Support_Card_30192_Card.png&width=100"
+  },
+  {
+    "id": 30193,
+    "name": "[Over the Ocean] Cheval Grand",
+    "character_name": "Cheval Grand",
+    "card_title": "Over the Ocean",
+    "rarity": "SSR",
+    "type": "Stamina",
+    "image_url": "https://umamusu.wiki/w/thumb.php?f=Support_Card_30193_Card.png&width=100"
+  },
+  {
+    "id": 30194,
+    "name": "[ティアラが描くレイライン] Rhein Kraft",
+    "character_name": "Rhein Kraft",
+    "card_title": "ティアラが描くレイライン",
+    "rarity": "SSR",
+    "type": "Guts",
+    "image_url": "https://umamusu.wiki/w/thumb.php?f=Support_Card_30194_Card.png&width=100"
+  },
+  {
+    "id": 30195,
+    "name": "[白い鳥のアラベスク] K.S.Miracle",
+    "character_name": "K.S.Miracle",
+    "card_title": "白い鳥のアラベスク",
+    "rarity": "SSR",
+    "type": "Power",
+    "image_url": "https://umamusu.wiki/w/thumb.php?f=Support_Card_30195_Card.png&width=100"
+  },
+  {
+    "id": 30196,
+    "name": "[浚いの風] Yamanin Zephyr",
+    "character_name": "Yamanin Zephyr",
+    "card_title": "浚いの風",
+    "rarity": "SSR",
+    "type": "Speed",
+    "image_url": "https://umamusu.wiki/w/thumb.php?f=Support_Card_30196_Card.png&width=100"
+  },
+  {
+    "id": 30197,
+    "name": "[Burning!!] Bamboo Memory",
+    "character_name": "Bamboo Memory",
+    "card_title": "Burning!!",
+    "rarity": "SSR",
+    "type": "Power",
+    "image_url": "https://umamusu.wiki/w/thumb.php?f=Support_Card_30197_Card.png&width=100"
+  },
+  {
+    "id": 30198,
+    "name": "[V.E.R.2285のあなたへ] Neo Universe",
+    "character_name": "Neo Universe",
+    "card_title": "V.E.R.2285のあなたへ",
+    "rarity": "SSR",
+    "type": "Wit",
+    "image_url": "https://umamusu.wiki/w/thumb.php?f=Support_Card_30198_Card.png&width=100"
+  },
+  {
+    "id": 30199,
+    "name": "[わーく・あ・みらくる！] Hishi Miracle",
+    "character_name": "Hishi Miracle",
+    "card_title": "わーく・あ・みらくる！",
+    "rarity": "SSR",
+    "type": "Stamina",
+    "image_url": "https://umamusu.wiki/w/thumb.php?f=Support_Card_30199_Card.png&width=100"
+  },
+  {
+    "id": 30200,
+    "name": "[大胆不敵の兵よ] No Reason",
+    "character_name": "No Reason",
+    "card_title": "大胆不敵の兵よ",
+    "rarity": "SSR",
+    "type": "Guts",
+    "image_url": "https://umamusu.wiki/w/thumb.php?f=Support_Card_30200_Card.png&width=100"
+  },
+  {
+    "id": 30201,
+    "name": "[Take Them Down!] Narita Taishin",
+    "character_name": "Narita Taishin",
+    "card_title": "Take Them Down!",
+    "rarity": "SSR",
+    "type": "Wit",
+    "image_url": "https://umamusu.wiki/w/thumb.php?f=Support_Card_30201_Card.png&width=100"
+  },
+  {
+    "id": 30202,
+    "name": "[明日のライド・オン] Vodka",
+    "character_name": "Vodka",
+    "card_title": "明日のライド・オン",
+    "rarity": "SSR",
+    "type": "Guts",
+    "image_url": "https://umamusu.wiki/w/thumb.php?f=Support_Card_30202_Card.png&width=100"
+  },
+  {
+    "id": 30203,
+    "name": "[新時代を開く者] Jungle Pocket",
+    "character_name": "Jungle Pocket",
+    "card_title": "新時代を開く者",
+    "rarity": "SSR",
+    "type": "Power",
+    "image_url": "https://umamusu.wiki/w/thumb.php?f=Support_Card_30203_Card.png&width=100"
+  },
+  {
+    "id": 30204,
+    "name": "[幸福の匂いにまどろむ] Seiun Sky",
+    "character_name": "Seiun Sky",
+    "card_title": "幸福の匂いにまどろむ",
+    "rarity": "SSR",
+    "type": "Power",
+    "image_url": "https://umamusu.wiki/w/thumb.php?f=Support_Card_30204_Card.png&width=100"
+  },
+  {
+    "id": 30205,
+    "name": "[紺碧の戴冠式] Verxina",
+    "character_name": "Verxina",
+    "card_title": "紺碧の戴冠式",
+    "rarity": "SSR",
+    "type": "Speed",
+    "image_url": "https://umamusu.wiki/w/thumb.php?f=Support_Card_30205_Card.png&width=100"
+  },
+  {
+    "id": 30206,
+    "name": "[アルストロメリアの夢] Vivlos",
+    "character_name": "Vivlos",
+    "card_title": "アルストロメリアの夢",
+    "rarity": "SSR",
+    "type": "Speed",
+    "image_url": "https://umamusu.wiki/w/thumb.php?f=Support_Card_30206_Card.png&width=100"
+  },
+  {
+    "id": 30207,
+    "name": "[謹製ッ！特大夢にんじん！] Director Akikawa",
+    "character_name": "Director Akikawa",
+    "card_title": "謹製ッ！特大夢にんじん！",
+    "rarity": "SSR",
+    "type": "Pal",
+    "image_url": "https://umamusu.wiki/w/thumb.php?f=Support_Card_30207_Card.png&width=100"
+  },
+  {
+    "id": 30208,
+    "name": "[朝焼け苺の畑にて] Nishino Flower",
+    "character_name": "Nishino Flower",
+    "card_title": "朝焼け苺の畑にて",
+    "rarity": "SSR",
+    "type": "Power",
+    "image_url": "https://umamusu.wiki/w/thumb.php?f=Support_Card_30208_Card.png&width=100"
+  },
+  {
+    "id": 30209,
+    "name": "[そして幕は上がる] Dantsu Flame",
+    "character_name": "Dantsu Flame",
+    "card_title": "そして幕は上がる",
+    "rarity": "SSR",
+    "type": "Stamina",
+    "image_url": "https://umamusu.wiki/w/thumb.php?f=Support_Card_30209_Card.png&width=100"
+  },
+  {
+    "id": 30210,
+    "name": "[波間のオフショット] Smart Falcon",
+    "character_name": "Smart Falcon",
+    "card_title": "波間のオフショット",
+    "rarity": "SSR",
+    "type": "Speed",
+    "image_url": "https://umamusu.wiki/w/thumb.php?f=Support_Card_30210_Card.png&width=100"
+  },
+  {
+    "id": 30211,
+    "name": "[Lucky☆Summertime] Copano Rickey",
+    "character_name": "Copano Rickey",
+    "card_title": "Lucky☆Summertime",
+    "rarity": "SSR",
+    "type": "Wit",
+    "image_url": "https://umamusu.wiki/w/thumb.php?f=Support_Card_30211_Card.png&width=100"
+  },
+  {
+    "id": 30212,
+    "name": "[あの夏のキリトリ線] Wonder Acute",
+    "character_name": "Wonder Acute",
+    "card_title": "あの夏のキリトリ線",
+    "rarity": "SSR",
+    "type": "Stamina",
+    "image_url": "https://umamusu.wiki/w/thumb.php?f=Support_Card_30212_Card.png&width=100"
+  },
+  {
+    "id": 30213,
+    "name": "[開催☆ハチャメチャGP！] Tokai Teio",
+    "character_name": "Tokai Teio",
+    "card_title": "開催☆ハチャメチャGP！",
+    "rarity": "SSR",
+    "type": "Speed",
+    "image_url": "https://umamusu.wiki/w/thumb.php?f=Support_Card_30213_Card.png&width=100"
+  },
+  {
+    "id": 30214,
+    "name": "[歴史も美食も余すところなく] Fine Motion",
+    "character_name": "Fine Motion",
+    "card_title": "歴史も美食も余すところなく",
+    "rarity": "SSR",
+    "type": "Guts",
+    "image_url": "https://umamusu.wiki/w/thumb.php?f=Support_Card_30214_Card.png&width=100"
+  },
+  {
+    "id": 30215,
+    "name": "[Devilish Whispers] Still in Love",
+    "character_name": "Still in Love",
+    "card_title": "Devilish Whispers",
+    "rarity": "SSR",
+    "type": "Speed",
+    "image_url": "https://umamusu.wiki/w/thumb.php?f=Support_Card_30215_Card.png&width=100"
+  },
+  {
+    "id": 30216,
+    "name": "[我が学び舎へ、愛をこめて] Buena Vista",
+    "character_name": "Buena Vista",
+    "card_title": "我が学び舎へ、愛をこめて",
+    "rarity": "SSR",
+    "type": "Guts",
+    "image_url": "https://umamusu.wiki/w/thumb.php?f=Support_Card_30216_Card.png&width=100"
+  },
+  {
+    "id": 30217,
+    "name": "[慈恵のMother Sea] Cesario",
+    "character_name": "Cesario",
+    "card_title": "慈恵のMother Sea",
+    "rarity": "SSR",
+    "type": "Wit",
+    "image_url": "https://umamusu.wiki/w/thumb.php?f=Support_Card_30217_Card.png&width=100"
+  },
+  {
+    "id": 30218,
+    "name": "[月下のSunshine] Taiki Shuttle",
+    "character_name": "Taiki Shuttle",
+    "card_title": "月下のSunshine",
+    "rarity": "SSR",
+    "type": "Wit",
+    "image_url": "https://umamusu.wiki/w/thumb.php?f=Support_Card_30218_Card.png&width=100"
+  },
+  {
+    "id": 30219,
+    "name": "[悩み事かい？ポニーちゃん] Fuji Kiseki",
+    "character_name": "Fuji Kiseki",
+    "card_title": "悩み事かい？ポニーちゃん",
+    "rarity": "SSR",
+    "type": "Guts",
+    "image_url": "https://umamusu.wiki/w/thumb.php?f=Support_Card_30219_Card.png&width=100"
+  },
+  {
+    "id": 30220,
+    "name": "[Rewarding Job] Symboli Kris S",
+    "character_name": "Symboli Kris S",
+    "card_title": "Rewarding Job",
+    "rarity": "SSR",
+    "type": "Wit",
+    "image_url": "https://umamusu.wiki/w/thumb.php?f=Support_Card_30220_Card.png&width=100"
+  },
+  {
+    "id": 30221,
+    "name": "[今日もたのしく、おいしく。] Satono Diamond",
+    "character_name": "Satono Diamond",
+    "card_title": "今日もたのしく、おいしく。",
+    "rarity": "SSR",
+    "type": "Stamina",
+    "image_url": "https://umamusu.wiki/w/thumb.php?f=Support_Card_30221_Card.png&width=100"
+  },
+  {
+    "id": 30222,
+    "name": "[KNOCK 'EM DOWN!] Espoir City",
+    "character_name": "Espoir City",
+    "card_title": "KNOCK 'EM DOWN!",
+    "rarity": "SSR",
+    "type": "Power",
+    "image_url": "https://umamusu.wiki/w/thumb.php?f=Support_Card_30222_Card.png&width=100"
+  },
+  {
+    "id": 30223,
+    "name": "[牙を立て、リフレイン] Hishi Amazon",
+    "character_name": "Hishi Amazon",
+    "card_title": "牙を立て、リフレイン",
+    "rarity": "SSR",
+    "type": "Guts",
+    "image_url": "https://umamusu.wiki/w/thumb.php?f=Support_Card_30223_Card.png&width=100"
+  },
+  {
+    "id": 30224,
+    "name": "[咆哮のアポヤンド] Narita Brian",
+    "character_name": "Narita Brian",
+    "card_title": "咆哮のアポヤンド",
+    "rarity": "SSR",
+    "type": "Speed",
+    "image_url": "https://umamusu.wiki/w/thumb.php?f=Support_Card_30224_Card.png&width=100"
+  },
+  {
+    "id": 30225,
+    "name": "[メークパワートリオ] Matikanefukukitaru",
+    "character_name": "Matikanefukukitaru",
+    "card_title": "メークパワートリオ",
+    "rarity": "SSR",
+    "type": "Guts",
+    "image_url": "https://umamusu.wiki/w/thumb.php?f=Support_Card_30225_Card.png&width=100"
+  },
+  {
+    "id": 30226,
+    "name": "[Cocoon] Air Shakur",
+    "character_name": "Air Shakur",
+    "card_title": "Cocoon",
+    "rarity": "SSR",
+    "type": "Stamina",
+    "image_url": "https://umamusu.wiki/w/thumb.php?f=Support_Card_30226_Card.png&width=100"
+  },
+  {
+    "id": 30227,
+    "name": "[緋色の君へ風が吹く] Daiwa Scarlet",
+    "character_name": "Daiwa Scarlet",
+    "card_title": "緋色の君へ風が吹く",
+    "rarity": "SSR",
+    "type": "Wit",
+    "image_url": "https://umamusu.wiki/w/thumb.php?f=Support_Card_30227_Card.png&width=100"
+  },
+  {
+    "id": 30228,
+    "name": "[COOL⇔CRAZY/Buddy] Symboli Kris S",
+    "character_name": "Symboli Kris S",
+    "card_title": "COOL⇔CRAZY/Buddy",
+    "rarity": "SSR",
+    "type": "Power",
+    "image_url": "https://umamusu.wiki/w/thumb.php?f=Support_Card_30228_Card.png&width=100"
+  },
+  {
+    "id": 30229,
+    "name": "[【告知】新刊あります！] Agnes Digital",
+    "character_name": "Agnes Digital",
+    "card_title": "【告知】新刊あります！",
+    "rarity": "SSR",
+    "type": "Wit",
+    "image_url": "https://umamusu.wiki/w/thumb.php?f=Support_Card_30229_Card.png&width=100"
+  },
+  {
+    "id": 30230,
+    "name": "[不屈の遠吠え] Meisho Doto",
+    "character_name": "Meisho Doto",
+    "card_title": "不屈の遠吠え",
+    "rarity": "SSR",
+    "type": "Speed",
+    "image_url": "https://umamusu.wiki/w/thumb.php?f=Support_Card_30230_Card.png&width=100"
+  },
+  {
+    "id": 30231,
+    "name": "[王を統べて覇す者] T.M. Opera O",
+    "character_name": "T.M. Opera O",
+    "card_title": "王を統べて覇す者",
+    "rarity": "SSR",
+    "type": "Power",
+    "image_url": "https://umamusu.wiki/w/thumb.php?f=Support_Card_30231_Card.png&width=100"
+  },
+  {
+    "id": 30232,
+    "name": "[Blast Off!] Blast Onepiece",
+    "character_name": "Blast Onepiece",
+    "card_title": "Blast Off!",
+    "rarity": "SSR",
+    "type": "Guts",
+    "image_url": "https://umamusu.wiki/w/thumb.php?f=Support_Card_30232_Card.png&width=100"
+  },
+  {
+    "id": 30233,
+    "name": "[雲煙飛動] Symboli Rudolf",
+    "character_name": "Symboli Rudolf",
+    "card_title": "雲煙飛動",
+    "rarity": "SSR",
+    "type": "Wit",
+    "image_url": "https://umamusu.wiki/w/thumb.php?f=Support_Card_30233_Card.png&width=100"
+  },
+  {
+    "id": 30234,
+    "name": "[深窓の少女へ] Mejiro Ardan",
+    "character_name": "Mejiro Ardan",
+    "card_title": "深窓の少女へ",
+    "rarity": "SSR",
+    "type": "Power",
+    "image_url": "https://umamusu.wiki/w/thumb.php?f=Support_Card_30234_Card.png&width=100"
+  },
+  {
+    "id": 30235,
+    "name": "[ふりさけみれば天花のわらう] Maruzensky",
+    "character_name": "Maruzensky",
+    "card_title": "ふりさけみれば天花のわらう",
+    "rarity": "SSR",
+    "type": "Speed",
+    "image_url": "https://umamusu.wiki/w/thumb.php?f=Support_Card_30235_Card.png&width=100"
+  },
+  {
+    "id": 30236,
+    "name": "[飛び立つヴィーナス] Seeking the Pearl",
+    "character_name": "Seeking the Pearl",
+    "card_title": "飛び立つヴィーナス",
+    "rarity": "SSR",
+    "type": "Speed",
+    "image_url": "https://umamusu.wiki/w/thumb.php?f=Support_Card_30236_Card.png&width=100"
+  },
+  {
+    "id": 30237,
+    "name": "[Cutest in Ur ♡] Curren Chan",
+    "character_name": "Curren Chan",
+    "card_title": "Cutest in Ur ♡",
+    "rarity": "SSR",
+    "type": "Guts",
+    "image_url": "https://umamusu.wiki/w/thumb.php?f=Support_Card_30237_Card.png&width=100"
+  },
+  {
+    "id": 30238,
+    "name": "[鉄の乙女も微笑んで] Ikuno Dictus",
+    "character_name": "Ikuno Dictus",
+    "card_title": "鉄の乙女も微笑んで",
+    "rarity": "SSR",
+    "type": "Wit",
+    "image_url": "https://umamusu.wiki/w/thumb.php?f=Support_Card_30238_Card.png&width=100"
+  },
+  {
+    "id": 30239,
+    "name": "[これきり、特別ですよ？] Nice Nature",
+    "character_name": "Nice Nature",
+    "card_title": "これきり、特別ですよ？",
+    "rarity": "SSR",
+    "type": "Stamina",
+    "image_url": "https://umamusu.wiki/w/thumb.php?f=Support_Card_30239_Card.png&width=100"
+  },
+  {
+    "id": 30240,
+    "name": "[『最強は俺だ！！』] Jungle Pocket",
+    "character_name": "Jungle Pocket",
+    "card_title": "『最強は俺だ！！』",
+    "rarity": "SSR",
+    "type": "Stamina",
+    "image_url": "https://umamusu.wiki/w/thumb.php?f=Support_Card_30240_Card.png&width=100"
+  },
+  {
+    "id": 30241,
+    "name": "[導きの光] Speed Symboli",
+    "character_name": "Speed Symboli",
+    "card_title": "導きの光",
+    "rarity": "SSR",
+    "type": "Group",
+    "image_url": "https://umamusu.wiki/w/thumb.php?f=Support_Card_30241_Card.png&width=100"
+  },
+  {
+    "id": 30242,
+    "name": "[世界を変える眼差し] Almond Eye",
+    "character_name": "Almond Eye",
+    "card_title": "世界を変える眼差し",
+    "rarity": "SSR",
+    "type": "Speed",
+    "image_url": "https://umamusu.wiki/w/thumb.php?f=Support_Card_30242_Card.png&width=100"
+  },
+  {
+    "id": 30243,
+    "name": "[NEW TALES AWAIT] Gran Alegria",
+    "character_name": "Gran Alegria",
+    "card_title": "NEW TALES AWAIT",
+    "rarity": "SSR",
+    "type": "Power",
+    "image_url": "https://umamusu.wiki/w/thumb.php?f=Support_Card_30243_Card.png&width=100"
+  },
+  {
+    "id": 30244,
+    "name": "[春、来たれり] Mejiro Bright",
+    "character_name": "Mejiro Bright",
+    "card_title": "春、来たれり",
+    "rarity": "SSR",
+    "type": "Stamina",
+    "image_url": "https://umamusu.wiki/w/thumb.php?f=Support_Card_30244_Card.png&width=100"
+  },
+  {
+    "id": 30245,
+    "name": "[Ballroom Tempest] Vodka",
+    "character_name": "Vodka",
+    "card_title": "Ballroom Tempest",
+    "rarity": "SSR",
+    "type": "Power",
+    "image_url": "https://umamusu.wiki/w/thumb.php?f=Support_Card_30245_Card.png&width=100"
+  },
+  {
+    "id": 30246,
+    "name": "[誘うは夢心地] Dream Journey",
+    "character_name": "Dream Journey",
+    "card_title": "誘うは夢心地",
+    "rarity": "SSR",
+    "type": "Speed",
+    "image_url": "https://umamusu.wiki/w/thumb.php?f=Support_Card_30246_Card.png&width=100"
+  },
+  {
+    "id": 30247,
+    "name": "[Operation: Escort] Symboli Kris S",
+    "character_name": "Symboli Kris S",
+    "card_title": "Operation: Escort",
+    "rarity": "SSR",
+    "type": "Speed",
+    "image_url": "https://umamusu.wiki/w/thumb.php?f=Support_Card_30247_Card.png&width=100"
+  },
+  {
+    "id": 30248,
+    "name": "[無垢の白妙] Daring Tact",
+    "character_name": "Daring Tact",
+    "card_title": "無垢の白妙",
+    "rarity": "SSR",
+    "type": "Wit",
+    "image_url": "https://umamusu.wiki/w/thumb.php?f=Support_Card_30248_Card.png&width=100"
+  },
+  {
+    "id": 30249,
+    "name": "[繋がれパレード・ノーツ♪] Transcend",
+    "character_name": "Transcend",
+    "card_title": "繋がれパレード・ノーツ♪",
+    "rarity": "SSR",
+    "type": "Guts",
+    "image_url": "https://umamusu.wiki/w/thumb.php?f=Support_Card_30249_Card.png&width=100"
+  },
+  {
+    "id": 30250,
+    "name": "[Luz de ensueño] Buena Vista",
+    "character_name": "Buena Vista",
+    "card_title": "Luz de ensueño",
+    "rarity": "SSR",
+    "type": "Power",
+    "image_url": "https://umamusu.wiki/w/thumb.php?f=Support_Card_30250_Card.png&width=100"
+  },
+  {
+    "id": 30251,
+    "name": "[約束のglitter] Espoir City",
+    "character_name": "Espoir City",
+    "card_title": "約束のglitter",
+    "rarity": "SSR",
+    "type": "Guts",
+    "image_url": "https://umamusu.wiki/w/thumb.php?f=Support_Card_30251_Card.png&width=100"
+  },
+  {
+    "id": 30252,
+    "name": "[My Beloved Scenery] Silence Suzuka",
+    "character_name": "Silence Suzuka",
+    "card_title": "My Beloved Scenery",
+    "rarity": "SSR",
+    "type": "Guts",
+    "image_url": "https://umamusu.wiki/w/thumb.php?f=Support_Card_30252_Card.png&width=100"
+  },
+  {
+    "id": 30253,
+    "name": "[Unveiled Dream] Rhein Kraft",
+    "character_name": "Rhein Kraft",
+    "card_title": "Unveiled Dream",
+    "rarity": "SSR",
+    "type": "Speed",
+    "image_url": "https://umamusu.wiki/w/thumb.php?f=Support_Card_30253_Card.png&width=100"
+  },
+  {
+    "id": 30254,
+    "name": "[Blooming Buds] Daring Heart",
+    "character_name": "Daring Heart",
+    "card_title": "Blooming Buds",
+    "rarity": "SSR",
+    "type": "Wit",
+    "image_url": "https://umamusu.wiki/w/thumb.php?f=Support_Card_30254_Card.png&width=100"
+  },
+  {
+    "id": 30255,
+    "name": "[いつか深まる若草] Air Messiah",
+    "character_name": "Air Messiah",
+    "card_title": "いつか深まる若草",
+    "rarity": "SSR",
+    "type": "Wit",
+    "image_url": "https://umamusu.wiki/w/thumb.php?f=Support_Card_30255_Card.png&width=100"
+  },
+  {
+    "id": 30256,
+    "name": "[白き稲妻の如く] Tamamo Cross",
+    "character_name": "Tamamo Cross",
+    "card_title": "白き稲妻の如く",
+    "rarity": "SSR",
+    "type": "Power",
+    "image_url": "https://umamusu.wiki/w/thumb.php?f=Support_Card_30256_Card.png&width=100"
+  },
+  {
+    "id": 30257,
+    "name": "[本能は吼えているか！？] Tucker Bryne",
+    "character_name": "Tucker Bryne",
+    "card_title": "本能は吼えているか！？",
+    "rarity": "SSR",
+    "type": "Pal",
+    "image_url": "https://umamusu.wiki/w/thumb.php?f=Support_Card_30257_Card.png&width=100"
+  },
+  {
+    "id": 30258,
+    "name": "[瞳に闘志を胸に勝利の渇望を] Mejiro Ryan",
+    "character_name": "Mejiro Ryan",
+    "card_title": "瞳に闘志を胸に勝利の渇望を",
+    "rarity": "SSR",
+    "type": "Stamina",
+    "image_url": "https://umamusu.wiki/w/thumb.php?f=Support_Card_30258_Card.png&width=100"
+  },
+  {
+    "id": 30259,
+    "name": "[ゼッタイ☆天才伝説] Fusaichi Pandora",
+    "character_name": "Fusaichi Pandora",
+    "card_title": "ゼッタイ☆天才伝説",
+    "rarity": "SSR",
+    "type": "Speed",
+    "image_url": "https://umamusu.wiki/w/thumb.php?f=Support_Card_30259_Card.png&width=100"
+  },
+  {
+    "id": 30260,
+    "name": "[グレイッシュPARTY☆] Mejiro McQueen",
+    "character_name": "Mejiro McQueen",
+    "card_title": "グレイッシュPARTY☆",
+    "rarity": "SSR",
+    "type": "Speed",
+    "image_url": "https://umamusu.wiki/w/thumb.php?f=Support_Card_30260_Card.png&width=100"
+  },
+  {
+    "id": 30261,
+    "name": "[水面のプリンシパル] Win Variation",
+    "character_name": "Win Variation",
+    "card_title": "水面のプリンシパル",
+    "rarity": "SSR",
+    "type": "Wit",
+    "image_url": "https://umamusu.wiki/w/thumb.php?f=Support_Card_30261_Card.png&width=100"
+  },
+  {
+    "id": 30262,
+    "name": "[Tranquillo] Duramente",
+    "character_name": "Duramente",
+    "card_title": "Tranquillo",
+    "rarity": "SSR",
+    "type": "Stamina",
+    "image_url": "https://umamusu.wiki/w/thumb.php?f=Support_Card_30262_Card.png&width=100"
+  },
+  {
+    "id": 30263,
+    "name": "[極上スマイルはっし～ん♪] Vivlos",
+    "character_name": "Vivlos",
+    "card_title": "極上スマイルはっし～ん♪",
+    "rarity": "SSR",
+    "type": "Power",
+    "image_url": "https://umamusu.wiki/w/thumb.php?f=Support_Card_30263_Card.png&width=100"
+  },
+  {
+    "id": 30264,
+    "name": "[気まぐれ渡り星] Stay Gold",
+    "character_name": "Stay Gold",
+    "card_title": "気まぐれ渡り星",
+    "rarity": "SSR",
+    "type": "Guts",
+    "image_url": "https://umamusu.wiki/w/thumb.php?f=Support_Card_30264_Card.png&width=100"
+  },
+  {
+    "id": 30265,
+    "name": "[氷結晶の静域] Admire Groove",
+    "character_name": "Admire Groove",
+    "card_title": "氷結晶の静域",
+    "rarity": "SSR",
+    "type": "Speed",
+    "image_url": "https://umamusu.wiki/w/thumb.php?f=Support_Card_30265_Card.png&width=100"
+  },
+  {
+    "id": 30266,
+    "name": "[この先の未来で] Chrono Genesis",
+    "character_name": "Chrono Genesis",
+    "card_title": "この先の未来で",
+    "rarity": "SSR",
+    "type": "Wit",
+    "image_url": "https://umamusu.wiki/w/thumb.php?f=Support_Card_30266_Card.png&width=100"
+  },
+  {
+    "id": 30267,
+    "name": "[カルストンライトオ、猫です] Calstone Light O",
+    "character_name": "Calstone Light O",
+    "card_title": "カルストンライトオ、猫です",
+    "rarity": "SSR",
+    "type": "Speed",
+    "image_url": "https://umamusu.wiki/w/thumb.php?f=Support_Card_30267_Card.png&width=100"
+  },
+  {
+    "id": 30268,
+    "name": "[今宵、我が君のために] Durandal",
+    "character_name": "Durandal",
+    "card_title": "今宵、我が君のために",
+    "rarity": "SSR",
+    "type": "Wit",
+    "image_url": "https://umamusu.wiki/w/thumb.php?f=Support_Card_30268_Card.png&width=100"
+  },
+  {
+    "id": 30269,
+    "name": "[今日が楽しかったから、] Dantsu Flame",
+    "character_name": "Dantsu Flame",
+    "card_title": "今日が楽しかったから、",
+    "rarity": "SSR",
+    "type": "Speed",
+    "image_url": "https://umamusu.wiki/w/thumb.php?f=Support_Card_30269_Card.png&width=100"
+  },
+  {
+    "id": 30270,
+    "name": "[Inseparable] Daiichi Ruby",
+    "character_name": "Daiichi Ruby",
+    "card_title": "Inseparable",
+    "rarity": "SSR",
+    "type": "Guts",
+    "image_url": "https://umamusu.wiki/w/thumb.php?f=Support_Card_30270_Card.png&width=100"
+  },
+  {
+    "id": 30271,
+    "name": "[壇上より魔法を込めて] Fuji Kiseki",
+    "character_name": "Fuji Kiseki",
+    "card_title": "壇上より魔法を込めて",
+    "rarity": "SSR",
+    "type": "Guts",
+    "image_url": "https://umamusu.wiki/w/thumb.php?f=Support_Card_30271_Card.png&width=100"
+  },
+  {
+    "id": 30272,
+    "name": "[Zirkus der Träume] Eishin Flash",
+    "character_name": "Eishin Flash",
+    "card_title": "Zirkus der Träume",
+    "rarity": "SSR",
+    "type": "Speed",
+    "image_url": "https://umamusu.wiki/w/thumb.php?f=Support_Card_30272_Card.png&width=100"
+  },
+  {
+    "id": 30273,
+    "name": "[All-Out Brilliance] Tosen Jordan",
+    "character_name": "Tosen Jordan",
+    "card_title": "All-Out Brilliance",
+    "rarity": "SSR",
+    "type": "Power",
+    "image_url": "https://umamusu.wiki/w/thumb.php?f=Support_Card_30273_Card.png&width=100"
+  },
+  {
+    "id": 30274,
+    "name": "[決意のフローラ] Curren Bouquetd'or",
+    "character_name": "Curren Bouquetd'or",
+    "card_title": "決意のフローラ",
+    "rarity": "SSR",
+    "type": "Stamina",
+    "image_url": "https://umamusu.wiki/w/thumb.php?f=Support_Card_30274_Card.png&width=100"
+  },
+  {
+    "id": 30275,
+    "name": "[天才的ユートピア] Tokai Teio",
+    "character_name": "Tokai Teio",
+    "card_title": "天才的ユートピア",
+    "rarity": "SSR",
+    "type": "Speed",
+    "image_url": "https://umamusu.wiki/w/thumb.php?f=Support_Card_30275_Card.png&width=100"
+  },
+  {
+    "id": 30276,
+    "name": "[ゆるり、ゆこま旅館] Kiyoko Hoshina",
+    "character_name": "Kiyoko Hoshina",
+    "card_title": "ゆるり、ゆこま旅館",
+    "rarity": "SSR",
+    "type": "Pal",
+    "image_url": "https://umamusu.wiki/w/thumb.php?f=Support_Card_30276_Card.png&width=100"
+  },
+  {
+    "id": 30277,
+    "name": "[無機の闘志] Mihono Bourbon",
+    "character_name": "Mihono Bourbon",
+    "card_title": "無機の闘志",
+    "rarity": "SSR",
+    "type": "Power",
+    "image_url": "https://umamusu.wiki/w/thumb.php?f=Support_Card_30277_Card.png&width=100"
+  },
+  {
+    "id": 30278,
+    "name": "[激録！爆走トナカイ事件] Gold Ship",
+    "character_name": "Gold Ship",
+    "card_title": "激録！爆走トナカイ事件",
+    "rarity": "SSR",
+    "type": "Stamina",
+    "image_url": "https://umamusu.wiki/w/thumb.php?f=Support_Card_30278_Card.png&width=100"
+  },
+  {
+    "id": 30279,
+    "name": "[ぬくもりのノエル] Fenomeno",
+    "character_name": "Fenomeno",
+    "card_title": "ぬくもりのノエル",
+    "rarity": "SSR",
+    "type": "Stamina",
+    "image_url": "https://umamusu.wiki/w/thumb.php?f=Support_Card_30279_Card.png&width=100"
+  },
+  {
+    "id": 30280,
+    "name": "[黄金の夢に溺れよ] Orfevre",
+    "character_name": "Orfevre",
+    "card_title": "黄金の夢に溺れよ",
+    "rarity": "SSR",
+    "type": "Stamina",
+    "image_url": "https://umamusu.wiki/w/thumb.php?f=Support_Card_30280_Card.png&width=100"
+  },
+  {
+    "id": 30281,
+    "name": "[故郷に錦を飾るんでい！] Inari One",
+    "character_name": "Inari One",
+    "card_title": "故郷に錦を飾るんでい！",
+    "rarity": "SSR",
+    "type": "Stamina",
+    "image_url": "https://umamusu.wiki/w/thumb.php?f=Support_Card_30281_Card.png&width=100"
+  },
+  {
+    "id": 30282,
+    "name": "[心覚えし、京の華] Air Groove",
+    "character_name": "Air Groove",
+    "card_title": "心覚えし、京の華",
+    "rarity": "SSR",
+    "type": "Speed",
+    "image_url": "https://umamusu.wiki/w/thumb.php?f=Support_Card_30282_Card.png&width=100"
+  },
+  {
+    "id": 30283,
+    "name": "[ゆかし、きらめきの旅路] Fine Motion",
+    "character_name": "Fine Motion",
+    "card_title": "ゆかし、きらめきの旅路",
+    "rarity": "SSR",
+    "type": "Power",
+    "image_url": "https://umamusu.wiki/w/thumb.php?f=Support_Card_30283_Card.png&width=100"
+  },
+  {
+    "id": 30284,
+    "name": "[琴線弾きて、風光る] Bubble Gum Fellow",
+    "character_name": "Bubble Gum Fellow",
+    "card_title": "琴線弾きて、風光る",
+    "rarity": "SSR",
+    "type": "Guts",
+    "image_url": "https://umamusu.wiki/w/thumb.php?f=Support_Card_30284_Card.png&width=100"
+  },
+  {
+    "id": 30285,
+    "name": "[私のためのショッピング] King Halo",
+    "character_name": "King Halo",
+    "card_title": "私のためのショッピング",
+    "rarity": "SSR",
+    "type": "Guts",
+    "image_url": "https://umamusu.wiki/w/thumb.php?f=Support_Card_30285_Card.png&width=100"
+  },
+  {
+    "id": 30286,
+    "name": "[吉兆招福チョコ来たる] Matikanefukukitaru",
+    "character_name": "Matikanefukukitaru",
+    "card_title": "吉兆招福チョコ来たる",
+    "rarity": "SSR",
+    "type": "Speed",
+    "image_url": "https://umamusu.wiki/w/thumb.php?f=Support_Card_30286_Card.png&width=100"
+  },
+  {
+    "id": 30287,
+    "name": "[星跨ぐメッセージ] Neo Universe",
+    "character_name": "Neo Universe",
+    "card_title": "星跨ぐメッセージ",
+    "rarity": "SSR",
+    "type": "Power",
+    "image_url": "https://umamusu.wiki/w/thumb.php?f=Support_Card_30287_Card.png&width=100"
+  },
+  {
+    "id": 30288,
+    "name": "[ギュッとしてマイフレンド] Silence Suzuka",
+    "character_name": "Silence Suzuka",
+    "card_title": "ギュッとしてマイフレンド",
+    "rarity": "SSR",
+    "type": "Wit",
+    "image_url": "https://umamusu.wiki/w/thumb.php?f=Support_Card_30288_Card.png&width=100"
+  },
+  {
+    "id": 30289,
+    "name": "[Innovator] Forever Young",
+    "character_name": "Forever Young",
+    "card_title": "Innovator",
+    "rarity": "SSR",
+    "type": "Wit",
+    "image_url": "https://umamusu.wiki/w/thumb.php?f=Support_Card_30289_Card.png&width=100"
+  },
+  {
+    "id": 30290,
+    "name": "[American Dream] Casino Drive",
+    "character_name": "Casino Drive",
+    "card_title": "American Dream",
+    "rarity": "SSR",
+    "type": "Pal",
+    "image_url": "https://umamusu.wiki/w/thumb.php?f=Support_Card_30290_Card.png&width=100"
+  },
+  {
+    "id": 30291,
+    "name": "[Let's Go Together!] Victoire Pisa",
+    "character_name": "Victoire Pisa",
+    "card_title": "Let's Go Together!",
+    "rarity": "SSR",
+    "type": "Speed",
+    "image_url": "https://umamusu.wiki/w/thumb.php?f=Support_Card_30291_Card.png&width=100"
+  },
+  {
+    "id": 30292,
+    "name": "[響け、二人の凱歌] Marche Lorraine",
+    "character_name": "Marche Lorraine",
+    "card_title": "響け、二人の凱歌",
+    "rarity": "SSR",
+    "type": "Speed",
+    "image_url": "https://umamusu.wiki/w/thumb.php?f=Support_Card_30292_Card.png&width=100"
+  },
+  {
+    "id": 30293,
+    "name": "[白に至る純真] Daring Tact",
+    "character_name": "Daring Tact",
+    "card_title": "白に至る純真",
+    "rarity": "SSR",
+    "type": "Guts",
+    "image_url": "https://umamusu.wiki/w/thumb.php?f=Support_Card_30293_Card.png&width=100"
+  },
+  {
+    "id": 30294,
+    "name": "[白に至る覚悟] Daring Heart",
+    "character_name": "Daring Heart",
+    "card_title": "白に至る覚悟",
+    "rarity": "SSR",
+    "type": "Guts",
+    "image_url": "https://umamusu.wiki/w/thumb.php?f=Support_Card_30294_Card.png&width=100"
+  },
+  {
+    "id": 30295,
+    "name": "[花ども集いて束となる] Curren Bouquetd'or",
+    "character_name": "Curren Bouquetd'or",
+    "card_title": "花ども集いて束となる",
+    "rarity": "SSR",
+    "type": "Power",
+    "image_url": "https://umamusu.wiki/w/thumb.php?f=Support_Card_30295_Card.png&width=100"
+  },
+  {
+    "id": 30296,
+    "name": "[単焦点でつかまえて] Aston Machan",
+    "character_name": "Aston Machan",
+    "card_title": "単焦点でつかまえて",
+    "rarity": "SSR",
+    "type": "Guts",
+    "image_url": "https://umamusu.wiki/w/thumb.php?f=Support_Card_30296_Card.png&width=100"
+  },
+  {
+    "id": 30297,
+    "name": "[全てに挑む勇ましき者] Agnes Digital",
+    "character_name": "Agnes Digital",
+    "card_title": "全てに挑む勇ましき者",
+    "rarity": "SSR",
+    "type": "Power",
+    "image_url": "https://umamusu.wiki/w/thumb.php?f=Support_Card_30297_Card.png&width=100"
+  },
+  {
+    "id": 30298,
+    "name": "[刀光散らしてClash!] Tap Dance City",
+    "character_name": "Tap Dance City",
+    "card_title": "刀光散らしてClash!",
+    "rarity": "SSR",
+    "type": "Speed",
+    "image_url": "https://umamusu.wiki/w/thumb.php?f=Support_Card_30298_Card.png&width=100"
+  },
+  {
+    "id": 30299,
+    "name": "[無辺際ラボラトリィ] Agnes Tachyon",
+    "character_name": "Agnes Tachyon",
+    "card_title": "無辺際ラボラトリィ",
+    "rarity": "SSR",
+    "type": "Guts",
+    "image_url": "https://umamusu.wiki/w/thumb.php?f=Support_Card_30299_Card.png&width=100"
+  },
+  {
+    "id": 30300,
+    "name": "[賑やかな未来を乗せて走れ！] Sakura Chiyono O",
+    "character_name": "Sakura Chiyono O",
+    "card_title": "賑やかな未来を乗せて走れ！",
+    "rarity": "SSR",
+    "type": "Stamina",
+    "image_url": "https://umamusu.wiki/w/thumb.php?f=Support_Card_30300_Card.png&width=100"
+  },
+  {
+    "id": 30301,
+    "name": "[Smile Ever After] Gran Alegria",
+    "character_name": "Gran Alegria",
+    "card_title": "Smile Ever After",
+    "rarity": "SSR",
+    "type": "Power",
+    "image_url": "https://umamusu.wiki/w/thumb.php?f=Support_Card_30301_Card.png&width=100"
+  },
+  {
+    "id": 30302,
+    "name": "[永久の誓い、永久の輝き] Satono Diamond",
+    "character_name": "Satono Diamond",
+    "card_title": "永久の誓い、永久の輝き",
+    "rarity": "SSR",
+    "type": "Speed",
+    "image_url": "https://umamusu.wiki/w/thumb.php?f=Support_Card_30302_Card.png&width=100"
+  },
+  {
+    "id": 30303,
+    "name": "[ずーっと一緒、だぞー！] Blast Onepiece",
+    "character_name": "Blast Onepiece",
+    "card_title": "ずーっと一緒、だぞー！",
+    "rarity": "SSR",
+    "type": "Stamina",
+    "image_url": "https://umamusu.wiki/w/thumb.php?f=Support_Card_30303_Card.png&width=100"
+  },
+  {
+    "id": 30304,
+    "name": "[その執念は怒濤が如く] Meisho Doto",
+    "character_name": "Meisho Doto",
+    "card_title": "その執念は怒濤が如く",
+    "rarity": "SSR",
+    "type": "Stamina",
+    "image_url": "https://umamusu.wiki/w/thumb.php?f=Support_Card_30304_Card.png&width=100"
+  },
+  {
+    "id": 30305,
+    "name": "[一杯のノスタルジア] Tazuna Hayakawa",
+    "character_name": "Tazuna Hayakawa",
+    "card_title": "一杯のノスタルジア",
+    "rarity": "SSR",
+    "type": "Pal",
+    "image_url": "https://umamusu.wiki/w/thumb.php?f=Support_Card_30305_Card.png&width=100"
+  },
+  {
+    "id": 30306,
+    "name": "[両手いっぱい、小倉愛] Nice Nature",
+    "character_name": "Nice Nature",
+    "card_title": "両手いっぱい、小倉愛",
+    "rarity": "SSR",
+    "type": "Wit",
+    "image_url": "https://umamusu.wiki/w/thumb.php?f=Support_Card_30306_Card.png&width=100"
+  }
+]
