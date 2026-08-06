@@ -34,6 +34,7 @@ class CommunityBot(commands.Bot):
 
     async def setup_hook(self):
         self.add_view(SuggestionView())
+        check_web_suggestions.start()
 
     @tasks.loop(seconds=60)
     async def vc_payout_loop(self) -> None:
@@ -736,12 +737,11 @@ async def help_cmd(interaction: discord.Interaction) -> None:
     await interaction.response.send_message(embed=embed)
 
 
+
 # ─────────────────────────────  Custom Suggestions  ─────────────────────────────
 CUSTOM_GUILD_ID = 1049396166250475612
 SUGGESTION_CHANNEL_ID = 1171457664136532010
 SERVER_OWNER_ID = 879118301169602570
-
-suggestion_cooldowns = CooldownMap(3600)
 
 class SuggestionView(discord.ui.View):
     def __init__(self):
@@ -767,7 +767,6 @@ class SuggestionView(discord.ui.View):
         await poll_msg.add_reaction("👍")
         await poll_msg.add_reaction("👎")
 
-        # Parse author_id from footer if present
         author_id = None
         if embed.footer and embed.footer.text and "ID: " in embed.footer.text:
             try:
@@ -794,29 +793,42 @@ class SuggestionView(discord.ui.View):
         await interaction.message.edit(embed=embed, view=None)
 
 
-@tree.command(name="suggest", description="Make a suggestion for the server (1 hour cooldown)")
-@app_commands.describe(suggestion="Your suggestion")
-async def custom_suggest(interaction: discord.Interaction, suggestion: str):
-    if interaction.guild_id != CUSTOM_GUILD_ID:
-        return await interaction.response.send_message("❌ This command is not available in this server.", ephemeral=True)
+@tasks.loop(seconds=10)
+async def check_web_suggestions():
+    import json
+    queue = await db_get("global", "web_suggestions")
+    if not queue:
+        return
+        
+    processing = queue[:5]
+    remaining = queue[5:]
+    await db_set("global", remaining, "web_suggestions")
     
-    if suggestion_cooldowns.update(interaction.user.id):
-        rem = suggestion_cooldowns.get_remaining(interaction.user.id)
-        return await interaction.response.send_message(f"⏳ You are on cooldown. Try again in {int(rem/60)} minutes.", ephemeral=True)
-
-    sugg_channel = interaction.guild.get_channel(SUGGESTION_CHANNEL_ID)
-    if not sugg_channel:
-        return await interaction.response.send_message("❌ Suggestion channel not found.", ephemeral=True)
-
-    embed = (EmbedBuilder(color=Palette.INFO)
-             .title("💡 New Suggestion")
-             .description(suggestion)
-             .footer(f"Suggested by {interaction.user} (ID: {interaction.user.id})")
-             .build())
-             
-    view = SuggestionView()
-    await sugg_channel.send(embed=embed, view=view)
-    await interaction.response.send_message("✅ Suggestion submitted!", ephemeral=True)
+    guild = bot.get_guild(CUSTOM_GUILD_ID)
+    if not guild: return
+    sugg_channel = guild.get_channel(SUGGESTION_CHANNEL_ID)
+    if not sugg_channel: return
+    
+    for item in processing:
+        user_id = item.get("user_id")
+        suggestion = item.get("suggestion")
+        if not user_id or not suggestion: continue
+        
+        member = guild.get_member(int(user_id))
+        if not member:
+            try:
+                member = await guild.fetch_member(int(user_id))
+            except:
+                continue
+                
+        embed = (EmbedBuilder(color=Palette.INFO)
+                 .title("💡 New Suggestion (Web)")
+                 .description(suggestion)
+                 .footer(f"Suggested by {member} (ID: {member.id})")
+                 .build())
+                 
+        view = SuggestionView()
+        await sugg_channel.send(embed=embed, view=view)
 
 if __name__ == "__main__":
     TOKEN = os.getenv("COMMUNITY_BOT_TOKEN")

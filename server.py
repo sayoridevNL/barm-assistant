@@ -244,6 +244,50 @@ def publish_embed():
     else:
         return jsonify({'error': 'MongoDB is not connected. Broadcasts require MongoDB.'}), 500
 
+
+@app.route('/api/suggest', methods=['POST'])
+def submit_suggestion():
+    user_id = session.get('user_id')
+    if not user_id:
+        return jsonify({'error': 'Unauthorized'}), 401
+        
+    data = request.json
+    suggestion = data.get('suggestion', '').strip()
+    if not suggestion:
+        return jsonify({'error': 'Suggestion cannot be empty'}), 400
+    if len(suggestion) > 1000:
+        return jsonify({'error': 'Suggestion too long'}), 400
+        
+    # Check 1 hour cooldown via shared.py (using a global dict if shared doesn't export one, but let's use sqlite)
+    import time
+    from shared import db_get, db_set
+    import asyncio
+    
+    async def process():
+        last_submit = await db_get("global", f"sugg_cd_{user_id}") or 0
+        if time.time() - last_submit < 3600:
+            return False, int(3600 - (time.time() - last_submit))
+            
+        await db_set("global", time.time(), f"sugg_cd_{user_id}")
+        
+        queue = await db_get("global", "web_suggestions") or []
+        queue.append({
+            "user_id": user_id,
+            "suggestion": suggestion,
+            "timestamp": time.time()
+        })
+        await db_set("global", queue, "web_suggestions")
+        return True, 0
+        
+    loop = asyncio.new_event_loop()
+    success, rem = loop.run_until_complete(process())
+    loop.close()
+    
+    if not success:
+        return jsonify({'error': f'Cooldown active. Try again in {rem//60} minutes.'}), 429
+        
+    return jsonify({'success': True})
+
 @app.route('/api/leaderboards', methods=['GET'])
 def get_leaderboards():
     if not session.get('user_id'): return jsonify({'error': 'Unauthorized'}), 401

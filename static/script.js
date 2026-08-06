@@ -584,3 +584,61 @@ window.publishBroadcast = async function() {
     btn.disabled = false;
     btn.innerHTML = '<i class="fa-solid fa-paper-plane"></i> Publish to All Servers';
 };
+
+
+// --- Suggestions ---
+document.getElementById('suggestion-input')?.addEventListener('input', function(e) {
+    document.getElementById('suggestion-chars').innerText = `${e.target.value.length} / 1000`;
+});
+
+async function submitSuggestion() {
+    const input = document.getElementById('suggestion-input');
+    const btn = document.getElementById('btn-submit-suggestion');
+    const text = input.value.trim();
+    
+    if (!text) {
+        showToast('Please enter a suggestion first!', 'error');
+        return;
+    }
+    
+    btn.disabled = true;
+    btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Submitting...';
+    
+    try {
+        const res = await fetch('/api/suggest', {
+            method: 'POST',
+            headers: {'Content-Type': 'application/json'},
+            body: JSON.stringify({ suggestion: text })
+        });
+        
+        const data = await res.json();
+        
+        if (res.ok) {
+            showToast('Suggestion submitted successfully!', 'success');
+            input.value = '';
+            document.getElementById('suggestion-chars').innerText = '0 / 1000';
+            
+            // Start local cooldown timer visual
+            let timeLeft = 3600;
+            const timer = setInterval(() => {
+                timeLeft--;
+                if (timeLeft <= 0) {
+                    clearInterval(timer);
+                    btn.disabled = false;
+                    btn.innerHTML = '<i class="fa-solid fa-paper-plane"></i> Submit Suggestion';
+                } else {
+                    const m = Math.floor(timeLeft / 60);
+                    btn.innerHTML = `<i class="fa-solid fa-clock"></i> Cooldown (${m}m)`;
+                }
+            }, 1000);
+        } else {
+            showToast(data.error || 'Failed to submit suggestion', 'error');
+            btn.disabled = false;
+            btn.innerHTML = '<i class="fa-solid fa-paper-plane"></i> Submit Suggestion';
+        }
+    } catch (err) {
+        showToast('Network error submitting suggestion.', 'error');
+        btn.disabled = false;
+        btn.innerHTML = '<i class="fa-solid fa-paper-plane"></i> Submit Suggestion';
+    }
+}
