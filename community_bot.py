@@ -763,7 +763,8 @@ class SuggestionView(discord.ui.View):
         embed.title = "✅ Accepted Suggestion"
         await interaction.message.edit(embed=embed, view=None)
 
-        poll_msg = await interaction.channel.send(content="**Suggestion Poll:** (Active for 24 hours)", embed=embed)
+        poll_channel = interaction.guild.get_channel(1171464939437838427) or interaction.channel
+        poll_msg = await poll_channel.send(content="**Suggestion Poll:** (Active for 24 hours)", embed=embed)
         await poll_msg.add_reaction("👍")
         await poll_msg.add_reaction("👎")
 
@@ -778,7 +779,7 @@ class SuggestionView(discord.ui.View):
             import asyncio
             await asyncio.sleep(86400)
             try:
-                msg = await interaction.channel.fetch_message(poll_msg.id)
+                msg = await poll_channel.fetch_message(poll_msg.id)
                 await msg.reply("This poll has concluded.")
             except:
                 pass
