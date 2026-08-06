@@ -258,34 +258,50 @@ def submit_suggestion():
     if len(suggestion) > 1000:
         return jsonify({'error': 'Suggestion too long'}), 400
         
-    # Check 1 hour cooldown via shared.py (using a global dict if shared doesn't export one, but let's use sqlite)
     import time
-    from shared import db_get, db_set
-    import asyncio
+    import json
+    from pathlib import Path
     
-    async def process():
-        last_submit = await db_get("global", f"sugg_cd_{user_id}") or 0
+    # Simple JSON fallback for web suggestions since shared.py's lock isn't thread-safe for flask
+    WEB_SUGG_FILE = Path(__file__).parent / "data" / "web_suggestions.json"
+    
+    if mongo_db is not None:
+        last_submit_doc = mongo_db.cooldowns.find_one({"_id": f"sugg_cd_{user_id}"})
+        last_submit = last_submit_doc["time"] if last_submit_doc else 0
         if time.time() - last_submit < 3600:
-            return False, int(3600 - (time.time() - last_submit))
+            rem = int(3600 - (time.time() - last_submit))
+            return jsonify({'error': f'Cooldown active. Try again in {rem//60} minutes.'}), 429
             
-        await db_set("global", time.time(), f"sugg_cd_{user_id}")
-        
-        queue = await db_get("global", "web_suggestions") or []
-        queue.append({
+        mongo_db.cooldowns.update_one({"_id": f"sugg_cd_{user_id}"}, {"$set": {"time": time.time()}}, upsert=True)
+        mongo_db.web_suggestions.insert_one({
             "user_id": user_id,
             "suggestion": suggestion,
             "timestamp": time.time()
         })
-        await db_set("global", queue, "web_suggestions")
-        return True, 0
-        
-    loop = asyncio.new_event_loop()
-    success, rem = loop.run_until_complete(process())
-    loop.close()
+    else:
+        # Fallback to JSON
+        WEB_SUGG_FILE.parent.mkdir(parents=True, exist_ok=True)
+        data = {}
+        if WEB_SUGG_FILE.exists():
+            try:
+                with open(WEB_SUGG_FILE, "r", encoding="utf-8") as f:
+                    data = json.load(f)
+            except: pass
+            
+        last_submit = data.get("cooldowns", {}).get(str(user_id), 0)
+        if time.time() - last_submit < 3600:
+            rem = int(3600 - (time.time() - last_submit))
+            return jsonify({'error': f'Cooldown active. Try again in {rem//60} minutes.'}), 429
+            
+        data.setdefault("cooldowns", {})[str(user_id)] = time.time()
+        data.setdefault("queue", []).append({
+            "user_id": user_id,
+            "suggestion": suggestion,
+            "timestamp": time.time()
+        })
+        with open(WEB_SUGG_FILE, "w", encoding="utf-8") as f:
+            json.dump(data, f)
     
-    if not success:
-        return jsonify({'error': f'Cooldown active. Try again in {rem//60} minutes.'}), 429
-        
     return jsonify({'success': True})
 
 @app.route('/api/leaderboards', methods=['GET'])

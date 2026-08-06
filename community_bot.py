@@ -797,13 +797,37 @@ class SuggestionView(discord.ui.View):
 @tasks.loop(seconds=10)
 async def check_web_suggestions():
     import json
-    queue = await db_get("global", "web_suggestions")
-    if not queue:
-        return
-        
-    processing = queue[:5]
-    remaining = queue[5:]
-    await db_set("global", remaining, "web_suggestions")
+    import os
+    from pathlib import Path
+    
+    # Try MongoDB first
+    from shared import _get_mongo_db
+    db = _get_mongo_db()
+    processing = []
+    
+    if db is not None:
+        cursor = db.web_suggestions.find().limit(5)
+        docs = await cursor.to_list(length=5)
+        for doc in docs:
+            processing.append(doc)
+            await db.web_suggestions.delete_one({"_id": doc["_id"]})
+    else:
+        WEB_SUGG_FILE = Path(os.path.dirname(os.path.abspath(__file__))) / "data" / "web_suggestions.json"
+        if WEB_SUGG_FILE.exists():
+            try:
+                with open(WEB_SUGG_FILE, "r", encoding="utf-8") as f:
+                    data = json.load(f)
+                
+                queue = data.get("queue", [])
+                if not queue: return
+                
+                processing = queue[:5]
+                data["queue"] = queue[5:]
+                with open(WEB_SUGG_FILE, "w", encoding="utf-8") as f:
+                    json.dump(data, f)
+            except: return
+            
+    if not processing: return
     
     guild = bot.get_guild(CUSTOM_GUILD_ID)
     if not guild: return
