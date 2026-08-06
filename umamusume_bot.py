@@ -294,10 +294,11 @@ async def pull_trainee_cmd(interaction: discord.Interaction, banner: str, amount
                 .build())
             
             img = _uma_image(uma)
-            if img: embed.set_thumbnail(url=img)
+            if img: embed.set_image(url=img)
             embeds.append(embed)
             
-        await interaction.followup.send(content="## 🌸 10-PULL TRAINEE RESULTS 🌸", embeds=embeds)
+        view = Paginator(embeds, author_id=interaction.user.id)
+        await interaction.followup.send(content="## 🌸 10-PULL TRAINEE RESULTS 🌸\n*(Swipe to see all 10 pulls!)*", embed=embeds[0], view=view)
 
 @tree.command(name="pull_support", description="🎴 Pull for Support Cards")
 @app_commands.describe(banner="Use Free or Paid Haru-Urara-Coins?", amount="Pull 1 or 10 times?")
@@ -360,10 +361,11 @@ async def pull_support_cmd(interaction: discord.Interaction, banner: str, amount
                 .build())
                 
             img = _support_image(card)
-            if img: embed.set_thumbnail(url=img)
+            if img: embed.set_image(url=img)
             embeds.append(embed)
             
-        await interaction.followup.send(content="## 🎴 10-PULL SUPPORT RESULTS 🎴", embeds=embeds)
+        view = Paginator(embeds, author_id=interaction.user.id)
+        await interaction.followup.send(content="## 🎴 10-PULL SUPPORT RESULTS 🎴\n*(Swipe to see all 10 pulls!)*", embed=embeds[0], view=view)
 
 # ─────────────────────────────  Uma commands  ─────────────────────────────
 
