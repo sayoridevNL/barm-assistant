@@ -291,22 +291,40 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     const themeToggle = document.getElementById('theme-toggle-btn');
+    const themeColorMeta = document.querySelector('meta[name="theme-color"]');
+
+    function setTheme(theme, persist = true) {
+        const isLight = theme === 'light';
+        document.body.classList.toggle('light-theme', isLight);
+        document.body.classList.toggle('dark-theme', !isLight);
+
+        if (themeToggle) {
+            const icon = themeToggle.querySelector('i');
+            icon.classList.toggle('fa-sun', isLight);
+            icon.classList.toggle('fa-moon', !isLight);
+            themeToggle.setAttribute('aria-pressed', String(isLight));
+            themeToggle.title = isLight ? 'Switch to dark mode' : 'Switch to light mode';
+        }
+        if (themeColorMeta) themeColorMeta.content = isLight ? '#fff8f5' : '#17132a';
+
+        if (persist) {
+            try { localStorage.setItem('barm-theme', theme); } catch (error) { /* Storage can be unavailable. */ }
+        }
+    }
+
+    try {
+        const savedTheme = localStorage.getItem('barm-theme');
+        if (savedTheme === 'light' || savedTheme === 'dark') setTheme(savedTheme, false);
+    } catch (error) { /* Use the default dark theme when storage is unavailable. */ }
+
     if (themeToggle) {
         themeToggle.addEventListener('click', () => {
             const icon = themeToggle.querySelector('i');
             icon.style.transition = 'transform 0.15s ease';
             icon.style.transform = 'rotate(180deg) scale(0)';
-            
+
             setTimeout(() => {
-                document.body.classList.toggle('light-theme');
-                document.body.classList.toggle('dark-theme');
-                if (document.body.classList.contains('light-theme')) {
-                    icon.classList.remove('fa-moon');
-                    icon.classList.add('fa-sun');
-                } else {
-                    icon.classList.remove('fa-sun');
-                    icon.classList.add('fa-moon');
-                }
+                setTheme(document.body.classList.contains('dark-theme') ? 'light' : 'dark');
                 icon.style.transform = 'rotate(0deg) scale(1)';
             }, 150);
         });
