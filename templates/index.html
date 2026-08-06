@@ -171,6 +171,25 @@
                     </div>
                 </div>
 
+                <!-- Suggestions Tab -->
+                <div id="suggestions-tab" class="tab-content" role="tabpanel">
+                    <div class="glass-panel">
+                        <div class="section-header">
+                            <h2><i class="fa-solid fa-lightbulb"></i> Server Suggestions</h2>
+                            <p class="section-desc">Got a cool idea? Submit it to the server directly from here!</p>
+                        </div>
+                        
+                        <div class="suggestion-container" style="padding: 1.5rem;">
+                            <textarea id="suggestion-input" placeholder="Type your brilliant idea here... (Max 1000 characters)" maxlength="1000" style="width: 100%; height: 150px; padding: 1rem; border-radius: var(--radius-md); border: 1px solid var(--panel-border); background: rgba(255, 255, 255, 0.05); color: var(--text-primary); font-family: var(--font-family); resize: vertical; margin-bottom: 1rem;"></textarea>
+                            
+                            <div style="display: flex; justify-content: space-between; align-items: center;">
+                                <span id="suggestion-chars" style="color: var(--text-secondary); font-size: 0.9rem;">0 / 1000</span>
+                                <button id="btn-submit-suggestion" class="btn btn-primary" onclick="submitSuggestion()"><i class="fa-solid fa-paper-plane"></i> Submit Suggestion</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
                 <!-- Fleet Command Tab -->
                 <div id="fleet-tab" class="tab-content admin-only">
                     <div class="section-header">
