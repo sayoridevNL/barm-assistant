@@ -108,101 +108,22 @@ async def help_cmd(interaction: discord.Interaction):
     await interaction.response.send_message(embed=embed)
 
 
-# ─────────────────────────────  Custom Features  ─────────────────────────────
+
+
+# ─────────────────────────────  Custom Audit Logging  ─────────────────────────────
 CUSTOM_GUILD_ID = 1049396166250475612
-SUGGESTION_CHANNEL_ID = 1171457664136532010
 SERVER_OWNER_ID = 879118301169602570
 TARGET_USERS = {1158703899843231836, 315845909533556741}
-
-from ui_kit import CooldownMap
-suggestion_cooldowns = CooldownMap(3600)
-
-class SuggestionView(discord.ui.View):
-    def __init__(self, author_id: int):
-        super().__init__(timeout=None)
-        self.author_id = author_id
-
-    async def interaction_check(self, interaction: discord.Interaction) -> bool:
-        app_info = await bot.application_info()
-        if interaction.user.id not in (app_info.owner.id, SERVER_OWNER_ID):
-            await interaction.response.send_message("❌ You are not authorized to accept or reject suggestions.", ephemeral=True)
-            return False
-        return True
-
-    @discord.ui.button(label="Accept", style=discord.ButtonStyle.success, custom_id="sugg_acc")
-    async def btn_accept(self, interaction: discord.Interaction, button: discord.ui.Button):
-        await interaction.response.send_message("✅ Suggestion accepted. Creating poll...", ephemeral=True)
-        self.stop()
-        
-        # Edit original message to remove buttons and show accepted
-        embed = interaction.message.embeds[0]
-        embed.color = Palette.SUCCESS
-        embed.title = "✅ Accepted Suggestion"
-        await interaction.message.edit(embed=embed, view=None)
-
-        # Create the poll with emojis
-        poll_msg = await interaction.channel.send(content="**Suggestion Poll:** (Active for 24 hours)", embed=embed)
-        await poll_msg.add_reaction("👍")
-        await poll_msg.add_reaction("👎")
-
-        # Track poll
-        await db_set(interaction.guild_id, self.author_id, f"poll_{poll_msg.id}")
-        
-        # Setup 24h deletion task
-        async def close_poll():
-            await asyncio.sleep(86400)
-            try:
-                msg = await interaction.channel.fetch_message(poll_msg.id)
-                await msg.reply("This poll has concluded.")
-            except:
-                pass
-        bot.loop.create_task(close_poll())
-
-    @discord.ui.button(label="Reject", style=discord.ButtonStyle.danger, custom_id="sugg_rej")
-    async def btn_reject(self, interaction: discord.Interaction, button: discord.ui.Button):
-        await interaction.response.send_message("❌ Suggestion rejected.", ephemeral=True)
-        self.stop()
-        embed = interaction.message.embeds[0]
-        embed.color = Palette.ERROR
-        embed.title = "❌ Rejected Suggestion"
-        await interaction.message.edit(embed=embed, view=None)
-
-
-@tree.command(name="suggest", description="Make a suggestion for the server (1 hour cooldown)")
-@app_commands.describe(suggestion="Your suggestion")
-async def custom_suggest(interaction: discord.Interaction, suggestion: str):
-    if interaction.guild_id != CUSTOM_GUILD_ID:
-        return await interaction.response.send_message("❌ This command is not available in this server.", ephemeral=True)
-    
-    if suggestion_cooldowns.update(interaction.user.id):
-        rem = suggestion_cooldowns.get_remaining(interaction.user.id)
-        return await interaction.response.send_message(f"⏳ You are on cooldown. Try again in {int(rem/60)} minutes.", ephemeral=True)
-
-    sugg_channel = interaction.guild.get_channel(SUGGESTION_CHANNEL_ID)
-    if not sugg_channel:
-        return await interaction.response.send_message("❌ Suggestion channel not found.", ephemeral=True)
-
-    embed = (EmbedBuilder(color=Palette.INFO)
-             .title("💡 New Suggestion")
-             .description(suggestion)
-             .footer(f"Suggested by {interaction.user}")
-             .build())
-             
-    view = SuggestionView(interaction.user.id)
-    await sugg_channel.send(embed=embed, view=view)
-    await interaction.response.send_message("✅ Suggestion submitted!", ephemeral=True)
-
 
 @bot.event
 async def on_message_delete(message: discord.Message):
     if message.guild and message.guild.id == CUSTOM_GUILD_ID:
         author_id = await db_get(message.guild.id, f"poll_{message.id}")
         if author_id or (message.embeds and ("New Suggestion" in str(message.embeds[0].title) or "Accepted Suggestion" in str(message.embeds[0].title))):
-            # Give audit log a moment to populate
+            import asyncio
             await asyncio.sleep(2)
             async for entry in message.guild.audit_logs(action=discord.AuditLogAction.message_delete, limit=5):
                 if entry.target.id == message.author.id:
-                    # Notify bot owner / server owner
                     app_info = await bot.application_info()
                     bot_owner = app_info.owner
                     srv_owner = message.guild.get_member(SERVER_OWNER_ID) or await bot.fetch_user(SERVER_OWNER_ID)
@@ -253,7 +174,6 @@ async def on_audit_log_entry_create(entry: discord.AuditLogEntry):
         try:
             await app_info.owner.send(msg)
         except: pass
-
 
 if __name__ == "__main__":
     TOKEN = os.getenv("MODERATION_BOT_TOKEN")

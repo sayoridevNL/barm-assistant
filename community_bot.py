@@ -31,6 +31,10 @@ class CommunityBot(commands.Bot):
         self.bocchi_cd = CooldownMap(default_ttl=120.0)
         self._msg_count: dict[int | str, int | bool] = {}
 
+
+    async def setup_hook(self):
+        self.add_view(SuggestionView())
+
     @tasks.loop(seconds=60)
     async def vc_payout_loop(self) -> None:
         vc_sayories = 3
@@ -730,6 +734,89 @@ tree.add_command(counting_group)
 async def help_cmd(interaction: discord.Interaction) -> None:
     embed = build_help_embed("community", "Server engagement, quotes, word games, and Bocchies — this bot runs the chat.", {"⬆️ Tiers & Bocchies": ["`/rank [member]`", "`/leaderboard`", "`/tiers`", "`/bocchi_rank [member]`"], "🔢 Utilities": ["`/counting setup|reset|info|leaderboard`"]})
     await interaction.response.send_message(embed=embed)
+
+
+# ─────────────────────────────  Custom Suggestions  ─────────────────────────────
+CUSTOM_GUILD_ID = 1049396166250475612
+SUGGESTION_CHANNEL_ID = 1171457664136532010
+SERVER_OWNER_ID = 879118301169602570
+
+suggestion_cooldowns = CooldownMap(3600)
+
+class SuggestionView(discord.ui.View):
+    def __init__(self):
+        super().__init__(timeout=None)
+
+    async def interaction_check(self, interaction: discord.Interaction) -> bool:
+        app_info = await bot.application_info()
+        if interaction.user.id not in (app_info.owner.id, SERVER_OWNER_ID):
+            await interaction.response.send_message("❌ You are not authorized to accept or reject suggestions.", ephemeral=True)
+            return False
+        return True
+
+    @discord.ui.button(label="Accept", style=discord.ButtonStyle.success, custom_id="sugg_accept")
+    async def btn_accept(self, interaction: discord.Interaction, button: discord.ui.Button):
+        await interaction.response.send_message("✅ Suggestion accepted. Creating poll...", ephemeral=True)
+        
+        embed = interaction.message.embeds[0]
+        embed.color = Palette.SUCCESS
+        embed.title = "✅ Accepted Suggestion"
+        await interaction.message.edit(embed=embed, view=None)
+
+        poll_msg = await interaction.channel.send(content="**Suggestion Poll:** (Active for 24 hours)", embed=embed)
+        await poll_msg.add_reaction("👍")
+        await poll_msg.add_reaction("👎")
+
+        # Parse author_id from footer if present
+        author_id = None
+        if embed.footer and embed.footer.text and "ID: " in embed.footer.text:
+            try:
+                author_id = int(embed.footer.text.split("ID: ")[-1].replace(")", "").strip())
+                await db_set(interaction.guild_id, author_id, f"poll_{poll_msg.id}")
+            except: pass
+
+        async def close_poll():
+            import asyncio
+            await asyncio.sleep(86400)
+            try:
+                msg = await interaction.channel.fetch_message(poll_msg.id)
+                await msg.reply("This poll has concluded.")
+            except:
+                pass
+        bot.loop.create_task(close_poll())
+
+    @discord.ui.button(label="Reject", style=discord.ButtonStyle.danger, custom_id="sugg_reject")
+    async def btn_reject(self, interaction: discord.Interaction, button: discord.ui.Button):
+        await interaction.response.send_message("❌ Suggestion rejected.", ephemeral=True)
+        embed = interaction.message.embeds[0]
+        embed.color = Palette.ERROR
+        embed.title = "❌ Rejected Suggestion"
+        await interaction.message.edit(embed=embed, view=None)
+
+
+@tree.command(name="suggest", description="Make a suggestion for the server (1 hour cooldown)")
+@app_commands.describe(suggestion="Your suggestion")
+async def custom_suggest(interaction: discord.Interaction, suggestion: str):
+    if interaction.guild_id != CUSTOM_GUILD_ID:
+        return await interaction.response.send_message("❌ This command is not available in this server.", ephemeral=True)
+    
+    if suggestion_cooldowns.update(interaction.user.id):
+        rem = suggestion_cooldowns.get_remaining(interaction.user.id)
+        return await interaction.response.send_message(f"⏳ You are on cooldown. Try again in {int(rem/60)} minutes.", ephemeral=True)
+
+    sugg_channel = interaction.guild.get_channel(SUGGESTION_CHANNEL_ID)
+    if not sugg_channel:
+        return await interaction.response.send_message("❌ Suggestion channel not found.", ephemeral=True)
+
+    embed = (EmbedBuilder(color=Palette.INFO)
+             .title("💡 New Suggestion")
+             .description(suggestion)
+             .footer(f"Suggested by {interaction.user} (ID: {interaction.user.id})")
+             .build())
+             
+    view = SuggestionView()
+    await sugg_channel.send(embed=embed, view=view)
+    await interaction.response.send_message("✅ Suggestion submitted!", ephemeral=True)
 
 if __name__ == "__main__":
     TOKEN = os.getenv("COMMUNITY_BOT_TOKEN")
