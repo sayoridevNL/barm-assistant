@@ -80,7 +80,10 @@ document.addEventListener('DOMContentLoaded', () => {
         dashboardScreen.classList.remove('hidden');
         
         document.getElementById('profile-img').src = AVATAR_URL;
-        document.getElementById('profile-name').innerText = USERNAME || 'User';
+        const displayName = USERNAME || 'User';
+        document.getElementById('profile-name').innerText = displayName;
+        const welcomeName = document.getElementById('welcome-name');
+        if (welcomeName) welcomeName.innerText = displayName;
         
         if (!IS_ADMIN) {
             document.querySelectorAll('.admin-only').forEach(el => el.style.display = 'none');

@@ -5,7 +5,10 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="description" content="Barm Assistant Pro — Your premium Discord bot management dashboard.">
     <title>Barm Assistant Pro</title>
-    <link rel="stylesheet" href="/static/style.css?v=6.0">
+    <meta name="theme-color" content="#08131f">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link rel="stylesheet" href="/static/style.css?v=7.0">
     <!-- Google Fonts -->
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
     <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700;800&display=swap" rel="stylesheet">
@@ -47,35 +50,37 @@
 
         <!-- Dashboard Screen -->
         <div id="dashboard-screen" class="screen hidden">
-            <nav class="glass-nav">
-                <div class="nav-brand">
-                    <i class="fa-solid fa-robot"></i> Barm OS
-                </div>
-                <div class="profile-header nav-profile">
-                    <img id="profile-img" src="" class="profile-avatar" alt="Profile">
-                    <span class="profile-name" id="profile-name">User</span>
-                </div>
-                <div class="tabs nav-tabs" role="tablist" aria-label="Dashboard Tabs">
-                    <button class="tab-btn active" data-target="stats-tab" role="tab" aria-selected="true" aria-controls="stats-tab"><i class="fa-solid fa-user"></i> My Stats</button>
-                    <button class="tab-btn" data-target="leaderboard-tab" role="tab" aria-selected="false" aria-controls="leaderboard-tab"><i class="fa-solid fa-trophy"></i> Leaderboards</button>
-                    <button class="tab-btn" data-target="umas-tab" role="tab" aria-selected="false" aria-controls="umas-tab"><i class="fa-solid fa-horse-head"></i> Trainees</button>
-                    <button class="tab-btn" data-target="support-tab" role="tab" aria-selected="false" aria-controls="support-tab"><i class="fa-solid fa-clone"></i> Support Cards</button>
-                    <button class="tab-btn" data-target="quotes-tab" role="tab" aria-selected="false" aria-controls="quotes-tab"><i class="fa-solid fa-quote-left"></i> Quotes</button>
-                                        <button class="tab-btn" data-target="suggestions-tab" role="tab" aria-selected="false" aria-controls="suggestions-tab"><i class="fa-solid fa-lightbulb"></i> Suggestions</button>
-                    <button class="tab-btn admin-only" data-target="fleet-tab" role="tab" aria-selected="false" aria-controls="fleet-tab"><i class="fa-solid fa-server"></i> Fleet</button>
-                    <button class="tab-btn admin-only" data-target="broadcast-tab" role="tab" aria-selected="false" aria-controls="broadcast-tab"><i class="fa-solid fa-bullhorn"></i> Broadcast</button>
-                    <button class="tab-btn admin-only" data-target="dev-tab" role="tab" aria-selected="false" aria-controls="dev-tab"><i class="fa-solid fa-code"></i> Console</button>
-                </div>
-                <div class="nav-actions">
-                    <div class="status-pill global-status">
-                        <div class="pulse-dot"></div> System Online
+            <nav class="glass-nav" aria-label="Dashboard navigation">
+                <div class="nav-shell">
+                    <div class="nav-identity">
+                        <div class="nav-brand">
+                            <span class="brand-mark"><i class="fa-solid fa-robot"></i></span>
+                            <span>Barm <strong>OS</strong></span>
+                        </div>
+                        <span class="brand-caption">Command center</span>
                     </div>
-                    <button id="theme-toggle-btn" class="icon-btn" title="Toggle Theme" aria-label="Toggle Theme">
-                        <i class="fa-solid fa-moon"></i>
-                    </button>
-                    <button id="logout-btn" onclick="window.location.href='/api/auth/logout'" class="icon-btn" title="Logout" aria-label="Logout">
-                        <i class="fa-solid fa-power-off"></i>
-                    </button>
+                    <div class="tabs nav-tabs" role="tablist" aria-label="Dashboard Tabs">
+                        <button class="tab-btn active" data-target="stats-tab" role="tab" aria-selected="true" aria-controls="stats-tab"><i class="fa-solid fa-user"></i> My Stats</button>
+                        <button class="tab-btn" data-target="leaderboard-tab" role="tab" aria-selected="false" aria-controls="leaderboard-tab"><i class="fa-solid fa-trophy"></i> Leaderboards</button>
+                        <button class="tab-btn" data-target="umas-tab" role="tab" aria-selected="false" aria-controls="umas-tab"><i class="fa-solid fa-horse-head"></i> Trainees</button>
+                        <button class="tab-btn" data-target="support-tab" role="tab" aria-selected="false" aria-controls="support-tab"><i class="fa-solid fa-clone"></i> Support Cards</button>
+                        <button class="tab-btn" data-target="quotes-tab" role="tab" aria-selected="false" aria-controls="quotes-tab"><i class="fa-solid fa-quote-left"></i> Quotes</button>
+                        <button class="tab-btn" data-target="suggestions-tab" role="tab" aria-selected="false" aria-controls="suggestions-tab"><i class="fa-solid fa-lightbulb"></i> Suggestions</button>
+                        <button class="tab-btn admin-only" data-target="fleet-tab" role="tab" aria-selected="false" aria-controls="fleet-tab"><i class="fa-solid fa-server"></i> Fleet</button>
+                        <button class="tab-btn admin-only" data-target="broadcast-tab" role="tab" aria-selected="false" aria-controls="broadcast-tab"><i class="fa-solid fa-bullhorn"></i> Broadcast</button>
+                        <button class="tab-btn admin-only" data-target="dev-tab" role="tab" aria-selected="false" aria-controls="dev-tab"><i class="fa-solid fa-code"></i> Console</button>
+                    </div>
+                    <div class="nav-utility">
+                        <div class="profile-header nav-profile">
+                            <img id="profile-img" src="" class="profile-avatar" alt="Profile">
+                            <span class="profile-name" id="profile-name">User</span>
+                        </div>
+                        <div class="nav-actions">
+                            <div class="status-pill global-status"><div class="pulse-dot"></div><span>System Online</span></div>
+                            <button id="theme-toggle-btn" class="icon-btn" title="Toggle Theme" aria-label="Toggle Theme"><i class="fa-solid fa-moon"></i></button>
+                            <button id="logout-btn" onclick="window.location.href='/api/auth/logout'" class="icon-btn" title="Logout" aria-label="Logout"><i class="fa-solid fa-power-off"></i></button>
+                        </div>
+                    </div>
                 </div>
             </nav>
 
@@ -83,9 +88,28 @@
                 
                 <!-- Stats Tab -->
                 <div id="stats-tab" class="tab-content active">
-                    <div class="section-header">
-                        <h2><i class="fa-solid fa-chart-line"></i> Dashboard Overview</h2>
-                        <p class="section-desc">Your global economy and stats at a glance.</p>
+                    <section class="overview-hero glass-panel" aria-labelledby="overview-title">
+                        <div class="overview-copy">
+                            <p class="eyebrow"><i class="fa-solid fa-sparkles"></i> Personal command center</p>
+                            <h1 id="overview-title">Welcome back, <span id="welcome-name">Commander</span>.</h1>
+                            <p>Everything in your Barm universe, collected in one clear view.</p>
+                            <div class="overview-meta">
+                                <span><i class="fa-solid fa-circle-check"></i> Live sync enabled</span>
+                                <span><i class="fa-solid fa-shield-heart"></i> Discord connected</span>
+                            </div>
+                        </div>
+                        <div class="overview-orbit" aria-hidden="true">
+                            <div class="orbit-ring orbit-ring-one"></div>
+                            <div class="orbit-ring orbit-ring-two"></div>
+                            <div class="orbit-core"><i class="fa-solid fa-robot"></i></div>
+                        </div>
+                    </section>
+                    <div class="section-header section-header-inline">
+                        <div>
+                            <p class="eyebrow">Your collection</p>
+                            <h2><i class="fa-solid fa-chart-line"></i> At a glance</h2>
+                        </div>
+                        <p class="section-desc">Your global economy and stats, updated as you play.</p>
                     </div>
                     <div class="stats-grid">
                         <div class="stat-card gold glow-effect">
@@ -179,11 +203,11 @@
                             <p class="section-desc">Got a cool idea? Submit it to the server directly from here!</p>
                         </div>
                         
-                        <div class="suggestion-container" style="padding: 1.5rem;">
-                            <textarea id="suggestion-input" placeholder="Type your brilliant idea here... (Max 1000 characters)" maxlength="1000" style="width: 100%; height: 150px; padding: 1rem; border-radius: var(--radius-md); border: 1px solid var(--panel-border); background: rgba(255, 255, 255, 0.05); color: var(--text-primary); font-family: var(--font-family); resize: vertical; margin-bottom: 1rem;"></textarea>
+                        <div class="suggestion-container">
+                            <textarea id="suggestion-input" class="suggestion-input" placeholder="Type your brilliant idea here... (Max 1000 characters)" maxlength="1000"></textarea>
                             
-                            <div style="display: flex; justify-content: space-between; align-items: center;">
-                                <span id="suggestion-chars" style="color: var(--text-secondary); font-size: 0.9rem;">0 / 1000</span>
+                            <div class="suggestion-footer">
+                                <span id="suggestion-chars">0 / 1000</span>
                                 <button id="btn-submit-suggestion" class="btn btn-primary" onclick="submitSuggestion()"><i class="fa-solid fa-paper-plane"></i> Submit Suggestion</button>
                             </div>
                         </div>
