@@ -1,0 +1,1 @@
+(self.webpackChunk_N_E=self.webpackChunk_N_E||[]).push([[9838],{99277:(_,u,s)=>{(window.__NEXT_P=window.__NEXT_P||[]).push(["/umamusume/supports",function(){return s(88552)}])}},_=>{_.O(0,[8230,388,4076,833,4801,2573,3162,4892,5814,3391,953,8357,6105,8552,636,6593,8792],()=>_(_.s=99277)),_N_E=_.O()}]);

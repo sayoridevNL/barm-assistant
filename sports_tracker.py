@@ -2,6 +2,7 @@ import discord
 from discord.ext import commands, tasks
 import requests
 import asyncio
+import traceback
 from datetime import datetime
 from zoneinfo import ZoneInfo
 from shared import db_get, db_set, g_eco_add, global_get_section, global_save_section
@@ -108,89 +109,115 @@ class SportsTracker(commands.Cog):
                     'team': team_name, 'player': player_str, 'match_name': match['name']
                 })
                 self.seen_events.add(evt_id)
-        except: pass
+        except Exception as exc:
+            print(f"[Sports] Error extracting events: {exc}")
         return new_events
 
     @tasks.loop(seconds=30)
     async def match_tracker(self):
-        channel = await self.get_channel()
-        if not channel: return
-        
-        today_str = self.today_key()
-        toto_key = f"toto_battle_{today_str}"
-        battle = await global_get_section(toto_key)
-        
-        all_matches = []
-        
-        for league in LEAGUES:
-            matches = await self.fetch_league_matches(league)
-            all_matches.extend(matches)
-            for match in matches:
-                state = match.get('status', {}).get('type', {}).get('state', '')
-                if state == 'in':
-                    competition = match.get('competitions', [{}])[0]
-                    # ESPN's scoreboard payload has an empty `details` list. Fill it
-                    # from the match summary before looking for goals and cards.
-                    if not competition.get('details'):
-                        competition['details'] = await self.fetch_match_details(league, match['id'])
-                    new_events = self.extract_new_events(match)
-                    for ev in new_events:
-                        embed = discord.Embed(title=f"⚽ {ev['match_name']}", description=f"**{ev['time']}** - {ev['team']}", color=COLOR_MATCH)
-                        if 'Goal' in ev['type']:
-                            embed.color = COLOR_GOAL
-                            embed.add_field(name="🚨 GOAL! 🚨", value=f"**{ev['player']}** has scored!", inline=False)
-                        elif 'Yellow' in ev['type']:
-                            embed.color = COLOR_YELLOW
-                            embed.add_field(name="🟨 Yellow Card", value=f"**{ev['player']}** received a yellow card.", inline=False)
-                        elif 'Red' in ev['type']:
-                            embed.color = COLOR_RED
-                            embed.add_field(name="🟥 Red Card", value=f"**{ev['player']}** received a red card!", inline=False)
-                        else:
-                            embed.add_field(name=ev['type'], value=ev['player'], inline=False)
-                            
-                        try:
-                            comp = match['competitions'][0]['competitors']
-                            score_str = f"{comp[0]['team']['abbreviation']} {comp[0]['score']} - {comp[1]['score']} {comp[1]['team']['abbreviation']}"
-                            embed.set_footer(text=f"Current Score: {score_str}")
-                        except: pass
-                        
-                        await channel.send(embed=embed)
-                        
-                # State changes (halftime / fulltime)
-                match_id = match['id']
-                state_key = f"match_state_{match_id}"
-                
-                state_doc = await global_get_section(state_key)
-                last_state = state_doc.get("state", "")
-                
-                desc = match.get('status', {}).get('type', {}).get('description', '')
-                current_stage = desc
-                
-                if last_state != current_stage:
-                    if current_stage in ['Halftime', 'Full Time', 'Final']:
-                        try:
-                            comp = match['competitions'][0]['competitors']
-                            score_str = f"{comp[0]['team']['name']} {comp[0]['score']} - {comp[1]['score']} {comp[1]['team']['name']}"
-                            embed = discord.Embed(title=f"⏱️ {current_stage}: {match['name']}", description=f"**Score:** {score_str}", color=COLOR_MATCH)
-                            await channel.send(embed=embed)
-                        except: pass
-                    await global_save_section(state_key, {"state": current_stage})
+        # Wrapped in try/except: an unhandled exception here would silently
+        # kill this whole loop forever (discord.py's tasks.loop does not
+        # auto-restart on error), which is why live updates could stop
+        # completely after a single bad match/API response.
+        try:
+            channel = await self.get_channel()
+            if not channel:
+                return
 
-        # Check Toto Battle Resolution
-        if battle and not battle.get("resolved"):
-            all_completed = True
-            for mid in battle["matches"]:
-                m = next((m for m in all_matches if m['id'] == mid), None)
-                if m:
-                    state = m.get('status', {}).get('type', {}).get('state', '')
-                    if state != 'post':
-                        all_completed = False
-                        break
+            today_str = self.today_key()
+            toto_key = f"toto_battle_{today_str}"
+            battle = await global_get_section(toto_key)
+
+            all_matches = []
+
+            for league in LEAGUES:
+                matches = await self.fetch_league_matches(league)
+                all_matches.extend(matches)
+                for match in matches:
+                    try:
+                        await self.process_match(league, match, channel)
+                    except Exception as exc:
+                        print(f"[Sports] Error processing match {match.get('id')}: {exc}")
+                        traceback.print_exc()
+
+            # Check Toto Battle Resolution
+            if battle and not battle.get("resolved"):
+                all_completed = True
+                for mid in battle["matches"]:
+                    m = next((m for m in all_matches if m['id'] == mid), None)
+                    if m:
+                        state = m.get('status', {}).get('type', {}).get('state', '')
+                        if state != 'post':
+                            all_completed = False
+                            break
+                    else:
+                        pass
+
+                if all_completed and len(all_matches) > 0:
+                    await self.resolve_battle(battle, all_matches, toto_key)
+        except Exception as exc:
+            print(f"[Sports] FATAL ERROR IN match_tracker: {exc}")
+            traceback.print_exc()
+
+    async def process_match(self, league, match, channel):
+        """Handle live-event embeds and halftime/full-time updates for a single match."""
+        state = match.get('status', {}).get('type', {}).get('state', '')
+        if state == 'in':
+            competition = match.get('competitions', [{}])[0]
+            # ESPN's scoreboard payload has an empty `details` list. Fill it
+            # from the match summary before looking for goals and cards.
+            if not competition.get('details'):
+                competition['details'] = await self.fetch_match_details(league, match['id'])
+            new_events = self.extract_new_events(match)
+            for ev in new_events:
+                embed = discord.Embed(title=f"⚽ {ev['match_name']}", description=f"**{ev['time']}** - {ev['team']}", color=COLOR_MATCH)
+                if 'Goal' in ev['type']:
+                    embed.color = COLOR_GOAL
+                    embed.add_field(name="🚨 GOAL! 🚨", value=f"**{ev['player']}** has scored!", inline=False)
+                elif 'Yellow' in ev['type']:
+                    embed.color = COLOR_YELLOW
+                    embed.add_field(name="🟨 Yellow Card", value=f"**{ev['player']}** received a yellow card.", inline=False)
+                elif 'Red' in ev['type']:
+                    embed.color = COLOR_RED
+                    embed.add_field(name="🟥 Red Card", value=f"**{ev['player']}** received a red card!", inline=False)
                 else:
+                    embed.add_field(name=ev['type'], value=ev['player'], inline=False)
+
+                try:
+                    comp = match['competitions'][0]['competitors']
+                    score_str = f"{comp[0]['team']['abbreviation']} {comp[0]['score']} - {comp[1]['score']} {comp[1]['team']['abbreviation']}"
+                    embed.set_footer(text=f"Current Score: {score_str}")
+                except Exception:
                     pass
-            
-            if all_completed and len(all_matches) > 0:
-                await self.resolve_battle(battle, all_matches, toto_key)
+
+                await channel.send(embed=embed)
+
+        # State changes (halftime / fulltime)
+        match_id = match['id']
+        state_key = f"match_state_{match_id}"
+
+        state_doc = await global_get_section(state_key)
+        # BUG FIX: global_get_section returns None when the key doesn't exist
+        # yet (same as the `battle`/`has_run` lookups elsewhere in this file).
+        # Calling .get() directly on that None crashed match_tracker with an
+        # AttributeError on the very first live match it ever saw, which
+        # silently killed the whole 30s loop for good - so live updates
+        # appeared totally broken.
+        last_state = (state_doc or {}).get("state", "")
+
+        desc = match.get('status', {}).get('type', {}).get('description', '')
+        current_stage = desc
+
+        if last_state != current_stage:
+            if current_stage in ['Halftime', 'Full Time', 'Final']:
+                try:
+                    comp = match['competitions'][0]['competitors']
+                    score_str = f"{comp[0]['team']['name']} {comp[0]['score']} - {comp[1]['score']} {comp[1]['team']['name']}"
+                    embed = discord.Embed(title=f"⏱️ {current_stage}: {match['name']}", description=f"**Score:** {score_str}", color=COLOR_MATCH)
+                    await channel.send(embed=embed)
+                except Exception:
+                    pass
+            await global_save_section(state_key, {"state": current_stage})
 
     async def resolve_battle(self, battle, all_matches, toto_key):
         p1 = str(battle['p1'])
