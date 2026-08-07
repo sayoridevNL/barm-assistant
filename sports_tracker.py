@@ -4,7 +4,7 @@ import requests
 import asyncio
 import time
 from datetime import datetime
-from shared import db_get, db_set, add_bal
+from shared import db_get, db_set, g_eco_add
 
 # --- CONFIGURATION ---
 TARGET_GUILD_ID = 1049396166250475612
@@ -192,16 +192,16 @@ class SportsTracker(commands.Cog):
         
         if p1_score > p2_score:
             w, l = u1, u2
-            await add_bal(int(p1), 25000)
-            await add_bal(int(p2), 500)
+            await g_eco_add(int(p1), 25000)
+            await g_eco_add(int(p2), 500)
         elif p2_score > p1_score:
             w, l = u2, u1
-            await add_bal(int(p2), 25000)
-            await add_bal(int(p1), 500)
+            await g_eco_add(int(p2), 25000)
+            await g_eco_add(int(p1), 500)
         else:
             w, l = None, None
-            await add_bal(int(p1), 500)
-            await add_bal(int(p2), 500)
+            await g_eco_add(int(p1), 500)
+            await g_eco_add(int(p2), 500)
             
         msg = f"⚽ **Toto Battle Resolved!** ⚽\n\n<@{p1}> Score: {p1_score}\n<@{p2}> Score: {p2_score}\n\n"
         if w: msg += f"🏆 **<@{w.id}> WINS 25,000 Sayories!**\n<@{l.id}> receives 500 Sayories for participating."
