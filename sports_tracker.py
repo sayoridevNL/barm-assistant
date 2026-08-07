@@ -269,12 +269,14 @@ class SportsTracker(commands.Cog):
         try: 
             u1_user = await self.bot.fetch_user(TARGET_USER_ID)
             await u1_user.send(msg)
-        except: pass
+        except Exception as e: 
+            print(f"Failed to DM u1: {e}")
         
         try: 
             u2_user = await self.bot.fetch_user(chosen_opp)
             await u2_user.send(msg.replace(f"<@{chosen_opp}>", f"<@{TARGET_USER_ID}>"))
-        except: pass
+        except Exception as e: 
+            print(f"Failed to DM u2: {e}")
 
     @match_tracker.before_loop
     async def before_match_tracker(self):
