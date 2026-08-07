@@ -663,3 +663,83 @@ async function submitSuggestion() {
         btn.innerHTML = '<i class="fa-solid fa-paper-plane"></i> Submit Suggestion';
     }
 }
+
+// --- TOTO BATTLE SYSTEM ---
+let currentTotoPicks = {};
+
+async function loadTotoBattle() {
+    try {
+        const res = await fetch('/api/toto/battle');
+        const data = await res.json();
+        
+        if (data.active) {
+            document.getElementById('btn-toto-tab').style.display = 'inline-block';
+            
+            const container = document.getElementById('toto-matches-container');
+            const status = document.getElementById('toto-status');
+            const submitBtn = document.getElementById('btn-submit-toto');
+            
+            if (data.resolved) {
+                status.innerText = 'This battle has already concluded! Check Discord for results.';
+                container.innerHTML = '';
+                submitBtn.style.display = 'none';
+                return;
+            }
+            
+            status.innerText = 'Select your predictions below:';
+            currentTotoPicks = data.my_picks || {};
+            
+            let html = '';
+            for (let m of data.match_data) {
+                const pick = currentTotoPicks[m.id];
+                html += `
+                <div style="display: flex; flex-direction: column; background: rgba(0,0,0,0.2); padding: 1rem; border-radius: 8px;">
+                    <div style="font-weight: 600; margin-bottom: 0.5rem; text-align: center;">${m.name}</div>
+                    <div style="display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 0.5rem;">
+                        <button class="btn ${pick === '1' ? 'btn-primary' : 'glass-panel'}" onclick="selectToto('${m.id}', '1')">1 (Home)</button>
+                        <button class="btn ${pick === 'X' ? 'btn-primary' : 'glass-panel'}" onclick="selectToto('${m.id}', 'X')">X (Draw)</button>
+                        <button class="btn ${pick === '2' ? 'btn-primary' : 'glass-panel'}" onclick="selectToto('${m.id}', '2')">2 (Away)</button>
+                    </div>
+                </div>`;
+            }
+            container.innerHTML = html;
+            submitBtn.style.display = 'inline-block';
+        }
+    } catch (err) {
+        console.error(err);
+    }
+}
+
+function selectToto(matchId, choice) {
+    currentTotoPicks[matchId] = choice;
+    loadTotoBattle(); // re-render to update button styles
+}
+
+async function submitTotoPredictions() {
+    const btn = document.getElementById('btn-submit-toto');
+    btn.disabled = true;
+    btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Locking in...';
+    
+    try {
+        const res = await fetch('/api/toto/predict', {
+            method: 'POST',
+            headers: {'Content-Type': 'application/json'},
+            body: JSON.stringify({ picks: currentTotoPicks })
+        });
+        const data = await res.json();
+        if (data.success) {
+            showToast('Predictions locked in successfully!', 'success');
+        } else {
+            showToast(data.error || 'Failed to submit.', 'error');
+        }
+    } catch (err) {
+        showToast('Network error submitting predictions.', 'error');
+    }
+    
+    btn.disabled = false;
+    btn.innerHTML = '<i class="fa-solid fa-check"></i> Lock In Predictions';
+}
+
+document.addEventListener('DOMContentLoaded', () => {
+    setTimeout(loadTotoBattle, 1500);
+});

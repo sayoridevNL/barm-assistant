@@ -66,6 +66,7 @@
                             <button class="tab-btn" data-target="umas-tab" role="tab" aria-selected="false" aria-controls="umas-tab"><i class="fa-solid fa-horse-head"></i> Trainees</button>
                             <button class="tab-btn" data-target="support-tab" role="tab" aria-selected="false" aria-controls="support-tab"><i class="fa-solid fa-clone"></i> Support Cards</button>
                             <button class="tab-btn" data-target="quotes-tab" role="tab" aria-selected="false" aria-controls="quotes-tab"><i class="fa-solid fa-quote-left"></i> Quotes</button>
+                            <button class="tab-btn" id="btn-toto-tab" data-target="toto-tab" role="tab" aria-selected="false" aria-controls="toto-tab" style="display: none;"><i class="fa-solid fa-futbol"></i> Prediction Battle</button>
                             <button class="tab-btn" data-target="suggestions-tab" role="tab" aria-selected="false" aria-controls="suggestions-tab"><i class="fa-solid fa-lightbulb"></i> Suggestions</button>
                             <button class="tab-btn admin-only" data-target="fleet-tab" role="tab" aria-selected="false" aria-controls="fleet-tab"><i class="fa-solid fa-server"></i> Fleet</button>
                             <button class="tab-btn admin-only" data-target="broadcast-tab" role="tab" aria-selected="false" aria-controls="broadcast-tab"><i class="fa-solid fa-bullhorn"></i> Broadcast</button>
@@ -197,6 +198,23 @@
                     </div>
                 </div>
 
+                <!-- Toto Battle Tab -->
+                <div id="toto-tab" class="tab-content" role="tabpanel">
+                    <div class="glass-panel">
+                        <div class="section-header">
+                            <h2><i class="fa-solid fa-futbol"></i> Toto Prediction Battle</h2>
+                            <p class="section-desc">You've been selected for a live prediction battle for today's matches! Prize: 25,000 Sayories</p>
+                        </div>
+                        <div id="toto-status" style="padding: 1rem; text-align: center; font-weight: 600; color: var(--pink);">Loading battle data...</div>
+                        <div id="toto-matches-container" style="display: flex; flex-direction: column; gap: 1rem; padding: 1rem;">
+                            <!-- Dynamically populated -->
+                        </div>
+                        <div style="text-align: center; padding: 1rem;">
+                            <button id="btn-submit-toto" class="btn btn-primary" onclick="submitTotoPredictions()" style="display: none;"><i class="fa-solid fa-check"></i> Lock In Predictions</button>
+                        </div>
+                    </div>
+                </div>
+
                 <!-- Suggestions Tab -->
                 <div id="suggestions-tab" class="tab-content" role="tabpanel">
                     <div class="glass-panel">
@@ -292,6 +310,6 @@
     <!-- Scripts -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.13/codemirror.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.13/mode/python/python.min.js"></script>
-    <script src="{{ url_for('static', filename='script.js') }}?v=5.0"></script>
+    <script src="{{ url_for('static', filename='script.js') }}?v=6.0"></script>
 </body>
 </html>

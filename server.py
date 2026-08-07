@@ -244,6 +244,76 @@ def publish_embed():
     else:
         return jsonify({'error': 'MongoDB is not connected. Broadcasts require MongoDB.'}), 500
 
+@app.route('/api/toto/battle', methods=['GET'])
+def get_toto_battle():
+    user_id = session.get('user_id')
+    if not user_id:
+        return jsonify({'error': 'Unauthorized'}), 401
+        
+    import time, json
+    from datetime import datetime
+    from pathlib import Path
+    
+    today_str = datetime.now().strftime("%Y%m%d")
+    toto_key = f"toto_battle_{today_str}"
+    
+    battle = {}
+    if mongo_db is not None:
+        doc = mongo_db.global_data.find_one({"_id": toto_key})
+        if doc: battle = doc.get("data", {})
+    else:
+        from shared import _load_global_sync
+        battle = _load_global_sync().get(toto_key, {})
+        
+    if not battle:
+        return jsonify({'active': False})
+        
+    if int(user_id) not in [int(battle.get('p1', 0)), int(battle.get('p2', 0))]:
+        return jsonify({'active': False})
+        
+    # Return battle data without opponent's picks to prevent cheating
+    my_picks = battle.get('picks', {}).get(str(user_id), {})
+    return jsonify({
+        'active': True,
+        'resolved': battle.get('resolved', False),
+        'match_data': battle.get('match_data', []),
+        'my_picks': my_picks
+    })
+
+@app.route('/api/toto/predict', methods=['POST'])
+def submit_toto_predict():
+    user_id = session.get('user_id')
+    if not user_id: return jsonify({'error': 'Unauthorized'}), 401
+    
+    data = request.json
+    picks = data.get('picks', {})
+    
+    import time, json
+    from datetime import datetime
+    today_str = datetime.now().strftime("%Y%m%d")
+    toto_key = f"toto_battle_{today_str}"
+    
+    if mongo_db is not None:
+        doc = mongo_db.global_data.find_one({"_id": toto_key})
+        battle = doc.get("data", {}) if doc else {}
+        if not battle or battle.get('resolved'): return jsonify({'error': 'Battle not active or already resolved'}), 400
+        if int(user_id) not in [int(battle.get('p1', 0)), int(battle.get('p2', 0))]: return jsonify({'error': 'Not in battle'}), 403
+        
+        battle.setdefault('picks', {})[str(user_id)] = picks
+        mongo_db.global_data.update_one({"_id": toto_key}, {"$set": {"data": battle}}, upsert=True)
+    else:
+        from shared import _load_global_sync, _save_global_sync, _global_lock
+        gl_data = _load_global_sync()
+        battle = gl_data.get(toto_key, {})
+        if not battle or battle.get('resolved'): return jsonify({'error': 'Battle not active or already resolved'}), 400
+        if int(user_id) not in [int(battle.get('p1', 0)), int(battle.get('p2', 0))]: return jsonify({'error': 'Not in battle'}), 403
+        
+        battle.setdefault('picks', {})[str(user_id)] = picks
+        gl_data[toto_key] = battle
+        _save_global_sync(gl_data)
+        
+    return jsonify({'success': True})
+
 
 @app.route('/api/suggest', methods=['POST'])
 def submit_suggestion():
