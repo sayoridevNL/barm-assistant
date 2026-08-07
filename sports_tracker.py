@@ -216,67 +216,78 @@ class SportsTracker(commands.Cog):
 
     @tasks.loop(minutes=60)
     async def toto_daily(self):
-        import random
-        # Bot can create the battle any time of day if it missed it due to restarts
-        
-        today_str = datetime.now().strftime("%Y%m%d")
-        toto_key = f"toto_battle_{today_str}"
-        
-        has_run = await global_get_section(toto_key)
-        if has_run: return
-        
-        all_matches = []
-        for league in LEAGUES:
-            matches = self.fetch_league_matches(league, date_str=today_str)
-            all_matches.extend(matches)
+        try:
+            import random
+            today_str = datetime.now().strftime("%Y%m%d")
+            toto_key = f"toto_battle_{today_str}"
             
-        if not all_matches: return
-        
-        opponents = [u for u in WHITELISTED_IDS if u != TARGET_USER_ID]
-        chosen_opp = random.choice(opponents)
-        
-        match_data = []
-        for m in all_matches:
-            comp = m['competitions'][0]['competitors']
-            home = next((c for c in comp if c['homeAway'] == 'home'), comp[0])
-            away = next((c for c in comp if c['homeAway'] == 'away'), comp[1])
-            match_data.append({
-                "id": m['id'],
-                "name": f"{home['team']['name']} vs {away['team']['name']}"
+            has_run = await global_get_section(toto_key)
+            print(f"[Toto] has_run check: {has_run}")
+            if has_run: return
+            
+            all_matches = []
+            for league in LEAGUES:
+                matches = self.fetch_league_matches(league, date_str=today_str)
+                all_matches.extend(matches)
+                
+            print(f"[Toto] Fetched {len(all_matches)} matches.")
+            if not all_matches: return
+            
+            opponents = [u for u in WHITELISTED_IDS if u != TARGET_USER_ID]
+            chosen_opp = random.choice(opponents)
+            
+            match_data = []
+            for m in all_matches:
+                comp = m['competitions'][0]['competitors']
+                home = next((c for c in comp if c['homeAway'] == 'home'), comp[0])
+                away = next((c for c in comp if c['homeAway'] == 'away'), comp[1])
+                match_data.append({
+                    "id": m['id'],
+                    "name": f"{home['team']['name']} vs {away['team']['name']}"
+                })
+            
+            await global_save_section(toto_key, {
+                "p1": TARGET_USER_ID,
+                "p2": chosen_opp,
+                "matches": [m['id'] for m in all_matches],
+                "match_data": match_data,
+                "picks": {},
+                "resolved": False
             })
-        
-        await global_save_section(toto_key, {
-            "p1": TARGET_USER_ID,
-            "p2": chosen_opp,
-            "matches": [m['id'] for m in all_matches],
-            "match_data": match_data,
-            "picks": {},
-            "resolved": False
-        })
-        
-        # Announce matches in the sports channel
-        channel = await self.get_channel()
-        if channel:
-            announce_embed = discord.Embed(title="⚽ Today's Live Matches", description="The Toto Battle has started! Here are the matches for today:", color=COLOR_MATCH)
-            for m in match_data:
-                announce_embed.add_field(name=m['name'], value="Predictions locked in on the dashboard!", inline=False)
-            try:
-                await channel.send(embed=announce_embed)
-            except: pass
-        
-        msg = f"⚽ **Toto Prediction Battle!** ⚽\nYou have been challenged for today's matches!\n\nOpponent: <@{chosen_opp}>\nMatches today: {len(all_matches)}\n\nGo to the **Web Dashboard** and check the **Prediction Battle** tab to lock in your predictions!\nPrize: **25,000 Sayories**"
-        
-        try: 
-            u1_user = await self.bot.fetch_user(TARGET_USER_ID)
-            await u1_user.send(msg)
-        except Exception as e: 
-            print(f"Failed to DM u1: {e}")
-        
-        try: 
-            u2_user = await self.bot.fetch_user(chosen_opp)
-            await u2_user.send(msg.replace(f"<@{chosen_opp}>", f"<@{TARGET_USER_ID}>"))
-        except Exception as e: 
-            print(f"Failed to DM u2: {e}")
+            print("[Toto] Saved to global DB!")
+            
+            # Announce matches in the sports channel
+            channel = await self.get_channel()
+            if channel:
+                announce_embed = discord.Embed(title="⚽ Today's Live Matches", description="The Toto Battle has started! Here are the matches for today:", color=COLOR_MATCH)
+                for m in match_data:
+                    announce_embed.add_field(name=m['name'], value="Predictions locked in on the dashboard!", inline=False)
+                try:
+                    await channel.send(embed=announce_embed)
+                    print("[Toto] Announcement sent!")
+                except Exception as e:
+                    print(f"[Toto] Announcement failed: {e}")
+            else:
+                print("[Toto] Sports channel not found!")
+            
+            msg = f"⚽ **Toto Prediction Battle!** ⚽\nYou have been challenged for today's matches!\n\nOpponent: <@{chosen_opp}>\nMatches today: {len(all_matches)}\n\nGo to the **Web Dashboard** and check the **Prediction Battle** tab to lock in your predictions!\nPrize: **25,000 Sayories**"
+            
+            try: 
+                u1_user = await self.bot.fetch_user(TARGET_USER_ID)
+                await u1_user.send(msg)
+                print("[Toto] DM sent to u1")
+            except Exception as e: 
+                print(f"[Toto] Failed to DM u1: {e}")
+            
+            try: 
+                u2_user = await self.bot.fetch_user(chosen_opp)
+                await u2_user.send(msg.replace(f"<@{chosen_opp}>", f"<@{TARGET_USER_ID}>"))
+                print("[Toto] DM sent to u2")
+            except Exception as e: 
+                print(f"[Toto] Failed to DM u2: {e}")
+                
+        except Exception as e:
+            print(f"[Toto] FATAL ERROR IN TOTO DAILY: {e}")
 
     @match_tracker.before_loop
     async def before_match_tracker(self):
@@ -285,6 +296,13 @@ class SportsTracker(commands.Cog):
     @toto_daily.before_loop
     async def before_toto_daily(self):
         await self.bot.wait_until_ready()
+        
+    @discord.app_commands.command(name="totoforce", description="Manually force the Toto battle generation for today (Admin only)")
+    @discord.app_commands.default_permissions(administrator=True)
+    async def toto_force(self, interaction: discord.Interaction):
+        await interaction.response.send_message("Forcing toto_daily execution...", ephemeral=True)
+        await self.toto_daily()
+        await interaction.followup.send("Execution finished! Check the bot console for logs.", ephemeral=True)
 
 async def setup(bot):
     await bot.add_cog(SportsTracker(bot))
