@@ -2,7 +2,6 @@ import discord
 from discord.ext import commands, tasks
 import requests
 import asyncio
-import time
 from datetime import datetime
 from shared import db_get, db_set, g_eco_add, global_get_section, global_save_section
 
@@ -11,7 +10,8 @@ TARGET_GUILD_ID = 1049396166250475612
 WHITELISTED_IDS = [1158703899843231836, 899372657554894909, 907956482207776778, 315845909533556741, 787681263267479572, 1513484108033163309, 879118301169602570, 748110757400674324, 431864554910121994]
 TARGET_USER_ID = 879118301169602570
 LEAGUES = ['ned.1', 'ned.2', 'ned.cup']
-API_URL = "http://site.api.espn.com/apis/site/v2/sports/soccer/{}/scoreboard"
+API_URL = "https://site.api.espn.com/apis/site/v2/sports/soccer/{}/scoreboard"
+SUMMARY_URL = "https://site.api.espn.com/apis/site/v2/sports/soccer/{}/summary?event={}"
 
 COLOR_GOAL = 0x2ecc71
 COLOR_YELLOW = 0xf1c40f
@@ -44,15 +44,35 @@ class SportsTracker(commands.Cog):
                 return ch
         return guild.system_channel or guild.text_channels[0]
 
-    def fetch_league_matches(self, league, date_str=None):
+    async def fetch_league_matches(self, league, date_str=None):
         url = API_URL.format(league)
         if date_str: url += f"?dates={date_str}"
         try:
-            r = requests.get(url, timeout=10)
+            r = await asyncio.to_thread(requests.get, url, timeout=10)
             if r.status_code == 200:
                 return r.json().get('events', [])
-        except: pass
+        except requests.RequestException as exc:
+            print(f"[Sports] Could not fetch {league}: {exc}")
         return []
+
+    async def fetch_match_details(self, league, match_id):
+        """The scoreboard omits play-by-play details; the summary endpoint has them."""
+        try:
+            response = await asyncio.to_thread(
+                requests.get, SUMMARY_URL.format(league, match_id), timeout=10
+            )
+            if response.status_code != 200:
+                return []
+            payload = response.json()
+            header = payload.get("header", {})
+            competitions = header.get("competitions", [])
+            # Depending on the ESPN feed, live events appear either on the
+            # competition or in the top-level commentary collection.
+            details = competitions[0].get("details", []) if competitions else []
+            return details or payload.get("commentary", [])
+        except requests.RequestException as exc:
+            print(f"[Sports] Could not fetch match {match_id}: {exc}")
+            return []
 
     def extract_new_events(self, match):
         new_events = []
@@ -96,11 +116,16 @@ class SportsTracker(commands.Cog):
         all_matches = []
         
         for league in LEAGUES:
-            matches = self.fetch_league_matches(league)
+            matches = await self.fetch_league_matches(league)
             all_matches.extend(matches)
             for match in matches:
                 state = match.get('status', {}).get('type', {}).get('state', '')
                 if state == 'in':
+                    competition = match.get('competitions', [{}])[0]
+                    # ESPN's scoreboard payload has an empty `details` list. Fill it
+                    # from the match summary before looking for goals and cards.
+                    if not competition.get('details'):
+                        competition['details'] = await self.fetch_match_details(league, match['id'])
                     new_events = self.extract_new_events(match)
                     for ev in new_events:
                         embed = discord.Embed(title=f"⚽ {ev['match_name']}", description=f"**{ev['time']}** - {ev['team']}", color=COLOR_MATCH)
@@ -227,7 +252,7 @@ class SportsTracker(commands.Cog):
             
             all_matches = []
             for league in LEAGUES:
-                matches = self.fetch_league_matches(league, date_str=today_str)
+                matches = await self.fetch_league_matches(league, date_str=today_str)
                 all_matches.extend(matches)
                 
             print(f"[Toto] Fetched {len(all_matches)} matches.")

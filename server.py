@@ -285,8 +285,10 @@ def submit_toto_predict():
     user_id = session.get('user_id')
     if not user_id: return jsonify({'error': 'Unauthorized'}), 401
     
-    data = request.json
+    data = request.get_json(silent=True) or {}
     picks = data.get('picks', {})
+    if not isinstance(picks, dict):
+        return jsonify({'error': 'Predictions must be an object'}), 400
     
     import time, json
     from datetime import datetime
@@ -299,7 +301,10 @@ def submit_toto_predict():
         if not battle or battle.get('resolved'): return jsonify({'error': 'Battle not active or already resolved'}), 400
         if int(user_id) not in [int(battle.get('p1', 0)), int(battle.get('p2', 0))]: return jsonify({'error': 'Not in battle'}), 403
         
-        battle.setdefault('picks', {})[str(user_id)] = picks
+        valid_match_ids = {str(match['id']) for match in battle.get('match_data', [])}
+        if set(map(str, picks)) != valid_match_ids or any(choice not in {'1', 'X', '2'} for choice in picks.values()):
+            return jsonify({'error': 'Choose one valid result for every match'}), 400
+        battle.setdefault('picks', {})[str(user_id)] = {str(match_id): choice for match_id, choice in picks.items()}
         mongo_db.global_data.update_one({"_id": toto_key}, {"$set": {"data": battle}}, upsert=True)
     else:
         from shared import _load_global_sync, _save_global_sync, _global_lock
@@ -308,11 +313,14 @@ def submit_toto_predict():
         if not battle or battle.get('resolved'): return jsonify({'error': 'Battle not active or already resolved'}), 400
         if int(user_id) not in [int(battle.get('p1', 0)), int(battle.get('p2', 0))]: return jsonify({'error': 'Not in battle'}), 403
         
-        battle.setdefault('picks', {})[str(user_id)] = picks
+        valid_match_ids = {str(match['id']) for match in battle.get('match_data', [])}
+        if set(map(str, picks)) != valid_match_ids or any(choice not in {'1', 'X', '2'} for choice in picks.values()):
+            return jsonify({'error': 'Choose one valid result for every match'}), 400
+        battle.setdefault('picks', {})[str(user_id)] = {str(match_id): choice for match_id, choice in picks.items()}
         gl_data[toto_key] = battle
         _save_global_sync(gl_data)
         
-    return jsonify({'success': True})
+    return jsonify({'success': True, 'picks': battle['picks'][str(user_id)]})
 
 
 @app.route('/api/suggest', methods=['POST'])

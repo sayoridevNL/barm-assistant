@@ -35,6 +35,10 @@ class CommunityBot(commands.Bot):
     async def setup_hook(self):
         self.add_view(SuggestionView())
         check_web_suggestions.start()
+        try:
+            await self.load_extension("sports_tracker")
+        except Exception as exc:
+            print(f"Failed to load sports_tracker: {exc}")
 
     @tasks.loop(seconds=60)
     async def vc_payout_loop(self) -> None:

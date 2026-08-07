@@ -687,7 +687,10 @@ async function loadTotoBattle() {
             }
             
             status.innerText = 'Select your predictions below:';
-            currentTotoPicks = data.my_picks || {};
+            // Keep choices made in this browser while the cards are re-rendered.
+            // Previously every click reloaded the saved server state and discarded
+            // the choice before the user could lock it in.
+            currentTotoPicks = { ...(data.my_picks || {}), ...currentTotoPicks };
             
             let html = '';
             for (let m of data.match_data) {
@@ -729,6 +732,7 @@ async function submitTotoPredictions() {
         const data = await res.json();
         if (data.success) {
             showToast('Predictions locked in successfully!', 'success');
+            currentTotoPicks = data.picks || currentTotoPicks;
         } else {
             showToast(data.error || 'Failed to submit.', 'error');
         }

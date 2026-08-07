@@ -33,12 +33,6 @@ class GamblingBot(commands.Bot):
         self._uno: dict = {}
         self._roulette: dict = {}
 
-    async def setup_hook(self):
-        try:
-            await self.load_extension("sports_tracker")
-        except Exception as e:
-            print(f"Failed to load sports_tracker: {e}")
-
     async def on_ready(self):
         print("🔄 Syncing gambling bot commands…")
         asyncio.create_task(safe_sync(self))
