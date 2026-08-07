@@ -13,17 +13,6 @@ from discord.ext import commands
 import motor.motor_asyncio
 from typing import Optional, Union, List, Dict, Any
 
-MONGO_URI = os.getenv("MONGODB_URI")
-mongo_client = None
-mongo_db = None
-
-def _get_mongo_db():
-    global mongo_client, mongo_db
-    if mongo_db is None and MONGO_URI:
-        mongo_client = motor.motor_asyncio.AsyncIOMotorClient(MONGO_URI)
-        mongo_db = mongo_client["barm_os"]
-    return mongo_db
-
 # ── .env LOADER ──────────────────────────────────────────────────────────────
 BASE_DIR = Path(__file__).resolve().parent
 
@@ -40,6 +29,19 @@ def _load_dotenv(path: str = ".env"):
         os.environ.setdefault(key, value)
 
 _load_dotenv()
+
+# The bots and web dashboard must initialize this after .env is loaded, or
+# they can accidentally use separate stores for the same prediction battle.
+MONGO_URI = os.getenv("MONGODB_URI")
+mongo_client = None
+mongo_db = None
+
+def _get_mongo_db():
+    global mongo_client, mongo_db
+    if mongo_db is None and MONGO_URI:
+        mongo_client = motor.motor_asyncio.AsyncIOMotorClient(MONGO_URI)
+        mongo_db = mongo_client["barm_os"]
+    return mongo_db
 
 # ── CONFIG ───────────────────────────────────────────────────────────────────
 BOT_OWNER_ID = int(os.getenv("SAYORIE_OWNER_ID", "1043235209639886972"))

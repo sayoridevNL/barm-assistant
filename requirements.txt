@@ -9,3 +9,4 @@ wavelink
 requests
 motor[srv]
 dnspython
+tzdata

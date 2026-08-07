@@ -671,14 +671,15 @@ async function loadTotoBattle() {
     try {
         const res = await fetch('/api/toto/battle');
         const data = await res.json();
+        const tab = document.getElementById('btn-toto-tab');
+        const container = document.getElementById('toto-matches-container');
+        const status = document.getElementById('toto-status');
+        const submitBtn = document.getElementById('btn-submit-toto');
+
+        if (!data.eligible) return;
+        tab.style.display = 'inline-block';
         
         if (data.active) {
-            document.getElementById('btn-toto-tab').style.display = 'inline-block';
-            
-            const container = document.getElementById('toto-matches-container');
-            const status = document.getElementById('toto-status');
-            const submitBtn = document.getElementById('btn-submit-toto');
-            
             if (data.resolved) {
                 status.innerText = 'This battle has already concluded! Check Discord for results.';
                 container.innerHTML = '';
@@ -707,6 +708,10 @@ async function loadTotoBattle() {
             }
             container.innerHTML = html;
             submitBtn.style.display = 'inline-block';
+        } else {
+            status.innerText = data.message || 'There is no Prediction Battle for you today. A battle is created automatically on Eredivisie, Keuken Kampioen Divisie, or KNVB Beker match days.';
+            container.innerHTML = '';
+            submitBtn.style.display = 'none';
         }
     } catch (err) {
         console.error(err);

@@ -6,6 +6,7 @@ import threading
 import time
 import requests
 import pymongo
+from zoneinfo import ZoneInfo
 from flask import Flask, request, jsonify, render_template, session, send_from_directory, redirect
 from dotenv import load_dotenv
 
@@ -25,6 +26,12 @@ DISCORD_CLIENT_ID = os.getenv('DISCORD_CLIENT_ID')
 DISCORD_CLIENT_SECRET = os.getenv('DISCORD_CLIENT_SECRET')
 DISCORD_REDIRECT_URI = os.getenv('DISCORD_REDIRECT_URI', 'http://localhost:5000/api/auth/callback')
 ADMIN_IDS = ["1043235209639886972", "1480592862734323763"]
+TOTO_PARTICIPANT_IDS = {
+    "1158703899843231836", "899372657554894909", "907956482207776778",
+    "315845909533556741", "787681263267479572", "1513484108033163309",
+    "879118301169602570", "748110757400674324", "431864554910121994",
+}
+NETHERLANDS_TZ = ZoneInfo("Europe/Amsterdam")
 
 BOTS = [
     "music_bot",
@@ -249,12 +256,14 @@ def get_toto_battle():
     user_id = session.get('user_id')
     if not user_id:
         return jsonify({'error': 'Unauthorized'}), 401
+    if user_id not in TOTO_PARTICIPANT_IDS:
+        return jsonify({'eligible': False, 'active': False})
         
     import time, json
     from datetime import datetime
     from pathlib import Path
     
-    today_str = datetime.now().strftime("%Y%m%d")
+    today_str = datetime.now(NETHERLANDS_TZ).strftime("%Y%m%d")
     toto_key = f"toto_battle_{today_str}"
     
     battle = {}
@@ -266,14 +275,15 @@ def get_toto_battle():
         battle = _load_global_sync().get(toto_key, {})
         
     if not battle:
-        return jsonify({'active': False})
+        return jsonify({'eligible': True, 'active': False})
         
     if int(user_id) not in [int(battle.get('p1', 0)), int(battle.get('p2', 0))]:
-        return jsonify({'active': False})
+        return jsonify({'eligible': True, 'active': False, 'message': 'A battle is running today, but you were not selected.'})
         
     # Return battle data without opponent's picks to prevent cheating
     my_picks = battle.get('picks', {}).get(str(user_id), {})
     return jsonify({
+        'eligible': True,
         'active': True,
         'resolved': battle.get('resolved', False),
         'match_data': battle.get('match_data', []),
@@ -284,6 +294,8 @@ def get_toto_battle():
 def submit_toto_predict():
     user_id = session.get('user_id')
     if not user_id: return jsonify({'error': 'Unauthorized'}), 401
+    if user_id not in TOTO_PARTICIPANT_IDS:
+        return jsonify({'error': 'You are not eligible for Prediction Battles'}), 403
     
     data = request.get_json(silent=True) or {}
     picks = data.get('picks', {})
@@ -292,7 +304,7 @@ def submit_toto_predict():
     
     import time, json
     from datetime import datetime
-    today_str = datetime.now().strftime("%Y%m%d")
+    today_str = datetime.now(NETHERLANDS_TZ).strftime("%Y%m%d")
     toto_key = f"toto_battle_{today_str}"
     
     if mongo_db is not None:
