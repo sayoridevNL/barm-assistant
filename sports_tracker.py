@@ -264,18 +264,17 @@ class SportsTracker(commands.Cog):
                 await channel.send(embed=announce_embed)
             except: pass
         
-        guild = self.bot.get_guild(TARGET_GUILD_ID)
-        if guild:
-            u1 = guild.get_member(TARGET_USER_ID)
-            u2 = guild.get_member(chosen_opp)
-            msg = f"⚽ **Toto Prediction Battle!** ⚽\nYou have been challenged for today's matches!\n\nOpponent: <@{chosen_opp if u1 else TARGET_USER_ID}>\nMatches today: {len(all_matches)}\n\nGo to the **Web Dashboard** and check the **Prediction Battle** tab to lock in your predictions!\nPrize: **25,000 Sayories**"
-            
-            if u1: 
-                try: await u1.send(msg)
-                except: pass
-            if u2:
-                try: await u2.send(msg.replace(f"<@{chosen_opp}>", f"<@{TARGET_USER_ID}>"))
-                except: pass
+        msg = f"⚽ **Toto Prediction Battle!** ⚽\nYou have been challenged for today's matches!\n\nOpponent: <@{chosen_opp}>\nMatches today: {len(all_matches)}\n\nGo to the **Web Dashboard** and check the **Prediction Battle** tab to lock in your predictions!\nPrize: **25,000 Sayories**"
+        
+        try: 
+            u1_user = await self.bot.fetch_user(TARGET_USER_ID)
+            await u1_user.send(msg)
+        except: pass
+        
+        try: 
+            u2_user = await self.bot.fetch_user(chosen_opp)
+            await u2_user.send(msg.replace(f"<@{chosen_opp}>", f"<@{TARGET_USER_ID}>"))
+        except: pass
 
     @match_tracker.before_loop
     async def before_match_tracker(self):
