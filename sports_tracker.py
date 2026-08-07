@@ -208,8 +208,7 @@ class SportsTracker(commands.Cog):
     @tasks.loop(minutes=60)
     async def toto_daily(self):
         import random
-        hour = datetime.now().hour
-        if hour < 7 or hour > 10: return
+        # Bot can create the battle any time of day if it missed it due to restarts
         
         today_str = datetime.now().strftime("%Y%m%d")
         toto_key = f"toto_battle_{today_str}"
