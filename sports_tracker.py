@@ -71,21 +71,26 @@ class SportsTracker(commands.Cog):
             competition = match['competitions'][0]
             details = competition.get('details', [])
             for det in details:
-                evt_id = det.get('id')
-                if not evt_id or evt_id in self.seen_events: continue
-
                 type_text = det.get('type', {}).get('text', '')
                 clock = det.get('clock', {}).get('displayValue', '')
                 team_id = det.get('team', {}).get('id')
+
+                players = [ath.get('displayName', 'Unknown') for ath in det.get('athletesInvolved', [])]
+                player_str = ", ".join(players) if players else "Unknown Player"
+
+                # ESPN's soccer detail entries usually don't carry a stable
+                # top-level "id" (it's None/absent), which used to make every
+                # event look "already seen" and get silently skipped. Build
+                # our own key from fields that are reliably present instead.
+                evt_id = det.get('id') or f"{match['id']}:{team_id}:{type_text}:{clock}:{player_str}"
+                if evt_id in self.seen_events:
+                    continue
 
                 team_name = "Unknown Team"
                 for comp in competition.get('competitors', []):
                     if comp['team']['id'] == team_id:
                         team_name = comp['team']['displayName']
                         break
-
-                players = [ath.get('displayName', 'Unknown') for ath in det.get('athletesInvolved', [])]
-                player_str = ", ".join(players) if players else "Unknown Player"
 
                 new_events.append({
                     'id': evt_id, 'type': type_text, 'time': clock,
