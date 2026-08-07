@@ -4,7 +4,7 @@ import requests
 import asyncio
 import time
 from datetime import datetime
-from shared import db_get, db_set, g_eco_add
+from shared import db_get, db_set, g_eco_add, global_get_section, global_save_section
 
 # --- CONFIGURATION ---
 TARGET_GUILD_ID = 1049396166250475612
@@ -91,7 +91,7 @@ class SportsTracker(commands.Cog):
         
         today_str = datetime.now().strftime("%Y%m%d")
         toto_key = f"toto_battle_{today_str}"
-        battle = await db_get("global", toto_key)
+        battle = await global_get_section(toto_key)
         
         all_matches = []
         
@@ -127,7 +127,9 @@ class SportsTracker(commands.Cog):
                 # State changes (halftime / fulltime)
                 match_id = match['id']
                 state_key = f"match_state_{match_id}"
-                last_state = await db_get("global", state_key)
+                
+                state_doc = await global_get_section(state_key)
+                last_state = state_doc.get("state", "")
                 
                 desc = match.get('status', {}).get('type', {}).get('description', '')
                 current_stage = desc
@@ -140,7 +142,7 @@ class SportsTracker(commands.Cog):
                             embed = discord.Embed(title=f"⏱️ {current_stage}: {match['name']}", description=f"**Score:** {score_str}", color=COLOR_MATCH)
                             await channel.send(embed=embed)
                         except: pass
-                    await db_set("global", current_stage, state_key)
+                    await global_save_section(state_key, {"state": current_stage})
 
         # Check Toto Battle Resolution
         if battle and not battle.get("resolved"):
@@ -183,7 +185,7 @@ class SportsTracker(commands.Cog):
             if p2_picks.get(match['id']) == actual: p2_score += 1
             
         battle["resolved"] = True
-        await db_set("global", battle, toto_key)
+        await global_save_section(toto_key, battle)
         
         guild = self.bot.get_guild(TARGET_GUILD_ID)
         if not guild: return
@@ -220,7 +222,7 @@ class SportsTracker(commands.Cog):
         today_str = datetime.now().strftime("%Y%m%d")
         toto_key = f"toto_battle_{today_str}"
         
-        has_run = await db_get("global", toto_key)
+        has_run = await global_get_section(toto_key)
         if has_run: return
         
         all_matches = []
@@ -243,14 +245,24 @@ class SportsTracker(commands.Cog):
                 "name": f"{home['team']['name']} vs {away['team']['name']}"
             })
         
-        await db_set("global", {
+        await global_save_section(toto_key, {
             "p1": TARGET_USER_ID,
             "p2": chosen_opp,
             "matches": [m['id'] for m in all_matches],
             "match_data": match_data,
             "picks": {},
             "resolved": False
-        }, toto_key)
+        })
+        
+        # Announce matches in the sports channel
+        channel = await self.get_channel()
+        if channel:
+            announce_embed = discord.Embed(title="⚽ Today's Live Matches", description="The Toto Battle has started! Here are the matches for today:", color=COLOR_MATCH)
+            for m in match_data:
+                announce_embed.add_field(name=m['name'], value="Predictions locked in on the dashboard!", inline=False)
+            try:
+                await channel.send(embed=announce_embed)
+            except: pass
         
         guild = self.bot.get_guild(TARGET_GUILD_ID)
         if guild:
