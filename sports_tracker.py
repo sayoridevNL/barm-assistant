@@ -3,16 +3,11 @@ from discord.ext import commands, tasks
 import requests
 import asyncio
 import traceback
-from datetime import datetime
-from zoneinfo import ZoneInfo
-from shared import db_get, db_set, g_eco_add, global_get_section, global_save_section
+from shared import global_get_section, global_save_section
 
 # --- CONFIGURATION ---
-TARGET_GUILD_ID = 1049396166250475612
-WHITELISTED_IDS = [1158703899843231836, 899372657554894909, 907956482207776778, 315845909533556741, 787681263267479572, 1513484108033163309, 879118301169602570, 748110757400674324, 431864554910121994]
-TARGET_USER_ID = 879118301169602570
+SPORTS_CHANNEL_ID = 1535258343675789322
 LEAGUES = ['ned.1', 'ned.2', 'ned.cup']
-NETHERLANDS_TZ = ZoneInfo("Europe/Amsterdam")
 API_URL = "https://site.api.espn.com/apis/site/v2/sports/soccer/{}/scoreboard"
 SUMMARY_URL = "https://site.api.espn.com/apis/site/v2/sports/soccer/{}/summary?event={}"
 
@@ -26,31 +21,19 @@ class SportsTracker(commands.Cog):
         self.bot = bot
         self.seen_events = set()
         self.match_tracker.start()
-        self.toto_daily.start()
-        
+
     def cog_unload(self):
         self.match_tracker.cancel()
-        self.toto_daily.cancel()
-
-    @staticmethod
-    def today_key():
-        """Use the Dutch calendar date for both ESPN and the web dashboard."""
-        return datetime.now(NETHERLANDS_TZ).strftime("%Y%m%d")
 
     async def get_channel(self):
-        guild = self.bot.get_guild(TARGET_GUILD_ID)
-        if not guild: return None
-        
-        channel_id = await db_get(TARGET_GUILD_ID, "sports_channel")
-        if channel_id:
-            ch = guild.get_channel(int(channel_id))
-            if ch: return ch
-            
-        # Fallback if not configured
-        for ch in guild.text_channels:
-            if "sport" in ch.name.lower() or "voetbal" in ch.name.lower():
-                return ch
-        return guild.system_channel or guild.text_channels[0]
+        channel = self.bot.get_channel(SPORTS_CHANNEL_ID)
+        if channel:
+            return channel
+        try:
+            return await self.bot.fetch_channel(SPORTS_CHANNEL_ID)
+        except (discord.NotFound, discord.Forbidden, discord.HTTPException) as exc:
+            print(f"[Sports] Could not access sports channel {SPORTS_CHANNEL_ID}: {exc}")
+            return None
 
     async def fetch_league_matches(self, league, date_str=None):
         url = API_URL.format(league)
@@ -90,20 +73,20 @@ class SportsTracker(commands.Cog):
             for det in details:
                 evt_id = det.get('id')
                 if not evt_id or evt_id in self.seen_events: continue
-                
+
                 type_text = det.get('type', {}).get('text', '')
                 clock = det.get('clock', {}).get('displayValue', '')
                 team_id = det.get('team', {}).get('id')
-                
+
                 team_name = "Unknown Team"
                 for comp in competition.get('competitors', []):
                     if comp['team']['id'] == team_id:
                         team_name = comp['team']['displayName']
                         break
-                
+
                 players = [ath.get('displayName', 'Unknown') for ath in det.get('athletesInvolved', [])]
                 player_str = ", ".join(players) if players else "Unknown Player"
-                
+
                 new_events.append({
                     'id': evt_id, 'type': type_text, 'time': clock,
                     'team': team_name, 'player': player_str, 'match_name': match['name']
@@ -117,44 +100,20 @@ class SportsTracker(commands.Cog):
     async def match_tracker(self):
         # Wrapped in try/except: an unhandled exception here would silently
         # kill this whole loop forever (discord.py's tasks.loop does not
-        # auto-restart on error), which is why live updates could stop
-        # completely after a single bad match/API response.
+        # auto-restart on error), taking down all live updates with it.
         try:
             channel = await self.get_channel()
             if not channel:
                 return
 
-            today_str = self.today_key()
-            toto_key = f"toto_battle_{today_str}"
-            battle = await global_get_section(toto_key)
-
-            all_matches = []
-
             for league in LEAGUES:
                 matches = await self.fetch_league_matches(league)
-                all_matches.extend(matches)
                 for match in matches:
                     try:
                         await self.process_match(league, match, channel)
                     except Exception as exc:
                         print(f"[Sports] Error processing match {match.get('id')}: {exc}")
                         traceback.print_exc()
-
-            # Check Toto Battle Resolution
-            if battle and not battle.get("resolved"):
-                all_completed = True
-                for mid in battle["matches"]:
-                    m = next((m for m in all_matches if m['id'] == mid), None)
-                    if m:
-                        state = m.get('status', {}).get('type', {}).get('state', '')
-                        if state != 'post':
-                            all_completed = False
-                            break
-                    else:
-                        pass
-
-                if all_completed and len(all_matches) > 0:
-                    await self.resolve_battle(battle, all_matches, toto_key)
         except Exception as exc:
             print(f"[Sports] FATAL ERROR IN match_tracker: {exc}")
             traceback.print_exc()
@@ -197,12 +156,6 @@ class SportsTracker(commands.Cog):
         state_key = f"match_state_{match_id}"
 
         state_doc = await global_get_section(state_key)
-        # BUG FIX: global_get_section returns None when the key doesn't exist
-        # yet (same as the `battle`/`has_run` lookups elsewhere in this file).
-        # Calling .get() directly on that None crashed match_tracker with an
-        # AttributeError on the very first live match it ever saw, which
-        # silently killed the whole 30s loop for good - so live updates
-        # appeared totally broken.
         last_state = (state_doc or {}).get("state", "")
 
         desc = match.get('status', {}).get('type', {}).get('description', '')
@@ -219,151 +172,9 @@ class SportsTracker(commands.Cog):
                     pass
             await global_save_section(state_key, {"state": current_stage})
 
-    async def resolve_battle(self, battle, all_matches, toto_key):
-        p1 = str(battle['p1'])
-        p2 = str(battle['p2'])
-        p1_picks = battle.get("picks", {}).get(p1, {})
-        p2_picks = battle.get("picks", {}).get(p2, {})
-        
-        p1_score = 0
-        p2_score = 0
-        
-        for match in all_matches:
-            if match['id'] not in battle['matches']: continue
-            comp = match['competitions'][0]['competitors']
-            home = next(c for c in comp if c['homeAway'] == 'home')
-            away = next(c for c in comp if c['homeAway'] == 'away')
-            h_score = int(home.get('score', 0))
-            a_score = int(away.get('score', 0))
-            
-            if h_score > a_score: actual = "1"
-            elif h_score < a_score: actual = "2"
-            else: actual = "X"
-            
-            if p1_picks.get(match['id']) == actual: p1_score += 1
-            if p2_picks.get(match['id']) == actual: p2_score += 1
-            
-        battle["resolved"] = True
-        await global_save_section(toto_key, battle)
-        
-        guild = self.bot.get_guild(TARGET_GUILD_ID)
-        if not guild: return
-        u1 = guild.get_member(int(p1))
-        u2 = guild.get_member(int(p2))
-        
-        if p1_score > p2_score:
-            w, l = u1, u2
-            await g_eco_add(int(p1), 25000)
-            await g_eco_add(int(p2), 500)
-        elif p2_score > p1_score:
-            w, l = u2, u1
-            await g_eco_add(int(p2), 25000)
-            await g_eco_add(int(p1), 500)
-        else:
-            w, l = None, None
-            await g_eco_add(int(p1), 500)
-            await g_eco_add(int(p2), 500)
-            
-        msg = f"⚽ **Toto Battle Resolved!** ⚽\n\n<@{p1}> Score: {p1_score}\n<@{p2}> Score: {p2_score}\n\n"
-        if w: msg += f"🏆 **<@{w.id}> WINS 25,000 Sayories!**\n<@{l.id}> receives 500 Sayories for participating."
-        else: msg += "🤝 **It's a TIE!** Both players receive 500 Sayories."
-        
-        for u in [u1, u2]:
-            if u:
-                try: await u.send(msg)
-                except: pass
-
-    @tasks.loop(minutes=60)
-    async def toto_daily(self):
-        try:
-            import random
-            today_str = self.today_key()
-            toto_key = f"toto_battle_{today_str}"
-            
-            has_run = await global_get_section(toto_key)
-            print(f"[Toto] has_run check: {has_run}")
-            if has_run: return
-            
-            all_matches = []
-            for league in LEAGUES:
-                matches = await self.fetch_league_matches(league, date_str=today_str)
-                all_matches.extend(matches)
-                
-            print(f"[Toto] Fetched {len(all_matches)} matches.")
-            if not all_matches: return
-            
-            opponents = [u for u in WHITELISTED_IDS if u != TARGET_USER_ID]
-            chosen_opp = random.choice(opponents)
-            
-            match_data = []
-            for m in all_matches:
-                comp = m['competitions'][0]['competitors']
-                home = next((c for c in comp if c['homeAway'] == 'home'), comp[0])
-                away = next((c for c in comp if c['homeAway'] == 'away'), comp[1])
-                match_data.append({
-                    "id": m['id'],
-                    "name": f"{home['team']['name']} vs {away['team']['name']}"
-                })
-            
-            await global_save_section(toto_key, {
-                "guild_id": TARGET_GUILD_ID,
-                "p1": TARGET_USER_ID,
-                "p2": chosen_opp,
-                "matches": [m['id'] for m in all_matches],
-                "match_data": match_data,
-                "picks": {},
-                "resolved": False,
-                "created_at": datetime.now(NETHERLANDS_TZ).isoformat(),
-            })
-            print("[Toto] Saved to global DB!")
-            
-            # Announce matches in the sports channel
-            channel = await self.get_channel()
-            if channel:
-                announce_embed = discord.Embed(title="⚽ Today's Live Matches", description="The Toto Battle has started! Here are the matches for today:", color=COLOR_MATCH)
-                for m in match_data:
-                    announce_embed.add_field(name=m['name'], value="Predictions locked in on the dashboard!", inline=False)
-                try:
-                    await channel.send(embed=announce_embed)
-                    print("[Toto] Announcement sent!")
-                except Exception as e:
-                    print(f"[Toto] Announcement failed: {e}")
-            else:
-                print("[Toto] Sports channel not found!")
-            
-            msg = f"⚽ **Toto Prediction Battle!** ⚽\nYou have been challenged for today's matches!\n\nOpponent: <@{chosen_opp}>\nMatches today: {len(all_matches)}\n\nGo to the **Web Dashboard** and check the **Prediction Battle** tab to lock in your predictions!\nPrize: **25,000 Sayories**"
-            
-            try: 
-                u1_user = await self.bot.fetch_user(TARGET_USER_ID)
-                await u1_user.send(msg)
-                print("[Toto] DM sent to u1")
-            except Exception as e: 
-                print(f"[Toto] Failed to DM u1: {e}")
-            
-            try: 
-                u2_user = await self.bot.fetch_user(chosen_opp)
-                await u2_user.send(msg.replace(f"<@{chosen_opp}>", f"<@{TARGET_USER_ID}>"))
-                print("[Toto] DM sent to u2")
-            except Exception as e: 
-                print(f"[Toto] Failed to DM u2: {e}")
-                
-        except Exception as e:
-            print(f"[Toto] FATAL ERROR IN TOTO DAILY: {e}")
-
     @match_tracker.before_loop
     async def before_match_tracker(self):
         await self.bot.wait_until_ready()
-        
-    @toto_daily.before_loop
-    async def before_toto_daily(self):
-        await self.bot.wait_until_ready()
-        
-    @discord.app_commands.command(name="totoforce", description="Manually force the Toto battle generation for today (Admin only)")
-    @discord.app_commands.default_permissions(administrator=True)
-    async def toto_force(self, interaction: discord.Interaction):
-        await interaction.response.send_message("Forcing toto_daily execution...", ephemeral=True)
-        await self.toto_daily()
-        await interaction.followup.send("Execution finished! Check the bot console for logs.", ephemeral=True)
 
 async def setup(bot):
     await bot.add_cog(SportsTracker(bot))

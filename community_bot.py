@@ -39,6 +39,8 @@ class CommunityBot(commands.Bot):
             await self.load_extension("sports_tracker")
         except Exception as exc:
             print(f"Failed to load sports_tracker: {exc}")
+            import traceback
+            traceback.print_exc()
 
     @tasks.loop(seconds=60)
     async def vc_payout_loop(self) -> None:
