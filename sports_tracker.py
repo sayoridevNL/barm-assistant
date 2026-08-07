@@ -29,9 +29,16 @@ class SportsTracker(commands.Cog):
         self.match_tracker.cancel()
         self.toto_daily.cancel()
 
-    def get_channel(self):
+    async def get_channel(self):
         guild = self.bot.get_guild(TARGET_GUILD_ID)
         if not guild: return None
+        
+        channel_id = await db_get(TARGET_GUILD_ID, "sports_channel")
+        if channel_id:
+            ch = guild.get_channel(int(channel_id))
+            if ch: return ch
+            
+        # Fallback if not configured
         for ch in guild.text_channels:
             if "sport" in ch.name.lower() or "voetbal" in ch.name.lower():
                 return ch
@@ -79,7 +86,7 @@ class SportsTracker(commands.Cog):
 
     @tasks.loop(seconds=30)
     async def match_tracker(self):
-        channel = self.get_channel()
+        channel = await self.get_channel()
         if not channel: return
         
         today_str = datetime.now().strftime("%Y%m%d")

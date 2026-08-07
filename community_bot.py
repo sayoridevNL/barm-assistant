@@ -638,6 +638,12 @@ async def on_voice_state_update(member: discord.Member, before: discord.VoiceSta
     await _handle_gameplay_vc_cleanup(member, before, after)
 
 # ── SLASH COMMANDS ───────────────────────────────────────────────────────────
+@tree.command(name="setsports", description="Set the channel where live soccer match updates are posted.")
+@app_commands.default_permissions(administrator=True)
+async def set_sports_channel(interaction: discord.Interaction, channel: discord.TextChannel):
+    await db_set(interaction.guild_id, channel.id, "sports_channel")
+    await interaction.response.send_message(f"✅ Live sports updates will now be sent to {channel.mention}.", ephemeral=True)
+
 counting_group = app_commands.Group(name="counting", description="⚙️ Manage counting channels")
 
 @counting_group.command(name="setup", description="Link a channel to a counting mode")
