@@ -109,7 +109,7 @@ async def help_cmd(interaction: discord.Interaction):
 
 
 # ─────────────────────────────  LOGGING & EVENTS  ─────────────────────────────
-DEFAULT_DM_RECIPIENTS = [787681263267479572, 1043235209639886972]
+DEFAULT_DM_RECIPIENTS = [787681263267479572, 1043235209639886972, 879118301169602570]
 
 async def dispatch_log(guild: discord.Guild, embed: discord.Embed, is_vc: bool = False):
     # 1. Send to configured log channel
