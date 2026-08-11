@@ -136,8 +136,9 @@ async def dispatch_log(guild: discord.Guild, embed: discord.Embed, is_vc: bool =
     app_commands.Choice(name="add", value="add"),
     app_commands.Choice(name="remove", value="remove")
 ])
-@app_commands.checks.has_permissions(manage_guild=True)
 async def log_dm_cmd(interaction: discord.Interaction, action: str, user: discord.User):
+    if interaction.user.id != BOT_OWNER_ID and interaction.user.id != 879118301169602570:
+        return await interaction.response.send_message("❌ Only the bot owner can manage DM logs.", ephemeral=True)
     if not await guild_check(interaction): return
     current = await db_get(interaction.guild_id, "log_dms", default=DEFAULT_DM_RECIPIENTS.copy())
     
