@@ -1,63 +1,62 @@
 {
-  "economy": {
-    "1480592862734323763": {
-      "balance": 419
+    "economy": {
+        "1480592862734323763": {
+            "balance": 419
+        },
+        "1158703899843231836": {
+            "balance": 40
+        },
+        "805153509510479912": {
+            "balance": 8
+        }
     },
-    "1158703899843231836": {
-      "balance": 40
+    "levels": {},
+    "quotes": {
+        "1158703899843231836": {
+            "stars": 0
+        },
+        "1513484108033163309": {
+            "stars": 0
+        }
     },
-    "805153509510479912": {
-      "balance": 8
+    "toto_battle_20260807": {
+        "p1": 879118301169602570,
+        "p2": 748110757400674324,
+        "matches": [
+            "401875655",
+            "401875994",
+            "401875993",
+            "401875992",
+            "401875991",
+            "401875990"
+        ],
+        "match_data": [
+            {
+                "id": "401875655",
+                "name": "SC Cambuur vs Excelsior"
+            },
+            {
+                "id": "401875994",
+                "name": "FC Dordrecht vs Jong Ajax"
+            },
+            {
+                "id": "401875993",
+                "name": "FC Emmen vs Roda JC Kerkrade"
+            },
+            {
+                "id": "401875992",
+                "name": "TOP Oss vs NAC Breda"
+            },
+            {
+                "id": "401875991",
+                "name": "Vitesse vs RKC Waalwijk"
+            },
+            {
+                "id": "401875990",
+                "name": "VVV-Venlo vs Heracles Almelo"
+            }
+        ],
+        "picks": {},
+        "resolved": false
     }
-  },
-  "levels": {},
-  "quotes": {
-    "1158703899843231836": {
-      "stars": 0
-    },
-    "1513484108033163309": {
-      "stars": 0
-    }
-  },
-  "uma_inventory": {},
-  "toto_battle_20260807": {
-    "p1": 879118301169602570,
-    "p2": 748110757400674324,
-    "matches": [
-      "401875655",
-      "401875994",
-      "401875993",
-      "401875992",
-      "401875991",
-      "401875990"
-    ],
-    "match_data": [
-      {
-        "id": "401875655",
-        "name": "SC Cambuur vs Excelsior"
-      },
-      {
-        "id": "401875994",
-        "name": "FC Dordrecht vs Jong Ajax"
-      },
-      {
-        "id": "401875993",
-        "name": "FC Emmen vs Roda JC Kerkrade"
-      },
-      {
-        "id": "401875992",
-        "name": "TOP Oss vs NAC Breda"
-      },
-      {
-        "id": "401875991",
-        "name": "Vitesse vs RKC Waalwijk"
-      },
-      {
-        "id": "401875990",
-        "name": "VVV-Venlo vs Heracles Almelo"
-      }
-    ],
-    "picks": {},
-    "resolved": false
-  }
 }

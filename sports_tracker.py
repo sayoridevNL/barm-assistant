@@ -1,9 +1,16 @@
 import discord
 from discord.ext import commands, tasks
+from discord import app_commands
 import requests
 import asyncio
 import traceback
+import random
+from datetime import datetime
 from shared import global_get_section, global_save_section
+
+TOTO_PARTICIPANT_IDS = {879118301169602570, 748110757400674324, 431864554910121994, 315845909533556741, 1513484108033163309}
+TARGET_USER_ID = 879118301169602570
+
 
 # --- CONFIGURATION ---
 SPORTS_CHANNEL_ID = 1535258343675789322
@@ -21,6 +28,7 @@ class SportsTracker(commands.Cog):
         self.bot = bot
         self.seen_events = set()
         self.match_tracker.start()
+        self.daily_toto_setup.start()
 
     def cog_unload(self):
         self.match_tracker.cancel()
@@ -64,6 +72,93 @@ class SportsTracker(commands.Cog):
         except requests.RequestException as exc:
             print(f"[Sports] Could not fetch match {match_id}: {exc}")
             return []
+
+
+    @tasks.loop(hours=24)
+    async def daily_toto_setup(self):
+        try:
+            today_str = datetime.now().strftime('%Y%m%d')
+            toto_key = f'toto_battle_{today_str}'
+            
+            has_run = await global_get_section(toto_key)
+            if has_run:
+                return
+                
+            all_matches = []
+            for league in LEAGUES:
+                url = f'http://site.api.espn.com/apis/site/v2/sports/soccer/{league}/scoreboard?dates={today_str}'
+                try:
+                    r = await asyncio.to_thread(requests.get, url, timeout=10)
+                    if r.status_code == 200:
+                        matches = r.json().get('events', [])
+                        all_matches.extend(matches)
+                except Exception as e:
+                    print(f"Error fetching {league}: {e}")
+                    
+            if not all_matches: return
+            
+            opponents = [u for u in TOTO_PARTICIPANT_IDS if u != TARGET_USER_ID]
+            chosen_opp = random.choice(opponents) if opponents else TARGET_USER_ID
+            
+            match_data = []
+            for m in all_matches:
+                comp = m['competitions'][0]['competitors']
+                home = next((c for c in comp if c['homeAway'] == 'home'), comp[0])
+                away = next((c for c in comp if c['homeAway'] == 'away'), comp[1])
+                match_data.append({
+                    'id': m['id'],
+                    'name': f"{home['team']['name']} vs {away['team']['name']}"
+                })
+                
+            await global_save_section(toto_key, {
+                'p1': TARGET_USER_ID,
+                'p2': chosen_opp,
+                'matches': [m['id'] for m in all_matches],
+                'match_data': match_data,
+                'picks': {},
+                'resolved': False
+            })
+            
+            # Announce in channel
+            channel = await self.get_channel()
+            if channel:
+                embed = discord.Embed(title="🏆 Today's Toto Battle Generated!", description=f"Today's matches have been pulled! Player <@{TARGET_USER_ID}> vs <@{chosen_opp}>.", color=0xFFD700)
+                await channel.send(embed=embed)
+                
+            # Send DMs
+            link = "https://barm-os.onrender.com"
+            msg = f"🏆 You have been selected for today's Toto Prediction Battle! Submit your predictions here: {link}"
+            for uid in [TARGET_USER_ID, chosen_opp]:
+                try:
+                    user = await self.bot.fetch_user(uid)
+                    await user.send(msg)
+                except Exception as e:
+                    print(f"Failed to DM {uid}: {e}")
+                    
+        except Exception as e:
+            print(f"Error in daily_toto_setup: {e}")
+
+    @daily_toto_setup.before_loop
+    async def before_daily_toto_setup(self):
+        await self.bot.wait_until_ready()
+        
+    @app_commands.command(name="toto", description="Show today's Toto Battle matches!")
+    async def toto_cmd(self, interaction: discord.Interaction):
+        today_str = datetime.now().strftime('%Y%m%d')
+        toto_key = f'toto_battle_{today_str}'
+        
+        battle = await global_get_section(toto_key)
+        if not battle:
+            return await interaction.response.send_message("❌ No Toto battle scheduled for today yet.", ephemeral=True)
+            
+        desc = f"**Current Matchup:** <@{battle.get('p1')}> vs <@{battle.get('p2')}>\\n\\n"
+        for m in battle.get('match_data', []):
+            desc += f"⚽ {m['name']}\\n"
+            
+        desc += "\\nMake your predictions on the dashboard: https://barm-os.onrender.com"
+        
+        embed = discord.Embed(title=f"🏆 Toto Battle - {datetime.now().strftime('%B %d, %Y')}", description=desc, color=0xFFD700)
+        await interaction.response.send_message(embed=embed)
 
     def extract_new_events(self, match):
         new_events = []

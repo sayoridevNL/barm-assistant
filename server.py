@@ -153,6 +153,127 @@ def callback():
 @app.route('/api/auth/logout')
 def logout():
     session.clear()
+
+BOTS = [
+    "music_bot",
+    "moderation_bot",
+    "community_bot",
+    "gambling_bot",
+    "umamusume_bot",
+    "general_bot"
+]
+
+bot_processes = {bot: None for bot in BOTS}
+bot_lock = threading.Lock()
+
+def is_bot_running(bot_name):
+    process = bot_processes.get(bot_name)
+    if process is None:
+        return False
+    return process.poll() is None
+
+def start_single_bot(bot_name):
+    if is_bot_running(bot_name):
+        return False, "Already running"
+    try:
+        # Start the bot process using launcher.py with the bot name as an argument
+        process = subprocess.Popen([sys.executable, 'launcher.py', bot_name])
+        bot_processes[bot_name] = process
+        return True, "Bot started"
+    except Exception as e:
+        return False, str(e)
+
+def stop_single_bot(bot_name):
+    process = bot_processes.get(bot_name)
+    if not is_bot_running(bot_name):
+        return False, "Not running"
+    try:
+        process.terminate()
+        process.wait(timeout=5)
+        bot_processes[bot_name] = None
+        return True, "Bot stopped"
+    except Exception as e:
+        if process:
+            process.kill()
+        bot_processes[bot_name] = None
+        return False, str(e)
+
+# --- Automatic Startup ---
+# We use a simple lock file to prevent multiple Gunicorn workers from spawning duplicate bots
+LOCK_FILE = '/tmp/barm_bots_started.lock'
+if not os.path.exists(LOCK_FILE):
+    try:
+        with open(LOCK_FILE, 'w') as f:
+            f.write('started')
+        for bot in BOTS:
+            start_single_bot(bot)
+    except Exception:
+        pass
+
+
+@app.route('/')
+def index():
+    # Watchdog: Pinging the website automatically restarts any dead bots
+    with bot_lock:
+        for bot in BOTS:
+            if not is_bot_running(bot):
+                start_single_bot(bot)
+    
+    return render_template('index.html', user_id=session.get('user_id'), username=session.get('username'), avatar=session.get('avatar'), is_admin=is_admin())
+
+def is_admin():
+    return session.get('user_id') in ADMIN_IDS
+
+@app.route('/api/auth/login')
+def login():
+    if not DISCORD_CLIENT_ID:
+        return "Discord OAuth not configured", 500
+    
+    auth_url = f"https://discord.com/api/oauth2/authorize?client_id={DISCORD_CLIENT_ID}&redirect_uri={requests.utils.quote(DISCORD_REDIRECT_URI)}&response_type=code&scope=identify"
+    return redirect(auth_url)
+
+@app.route('/api/auth/callback')
+def callback():
+    code = request.args.get('code')
+    if not code:
+        return "Missing code", 400
+        
+    data = {
+        'client_id': DISCORD_CLIENT_ID,
+        'client_secret': DISCORD_CLIENT_SECRET,
+        'grant_type': 'authorization_code',
+        'code': code,
+        'redirect_uri': DISCORD_REDIRECT_URI
+    }
+    
+    headers = {
+        'Content-Type': 'application/x-www-form-urlencoded'
+    }
+    
+    r = requests.post('https://discord.com/api/oauth2/token', data=data, headers=headers)
+    if not r.ok:
+        return f"Failed to get token: {r.text}", 400
+        
+    token_data = r.json()
+    access_token = token_data['access_token']
+    
+    user_r = requests.get('https://discord.com/api/users/@me', headers={
+        'Authorization': f"Bearer {access_token}"
+    })
+    
+    if not user_r.ok:
+        return "Failed to get user info", 400
+        
+    user_data = user_r.json()
+    session['user_id'] = user_data['id']
+    session['username'] = user_data['username']
+    session['avatar'] = user_data.get('avatar')
+    
+    return redirect('/')
+
+@app.route('/api/auth/logout')
+def logout():
+    session.clear()
     return redirect('/')
 
 def get_global_section_sync(section):
@@ -164,6 +285,19 @@ def get_global_section_sync(section):
             return json.load(f).get(section, {})
     except:
         return {}
+
+def save_global_section_sync(section, data):
+    if mongo_db is not None:
+        mongo_db.global_data.update_one({"_id": section}, {"$set": {"data": data}}, upsert=True)
+    else:
+        try:
+            with open('data/global.json', 'r', encoding='utf-8') as f:
+                d = json.load(f)
+        except:
+            d = {}
+        d[section] = data
+        with open('data/global.json', 'w', encoding='utf-8') as f:
+            json.dump(d, f, indent=4)
 
 @app.route('/api/user/stats', methods=['GET'])
 def user_stats():
@@ -177,7 +311,7 @@ def user_stats():
     free_haru_coins = user_eco.get('free_haru_coins', 0)
     paid_haru_coins = user_eco.get('paid_haru_coins', 0)
     user_umas = get_global_section_sync('uma_inventory').get(user_id, {}).get('umas', [])
-    user_support = get_global_section_sync('support_inventory').get(user_id, {}).get('cards', [])
+    user_support = get_global_section_sync('uma_support_inventory').get(user_id, {}).get('cards', [])
     
     return jsonify({
         'user_id': user_id,
@@ -250,6 +384,83 @@ def publish_embed():
         return jsonify({'message': 'Broadcast queued successfully!'})
     else:
         return jsonify({'error': 'MongoDB is not connected. Broadcasts require MongoDB.'}), 500
+
+@app.route('/api/uma/train', methods=['POST'])
+def uma_train():
+    user_id = session.get('user_id')
+    if not user_id: return jsonify({'error': 'Unauthorized'}), 401
+    
+    data = request.json or {}
+    uma_id = data.get('uma_id')
+    
+    if not uma_id: return jsonify({'error': 'Missing uma_id'}), 400
+    
+    inv = get_global_section_sync('uma_inventory')
+    user_inv = inv.get(user_id, {})
+    umas = user_inv.get('umas', [])
+    
+    uma = next((u for u in umas if u['id'] == uma_id), None)
+    if not uma: return jsonify({'error': 'Uma not found'}), 404
+    
+    import time
+    now = int(time.time())
+    if uma.get('training_end') and now < uma['training_end']:
+        return jsonify({'error': 'Already training!'}), 400
+        
+    uma['training_start'] = now
+    uma['training_end'] = now + 3600  # 1 hour
+    uma['training_parents'] = data.get('parents', [])
+    uma['training_supports'] = data.get('supports', [])
+    
+    save_global_section_sync('uma_inventory', inv)
+    return jsonify({'success': True, 'training_end': uma['training_end']})
+
+@app.route('/api/uma/finish_train', methods=['POST'])
+def uma_finish_train():
+    user_id = session.get('user_id')
+    if not user_id: return jsonify({'error': 'Unauthorized'}), 401
+    
+    data = request.json or {}
+    uma_id = data.get('uma_id')
+    if not uma_id: return jsonify({'error': 'Missing uma_id'}), 400
+    
+    inv = get_global_section_sync('uma_inventory')
+    user_inv = inv.get(user_id, {})
+    umas = user_inv.get('umas', [])
+    
+    uma = next((u for u in umas if u['id'] == uma_id), None)
+    if not uma: return jsonify({'error': 'Uma not found'}), 404
+    
+    import time
+    now = int(time.time())
+    if not uma.get('training_end'):
+        return jsonify({'error': 'Not training'}), 400
+        
+    if now < uma['training_end']:
+        return jsonify({'error': 'Training not finished yet'}), 400
+        
+    # Calculate bonuses
+    # For now, give a flat boost plus the support card bonuses
+    bonus_speed = uma.get('speed_bonus', 0)
+    bonus_stamina = uma.get('stamina_bonus', 0)
+    bonus_power = uma.get('power_bonus', 0)
+    bonus_guts = uma.get('guts_bonus', 0)
+    bonus_wit = uma.get('wit_bonus', 0)
+    
+    # We will grant base points + % growth
+    uma['speed'] = uma.get('speed', 1) + 20 + int(20 * (bonus_speed/100))
+    uma['stamina'] = uma.get('stamina', 1) + 20 + int(20 * (bonus_stamina/100))
+    uma['power'] = uma.get('power', 1) + 20 + int(20 * (bonus_power/100))
+    uma['guts'] = uma.get('guts', 1) + 20 + int(20 * (bonus_guts/100))
+    uma['wit'] = uma.get('wit', 1) + 20 + int(20 * (bonus_wit/100))
+    
+    # Optional: fetch support card data to add extra stats, simplified for now.
+    
+    del uma['training_start']
+    del uma['training_end']
+    
+    save_global_section_sync('uma_inventory', inv)
+    return jsonify({'success': True, 'uma': uma})
 
 @app.route('/api/toto/battle', methods=['GET'])
 def get_toto_battle():
