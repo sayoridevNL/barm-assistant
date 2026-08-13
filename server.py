@@ -40,7 +40,6 @@ BOTS = [
     "gambling_bot",
     "umamusume_bot",
     "general_bot",
-    "cards_bot",
 ]
 
 bot_processes = {bot: None for bot in BOTS}
