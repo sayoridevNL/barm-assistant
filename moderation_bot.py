@@ -161,11 +161,14 @@ async def log_dm_cmd(interaction: discord.Interaction, action: str, user: discor
 # Helper to fetch audit log actor
 async def get_actor(guild: discord.Guild, action: discord.AuditLogAction, target_id: int = None) -> discord.User | None:
     import asyncio
+    from datetime import datetime, timezone
     await asyncio.sleep(1) # Wait for audit log to populate
+    now = discord.utils.utcnow()
     try:
         async for entry in guild.audit_logs(action=action, limit=5):
-            if target_id is None or (entry.target and getattr(entry.target, "id", None) == target_id):
-                return entry.user
+            if (now - entry.created_at).total_seconds() < 15:
+                if target_id is None or (entry.target and getattr(entry.target, "id", None) == target_id):
+                    return entry.user
     except: pass
     return None
 
@@ -174,7 +177,7 @@ async def on_message_delete(message: discord.Message):
     if not message.guild or message.author.bot: return
     
     actor = await get_actor(message.guild, discord.AuditLogAction.message_delete, message.author.id)
-    actor_str = f"{actor.mention}" if actor else f"{message.author.mention} (Self/Unknown)"
+    actor_str = f"{actor.mention}" if actor else "Unknown / Bot / Self"
     
     desc = f"**Message deleted in {message.channel.mention}**\n"
     if message.content: desc += f"**Content:** {message.content[:1000]}\n"
