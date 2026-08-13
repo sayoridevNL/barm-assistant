@@ -95,6 +95,12 @@ async def main(bot_name):
     try:
         print(f"🚀 Starting {bot_name}...")
         await bot.start(token)
+    except discord.HTTPException as e:
+        if e.status == 429 or "429" in str(e) or "1015" in str(e):
+            print(f"❌ {bot_name} hit a Cloudflare 1015 / 429 Rate Limit. Sleeping for 15 minutes to clear the IP ban...")
+            await asyncio.sleep(900)
+        else:
+            print(f"❌ {bot_name} crashed: {e.__class__.__name__}: {e}")
     except Exception as e:
         print(f"❌ {bot_name} crashed: {e.__class__.__name__}: {e}")
 
