@@ -68,6 +68,7 @@
                             <button class="tab-btn" data-target="training-tab" role="tab" aria-selected="false" aria-controls="training-tab"><i class="fa-solid fa-stopwatch"></i> Training Center</button>
                             <button class="tab-btn" data-target="quotes-tab" role="tab" aria-selected="false" aria-controls="quotes-tab"><i class="fa-solid fa-quote-left"></i> Quotes</button>
                             <button class="tab-btn" id="btn-toto-tab" data-target="toto-tab" role="tab" aria-selected="false" aria-controls="toto-tab" style="display: none;"><i class="fa-solid fa-futbol"></i> Prediction Battle</button>
+                            <button class="tab-btn" id="btn-trading-cards-tab" data-target="trading-cards-tab" role="tab" aria-selected="false" aria-controls="trading-cards-tab" style="display: none;"><i class="fa-solid fa-layer-group"></i> Trading Cards</button>
                             <button class="tab-btn" data-target="suggestions-tab" role="tab" aria-selected="false" aria-controls="suggestions-tab"><i class="fa-solid fa-lightbulb"></i> Suggestions</button>
                             <button class="tab-btn admin-only" data-target="fleet-tab" role="tab" aria-selected="false" aria-controls="fleet-tab"><i class="fa-solid fa-server"></i> Fleet</button>
                             <button class="tab-btn admin-only" data-target="broadcast-tab" role="tab" aria-selected="false" aria-controls="broadcast-tab"><i class="fa-solid fa-bullhorn"></i> Broadcast</button>
@@ -245,6 +246,67 @@
                     </div>
                 </div>
 
+                <!-- Trading Cards Tab -->
+                <div id="trading-cards-tab" class="tab-content" role="tabpanel">
+                    <!-- Admin Hub -->
+                    <div id="tc-admin-hub" class="admin-only glass-panel" style="margin-bottom: 2rem;">
+                        <div class="section-header">
+                            <h2><i class="fa-solid fa-wand-magic-sparkles"></i> Admin Creator Hub</h2>
+                            <p class="section-desc">Manage rarities and create new trading cards.</p>
+                        </div>
+                        <div style="display: flex; gap: 2rem; flex-wrap: wrap;">
+                            <div style="flex: 1; min-width: 300px;">
+                                <h3><i class="fa-solid fa-sort"></i> Manage Rarities</h3>
+                                <ul id="tc-rarity-list" style="list-style: none; padding: 0; margin-bottom: 1rem;">
+                                    <!-- Draggable items will be here -->
+                                </ul>
+                                <button class="btn-primary sm-btn" onclick="addRarity()"><i class="fa-solid fa-plus"></i> Add Rarity</button>
+                            </div>
+                            <div style="flex: 1; min-width: 300px;">
+                                <h3><i class="fa-solid fa-square-plus"></i> Create New Card</h3>
+                                <div class="broadcast-form-group">
+                                    <input type="text" id="tc-title" placeholder="Card Title">
+                                </div>
+                                <div class="broadcast-form-group">
+                                    <input type="text" id="tc-image" placeholder="Base Image URL">
+                                </div>
+                                <div class="broadcast-form-group">
+                                    <select id="tc-type" class="form-select" style="width: 100%; padding: 0.8rem; border-radius: 8px; background: var(--field); border: 1px solid var(--border); color: var(--text);">
+                                        <option value="Character">Character</option>
+                                        <option value="Item">Item</option>
+                                        <option value="Event">Event</option>
+                                    </select>
+                                </div>
+                                <div class="broadcast-form-group">
+                                    <select id="tc-rarity-select" class="form-select" style="width: 100%; padding: 0.8rem; border-radius: 8px; background: var(--field); border: 1px solid var(--border); color: var(--text);">
+                                        <!-- Populated from rarities -->
+                                    </select>
+                                </div>
+                                <div class="broadcast-form-group">
+                                    <input type="number" id="tc-drop-chance" placeholder="Drop Chance %" step="0.01">
+                                </div>
+                                <button class="btn-primary" onclick="saveNewCard()"><i class="fa-solid fa-floppy-disk"></i> Save Card</button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Collector Hub -->
+                    <div class="glass-panel">
+                        <div class="section-header">
+                            <h2><i class="fa-solid fa-layer-group"></i> My Collection</h2>
+                            <p class="section-desc">View your discovered and undiscovered trading cards.</p>
+                        </div>
+                        <div style="text-align: center; margin-bottom: 1rem;">
+                            <button class="btn-primary" onclick="pullCardGacha()"><i class="fa-solid fa-envelope-open-text"></i> Pull Card (100 Sayories)</button>
+                        </div>
+                        <div class="carousel-container" id="tc-carousel">
+                            <!-- Cards go here -->
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Suggestions Tab -->
+
                 <!-- Suggestions Tab -->
                 <div id="suggestions-tab" class="tab-content" role="tabpanel">
                     <div class="glass-panel">
@@ -337,6 +399,19 @@
         </div>
     </div>
 
+    <!-- Gacha Overlay -->
+    <div id="gacha-overlay" class="hidden">
+        <div id="gacha-envelope">
+            <div class="envelope-body">
+                <i class="fa-solid fa-envelope" style="font-size: 3rem; color: white;"></i>
+            </div>
+        </div>
+        <div id="gacha-card-reveal" class="hidden">
+            <!-- Revealed card goes here -->
+        </div>
+    </div>
+
+    <!-- Scripts -->
     <!-- Scripts -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.13/codemirror.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.13/mode/python/python.min.js"></script>

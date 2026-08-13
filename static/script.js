@@ -985,3 +985,124 @@ document.addEventListener('DOMContentLoaded', () => {
             btn.disabled = false;
         }
     };
+
+// TC logic
+let tcRarities = [
+    { id: 1, name: 'R', color: 'cyan' },
+    { id: 2, name: 'SR', color: 'magenta' },
+    { id: 3, name: 'SSR', color: 'gold' }
+];
+let tcCards = [];
+let totalDropChance = 0;
+
+function renderTcRarities() {
+    const list = document.getElementById('tc-rarity-list');
+    if(!list) return;
+    list.innerHTML = '';
+    tcRarities.forEach((r, i) => {
+        const li = document.createElement('li');
+        li.draggable = true;
+        li.innerHTML = `<span>${r.name}</span> <i class="fa-solid fa-grip-lines"></i>`;
+        li.ondragstart = (e) => e.dataTransfer.setData('text/plain', i);
+        li.ondragover = (e) => e.preventDefault();
+        li.ondrop = (e) => {
+            e.preventDefault();
+            const from = parseInt(e.dataTransfer.getData('text/plain'));
+            const to = i;
+            const item = tcRarities.splice(from, 1)[0];
+            tcRarities.splice(to, 0, item);
+            renderTcRarities();
+            updateTcRaritySelect();
+        };
+        list.appendChild(li);
+    });
+}
+
+window.addRarity = function() {
+    const name = prompt("Rarity Name:");
+    if(name) {
+        tcRarities.push({ id: Date.now(), name, color: 'white' });
+        renderTcRarities();
+        updateTcRaritySelect();
+    }
+}
+
+function updateTcRaritySelect() {
+    const sel = document.getElementById('tc-rarity-select');
+    if(!sel) return;
+    sel.innerHTML = '';
+    tcRarities.forEach(r => {
+        const opt = document.createElement('option');
+        opt.value = r.name;
+        opt.textContent = r.name;
+        sel.appendChild(opt);
+    });
+}
+
+window.saveNewCard = function() {
+    const title = document.getElementById('tc-title').value;
+    const img = document.getElementById('tc-image').value;
+    const type = document.getElementById('tc-type').value;
+    const rarity = document.getElementById('tc-rarity-select').value;
+    const chance = parseFloat(document.getElementById('tc-drop-chance').value);
+    
+    if(!title || isNaN(chance)) return showToast('Invalid input', 'error');
+    
+    totalDropChance += chance;
+    if(totalDropChance > 100) {
+        totalDropChance -= chance;
+        return showToast('Total drop chance exceeds 100%', 'error');
+    }
+    
+    tcCards.push({ title, img, type, rarity, chance });
+    showToast('Card saved!', 'success');
+    renderTcCarousel();
+}
+
+function renderTcCarousel() {
+    const carousel = document.getElementById('tc-carousel');
+    if(!carousel) return;
+    carousel.innerHTML = '';
+    for(let i=0; i<5; i++) {
+        const c = document.createElement('div');
+        c.className = `tc-card ${i%2==0 ? 'discovered' : 'undiscovered'}`;
+        c.innerHTML = `
+            <img class="tc-image" src="https://via.placeholder.com/200x280/17132a/ed5d9d?text=Card+${i}" />
+            <div class="tc-overlay"></div>
+        `;
+        carousel.appendChild(c);
+    }
+}
+
+window.pullCardGacha = function() {
+    const overlay = document.getElementById('gacha-overlay');
+    const env = document.getElementById('gacha-envelope');
+    const reveal = document.getElementById('gacha-card-reveal');
+    
+    overlay.classList.remove('hidden');
+    env.className = ''; 
+    setTimeout(() => {
+        env.classList.add('glow-SSR');
+        setTimeout(() => {
+            env.classList.add('burst');
+            setTimeout(() => {
+                reveal.innerHTML = `<div class="tc-card discovered" style="width: 300px; height: 420px; transform: scale(1);"><img class="tc-image" src="https://via.placeholder.com/300x420/17132a/ed5d9d?text=New+Card" /><div class="tc-overlay"></div></div>`;
+                reveal.classList.remove('hidden');
+                setTimeout(() => {
+                    overlay.classList.add('hidden');
+                    reveal.classList.add('hidden');
+                    reveal.innerHTML = '';
+                    showToast('Got a new card!', 'success');
+                }, 3000);
+            }, 500);
+        }, 1500);
+    }, 1000);
+}
+
+document.addEventListener('DOMContentLoaded', () => {
+    setTimeout(() => {
+        renderTcRarities();
+        updateTcRaritySelect();
+        renderTcCarousel();
+    }, 500);
+});

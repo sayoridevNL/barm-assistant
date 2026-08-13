@@ -566,3 +566,110 @@ textarea { resize: vertical; }
 @media (prefers-reduced-motion: reduce) {
     *, *::before, *::after { scroll-behavior: auto !important; animation-duration: .01ms !important; animation-iteration-count: 1 !important; transition-duration: .01ms !important; }
 }
+
+/* Trading Cards */
+.carousel-container {
+    display: flex;
+    gap: 1.5rem;
+    padding: 2rem;
+    overflow-x: auto;
+    align-items: center;
+    perspective: 1000px;
+}
+.tc-card {
+    width: 200px;
+    height: 280px;
+    border-radius: 12px;
+    background: var(--surface-strong);
+    position: relative;
+    transform-style: preserve-3d;
+    transition: transform 0.5s var(--ease);
+    flex-shrink: 0;
+    cursor: pointer;
+    box-shadow: var(--shadow);
+    overflow: hidden;
+}
+.tc-card.undiscovered {
+    filter: grayscale(100%) brightness(50%);
+}
+.tc-card.undiscovered::after {
+    content: '?';
+    position: absolute;
+    inset: 0;
+    display: grid;
+    place-items: center;
+    font-size: 4rem;
+    color: rgba(255, 255, 255, 0.3);
+    backdrop-filter: blur(8px);
+}
+.tc-card.discovered:hover {
+    transform: translateY(-10px) rotateX(10deg) rotateY(-10deg);
+}
+.tc-image {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+.tc-overlay {
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(135deg, transparent 0%, rgba(255,255,255,0.2) 50%, transparent 100%);
+    mix-blend-mode: overlay;
+    opacity: 0;
+    transition: opacity 0.3s;
+}
+.tc-card.discovered:hover .tc-overlay {
+    opacity: 1;
+    animation: holo-tilt 2s infinite linear;
+}
+@keyframes holo-tilt {
+    0% { background-position: 0% 0%; }
+    100% { background-position: 200% 200%; }
+}
+
+/* Gacha Animation */
+#gacha-overlay {
+    position: fixed;
+    inset: 0;
+    z-index: 10000;
+    background: rgba(0,0,0,0.85);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    perspective: 1000px;
+}
+#gacha-envelope {
+    width: 150px;
+    height: 100px;
+    background: #ffdb58;
+    position: relative;
+    display: grid;
+    place-items: center;
+    animation: dropIn 1s var(--ease-bounce) forwards;
+}
+#gacha-envelope.glow-Legendary { box-shadow: 0 0 50px gold; }
+#gacha-envelope.glow-SSR { box-shadow: 0 0 50px magenta; }
+#gacha-envelope.glow-SR { box-shadow: 0 0 50px cyan; }
+
+#gacha-envelope.burst {
+    animation: burstOpen 0.5s forwards;
+}
+@keyframes dropIn {
+    0% { transform: translateY(-500px) scale(0); }
+    100% { transform: translateY(0) scale(1.5); }
+}
+@keyframes burstOpen {
+    0% { transform: scale(1.5); opacity: 1; }
+    100% { transform: scale(3) rotate(15deg); opacity: 0; }
+}
+
+#tc-rarity-list li {
+    padding: 0.5rem;
+    margin-bottom: 0.5rem;
+    background: var(--surface-muted);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-sm);
+    cursor: grab;
+    display: flex;
+    justify-content: space-between;
+}

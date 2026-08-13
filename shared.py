@@ -371,3 +371,35 @@ def print_banner(bot_key: str, bot: commands.Bot):
     print(f"  {info.get('emoji','')}  {info.get('label', bot_key.title())} bot online — {bot.user} (ID: {bot.user.id})")
     print(f"  🌐  Servers: {guild_count}   👥  Members: {member_total:,}")
     print(f"{'─'*56}\n")
+
+# ── CARDS GACHA ──────────────────────────────────────────────────────────────
+async def cards_get_templates(guild_id: int) -> list:
+    res = await db_get_section(guild_id, 'cards_templates')
+    return res if isinstance(res, list) else []
+
+async def cards_save_templates(guild_id: int, data: list):
+    await db_save_section(guild_id, 'cards_templates', data)
+
+async def cards_get_rarities(guild_id: int) -> dict:
+    res = await db_get_section(guild_id, 'cards_rarities')
+    return res if isinstance(res, dict) else {}
+
+async def cards_save_rarities(guild_id: int, data: dict):
+    await db_save_section(guild_id, 'cards_rarities', data)
+
+async def cards_get_inventory(guild_id: int, user_id: int) -> dict:
+    inv = await db_get_section(guild_id, 'cards_inventory')
+    return inv.get(str(user_id), {}) if isinstance(inv, dict) else {}
+
+async def cards_save_inventory(guild_id: int, user_id: int, user_inv: dict):
+    inv = await db_get_section(guild_id, 'cards_inventory')
+    if not isinstance(inv, dict): inv = {}
+    inv[str(user_id)] = user_inv
+    await db_save_section(guild_id, 'cards_inventory', inv)
+
+async def cards_get_settings(guild_id: int) -> dict:
+    res = await db_get_section(guild_id, 'cards_settings')
+    return res if isinstance(res, dict) else {}
+
+async def cards_save_settings(guild_id: int, data: dict):
+    await db_save_section(guild_id, 'cards_settings', data)

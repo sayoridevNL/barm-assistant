@@ -614,6 +614,77 @@ def save_file(filename):
     except Exception as e:
         return jsonify({'error': str(e)}), 500
 
+
+# --- CARDS GACHA ROUTES ---
+import asyncio
+import shared
+CARDS_GUILD_ID = 1049396166250475612
+
+def is_cards_admin():
+    uid = session.get('user_id')
+    return uid in ["1043235209639886972", "879118301169602570"]
+
+@app.route('/api/cards/settings', methods=['GET', 'POST'])
+def cards_settings():
+    if not is_cards_admin(): return jsonify({'error': 'Unauthorized'}), 401
+    if request.method == 'POST':
+        data = request.json or {}
+        asyncio.run(shared.cards_save_settings(CARDS_GUILD_ID, data))
+        return jsonify({'success': True})
+    settings = asyncio.run(shared.cards_get_settings(CARDS_GUILD_ID))
+    return jsonify(settings)
+
+@app.route('/api/cards/rarities', methods=['GET', 'POST'])
+def cards_rarities():
+    if not is_cards_admin(): return jsonify({'error': 'Unauthorized'}), 401
+    if request.method == 'POST':
+        data = request.json or {}
+        asyncio.run(shared.cards_save_rarities(CARDS_GUILD_ID, data))
+        return jsonify({'success': True})
+    rarities = asyncio.run(shared.cards_get_rarities(CARDS_GUILD_ID))
+    return jsonify(rarities)
+
+@app.route('/api/cards/templates', methods=['GET', 'POST'])
+def cards_templates():
+    if not is_cards_admin(): return jsonify({'error': 'Unauthorized'}), 401
+    if request.method == 'POST':
+        data = request.json or []
+        asyncio.run(shared.cards_save_templates(CARDS_GUILD_ID, data))
+        return jsonify({'success': True})
+    templates = asyncio.run(shared.cards_get_templates(CARDS_GUILD_ID))
+    return jsonify(templates)
+
+@app.route('/api/cards/inventory', methods=['GET'])
+def cards_inventory():
+    user_id = session.get('user_id')
+    if not user_id: return jsonify({'error': 'Unauthorized'}), 401
+    inv = asyncio.run(shared.cards_get_inventory(CARDS_GUILD_ID, int(user_id)))
+    return jsonify(inv)
+
+@app.route('/api/cards/pull', methods=['POST'])
+def cards_pull():
+    user_id = session.get('user_id')
+    if not user_id: return jsonify({'error': 'Unauthorized'}), 401
+    settings = asyncio.run(shared.cards_get_settings(CARDS_GUILD_ID))
+    if not settings.get('enabled', False):
+        return jsonify({'error': 'Card pulls are currently disabled'}), 400
+    sayories = asyncio.run(shared.g_eco_get(int(user_id)))
+    if sayories < 150:
+        return jsonify({'error': 'Not enough Sayories (150 required)'}), 400
+    templates = asyncio.run(shared.cards_get_templates(CARDS_GUILD_ID))
+    if not templates:
+        return jsonify({'error': 'No cards available to pull'}), 400
+    import random, time, uuid
+    card = random.choice(templates)
+    asyncio.run(shared.g_eco_add(int(user_id), -150))
+    inv = asyncio.run(shared.cards_get_inventory(CARDS_GUILD_ID, int(user_id)))
+    new_item = {'id': str(uuid.uuid4()), 'template_id': card.get('id'), 'timestamp': int(time.time()), 'locked': False}
+    cards_list = inv.get('cards', [])
+    cards_list.append(new_item)
+    inv['cards'] = cards_list
+    asyncio.run(shared.cards_save_inventory(CARDS_GUILD_ID, int(user_id), inv))
+    return jsonify({'success': True, 'pulled_card': new_item, 'template': card, 'new_balance': sayories - 150})
+
 if __name__ == '__main__':
     port = int(os.environ.get("PORT", 7860))
     app.run(host='0.0.0.0', port=port, debug=False)
