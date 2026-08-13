@@ -130,13 +130,11 @@ async def dispatch_log(guild: discord.Guild, embed: discord.Embed, is_vc: bool =
                     await user.send(f"**Log for {guild.name}**", embed=embed)
             except: pass
 
+from typing import Literal
+
 @tree.command(name="log_dm", description="Manage who receives moderation logs in their DMs")
 @app_commands.describe(action="Add or remove", user="The user to modify")
-@app_commands.choices(action=[
-    app_commands.Choice(name="add", value="add"),
-    app_commands.Choice(name="remove", value="remove")
-])
-async def log_dm_cmd(interaction: discord.Interaction, action: str, user: discord.User):
+async def log_dm_cmd(interaction: discord.Interaction, action: Literal["add", "remove"], user: discord.User):
     if interaction.user.id != BOT_OWNER_ID and interaction.user.id != 879118301169602570:
         return await interaction.response.send_message("❌ Only the bot owner can manage DM logs.", ephemeral=True)
     if not await guild_check(interaction): return
