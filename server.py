@@ -44,6 +44,8 @@ BOTS = [
 
 bot_processes = {bot: None for bot in BOTS}
 bot_lock = threading.Lock()
+bot_restart_delays = {bot: 10 for bot in BOTS}
+bot_last_start = {bot: 0 for bot in BOTS}
 
 def is_bot_running(bot_name):
     process = bot_processes.get(bot_name)
@@ -53,7 +55,21 @@ def is_bot_running(bot_name):
 
 def start_single_bot(bot_name):
     if is_bot_running(bot_name):
+        # Reset delay if it's successfully running for a while
+        if time.time() - bot_last_start.get(bot_name, 0) > 60:
+            bot_restart_delays[bot_name] = 10
         return False, "Already running"
+        
+    now = time.time()
+    last = bot_last_start.get(bot_name, 0)
+    delay = bot_restart_delays.get(bot_name, 10)
+    
+    if now - last < delay:
+        return False, f"Cooldown active (waiting {int(delay - (now - last))}s)"
+        
+    bot_last_start[bot_name] = now
+    bot_restart_delays[bot_name] = min(delay * 2, 600)  # Max 10 mins
+    
     try:
         # Start the bot process using launcher.py with the bot name as an argument
         process = subprocess.Popen([sys.executable, 'launcher.py', bot_name])

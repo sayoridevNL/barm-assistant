@@ -47,6 +47,7 @@ BOTS = {
     "gambling_bot": "GAMBLING_BOT_TOKEN",
     "umamusume_bot": "UMAMUSUME_BOT_TOKEN",
     "general_bot": "GENERAL_BOT_TOKEN",
+    "cards_bot": "CARDS_BOT_TOKEN",
 }
 
 async def main(bot_name):
