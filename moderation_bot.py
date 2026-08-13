@@ -156,19 +156,38 @@ async def log_dm_cmd(interaction: discord.Interaction, action: Literal["add", "r
     await db_set(interaction.guild_id, current, "log_dms")
     await interaction.response.send_message(msg, ephemeral=True)
 
+_audit_locks = {}
+_audit_cache = {}
+
 # Helper to fetch audit log actor
 async def get_actor(guild: discord.Guild, action: discord.AuditLogAction, target_id: int = None) -> discord.User | None:
     import asyncio
-    from datetime import datetime, timezone
-    await asyncio.sleep(1) # Wait for audit log to populate
     now = discord.utils.utcnow()
-    try:
-        async for entry in guild.audit_logs(action=action, limit=5):
-            if (now - entry.created_at).total_seconds() < 15:
-                if target_id is None or (entry.target and getattr(entry.target, "id", None) == target_id):
-                    return entry.user
-    except: pass
-    return None
+    cache_key = f"{guild.id}_{action.value}"
+    
+    if cache_key not in _audit_locks:
+        _audit_locks[cache_key] = asyncio.Lock()
+        
+    async with _audit_locks[cache_key]:
+        if cache_key in _audit_cache:
+            cached_time, entries = _audit_cache[cache_key]
+            if (discord.utils.utcnow() - cached_time).total_seconds() < 3:
+                for entry in entries:
+                    if (now - entry.created_at).total_seconds() < 15:
+                        if target_id is None or (entry.target and getattr(entry.target, "id", None) == target_id):
+                            return entry.user
+                return None
+                
+        await asyncio.sleep(1) # Wait for audit log to populate
+        try:
+            entries = [e async for e in guild.audit_logs(action=action, limit=5)]
+            _audit_cache[cache_key] = (discord.utils.utcnow(), entries)
+            for entry in entries:
+                if (now - entry.created_at).total_seconds() < 15:
+                    if target_id is None or (entry.target and getattr(entry.target, "id", None) == target_id):
+                        return entry.user
+        except: pass
+        return None
 
 @bot.event
 async def on_message_delete(message: discord.Message):
