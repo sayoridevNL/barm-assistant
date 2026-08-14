@@ -343,6 +343,14 @@ async def sync_guild_safely(bot: commands.Bot, guild: discord.Guild) -> bool:
     except Exception: return False
 
 async def safe_sync(bot: commands.Bot):
+    if os.getenv("SKIP_SYNC") == "1":
+        print("  ⏭️ Skipping sync due to SKIP_SYNC=1")
+        return
+        
+    delay = random.uniform(5.0, 120.0)
+    print(f"  ⏳ Staggering global sync for {delay:.1f}s to avoid Discord rate limit...")
+    await asyncio.sleep(delay)
+
     async def _safe_global_sync():
         try: return await bot.tree.sync()
         except discord.HTTPException as e:
@@ -359,6 +367,7 @@ async def safe_sync(bot: commands.Bot):
         print(f"  ⚠️  Global sync failed: {e}")
     ok, fail = 0, 0
     for g in bot.guilds:
+        await asyncio.sleep(1.5)  # Throttle guild syncing to prevent Cloudflare 1015 ban
         if await sync_guild_safely(bot, g): ok += 1
         else: fail += 1
     print(f"  ✅ Guild sync: {ok} server(s) updated instantly" + (f" ({fail} failed)" if fail else ""))
