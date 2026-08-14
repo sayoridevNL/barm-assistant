@@ -2,25 +2,19 @@ FROM python:3.11-slim
 
 RUN apt-get update && apt-get install -y ffmpeg git fonts-liberation fonts-noto-color-emoji build-essential libffi-dev libsodium-dev python3-dev && rm -rf /var/lib/apt/lists/*
 
-# Hugging Face Spaces require running as a non-root user
-RUN useradd -m -u 1000 user
-USER user
-ENV HOME=/home/user \
-    PATH=/home/user/.local/bin:$PATH
-
-WORKDIR $HOME/app
+WORKDIR /app
 
 # Copy the project files
-COPY --chown=user . $HOME/app
+COPY . /app
 
 # Install Python requirements
 RUN pip install --no-cache-dir --upgrade pip && \
     pip install --no-cache-dir -r requirements.txt && \
     pip install -U --pre yt-dlp
 
-# Hugging Face Spaces routes traffic to port 7860 by default
-ENV PORT=7860
-EXPOSE 7860
+# Render automatically injects the PORT environment variable
+# Expose the default Render port just in case
+EXPOSE 10000
 
 # Start the web dashboard using gunicorn
-CMD gunicorn --bind 0.0.0.0:7860 server:app
+CMD gunicorn --bind 0.0.0.0:$PORT server:app
