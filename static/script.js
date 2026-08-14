@@ -1104,14 +1104,6 @@ function renderTcCarousel() {
         carousel.appendChild(c);
     });
 }
-`;
-        c.innerHTML = `
-            <img class="tc-image" src="https://via.placeholder.com/200x280/17132a/ed5d9d?text=Card+${i}" />
-            <div class="tc-overlay"></div>
-        `;
-        carousel.appendChild(c);
-    }
-}
 
 window.pullCardGacha = function(count = 1) {
     if(count > 1 && !confirm(`Pull ${count} cards for ${count * 100} Sayories?`)) return;
