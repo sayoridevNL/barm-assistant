@@ -305,51 +305,6 @@ document.addEventListener('DOMContentLoaded', () => {
             renderBoard(data.sayories, 'lb-sayories', '🪙');
             renderBoard(data.quotes, 'lb-quotes', '⭐');
             
-
-            // --- Umamusume Training Center Setup ---
-            if (data.stats.umas_list && data.stats.support_cards_list) {
-                const umaSelect = document.getElementById('train-uma-select');
-                const supportSelect = document.getElementById('train-support-select');
-                
-                if (umaSelect && supportSelect) {
-                    umaSelect.innerHTML = '';
-                    supportSelect.innerHTML = '';
-                    
-                    let trainingUma = null;
-                    data.stats.umas_list.forEach(uma => {
-                        const opt = document.createElement('option');
-                        opt.value = uma.id;
-                        opt.textContent = `${uma.name} [${uma.rarity}] (⭐${uma.stars || 1})`;
-                        umaSelect.appendChild(opt);
-                        
-                        if (uma.training_end) {
-                            trainingUma = uma;
-                        }
-                    });
-                    
-                    data.stats.support_cards_list.forEach(card => {
-                        const opt = document.createElement('option');
-                        opt.value = card.id;
-                        opt.textContent = `${card.name} [${card.type}] (Lv. ${card.level || 1})`;
-                        supportSelect.appendChild(opt);
-                    });
-                    
-                    const setupContainer = document.getElementById('training-setup-container');
-                    const activeContainer = document.getElementById('training-active-container');
-                    
-                    if (trainingUma) {
-                        setupContainer.style.display = 'none';
-                        activeContainer.style.display = 'block';
-                        window.currentTrainingUmaId = trainingUma.id;
-                        startTrainingCountdown(trainingUma.training_end);
-                    } else {
-                        setupContainer.style.display = 'block';
-                        activeContainer.style.display = 'none';
-                        if (window.trainingInterval) clearInterval(window.trainingInterval);
-                    }
-                }
-            }
-
         } catch (e) {
             console.error('Failed to fetch leaderboards:', e);
         }
