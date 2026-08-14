@@ -809,7 +809,6 @@ class SuggestionView(discord.ui.View):
             except:
                 pass
         bot.loop.create_task(close_poll())
-
     @discord.ui.button(label="Reject", style=discord.ButtonStyle.danger, custom_id="sugg_reject")
     async def btn_reject(self, interaction: discord.Interaction, button: discord.ui.Button):
         await interaction.response.send_message("❌ Suggestion rejected.", ephemeral=True)
@@ -844,11 +843,67 @@ async def generate_card_image(card_data: dict) -> io.BytesIO:
     top = (new_h - target_h) / 2
     img = img.crop((left, top, left + target_w, top + target_h))
     
-    draw = ImageDraw.Draw(img)
+    card_type = card_data.get("type", "Unknown")
     
+    # ── THEMATIC OVERLAYS ──
+    # Trip & Adventure Set
+    if card_type == "Texel":
+        overlay = Image.new("RGBA", (target_w, target_h), (34, 139, 34, 40)) # Green/Black overlay
+        img = Image.alpha_composite(img, overlay)
+        draw = ImageDraw.Draw(img)
+        draw.rectangle([(0,0), (target_w-1, target_h-1)], outline=(0, 0, 0), width=12)
+        draw.rectangle([(2,2), (target_w-3, target_h-3)], outline=(34, 139, 34), width=8)
+    elif card_type == "Berlijn":
+        draw = ImageDraw.Draw(img)
+        draw.rectangle([(0,0), (target_w-1, target_h-1)], outline=(0, 0, 0), width=15)
+        draw.rectangle([(3,3), (target_w-4, target_h-4)], outline=(255, 0, 0), width=10)
+        draw.rectangle([(6,6), (target_w-7, target_h-7)], outline=(255, 215, 0), width=5)
+    elif card_type == "Tikibad":
+        overlay = Image.new("RGBA", (target_w, target_h), (0, 191, 255, 60)) # Splash blue
+        img = Image.alpha_composite(img, overlay)
+        draw = ImageDraw.Draw(img)
+        draw.rectangle([(0,0), (target_w-1, target_h-1)], outline=(32, 178, 170), width=12)
+    elif card_type in ["Bobbejaanland", "Uitje"]:
+        draw = ImageDraw.Draw(img)
+        draw.rectangle([(0,0), (target_w-1, target_h-1)], outline=(139, 69, 19), width=14)
+    # School Life Set
+    elif "HAVO" in card_type or "Examen" in card_type:
+        draw = ImageDraw.Draw(img)
+        if card_type == "Rookie 1-2-3 HAVO":
+            draw.rectangle([(0,0), (target_w-1, target_h-1)], outline=(173, 216, 230), width=12)
+        elif card_type == "4HAVO":
+            draw.rectangle([(0,0), (target_w-1, target_h-1)], outline=(244, 164, 96), width=12)
+        elif card_type == "5HAVO":
+            draw.rectangle([(0,0), (target_w-1, target_h-1)], outline=(255, 69, 0), width=12)
+        elif card_type == "5HAVO EXAMENTIJD":
+            draw.rectangle([(0,0), (target_w-1, target_h-1)], outline=(255, 0, 0), width=16)
+            overlay = Image.new("RGBA", (target_w, target_h), (255, 0, 0, 30))
+            img = Image.alpha_composite(img, overlay)
+            draw = ImageDraw.Draw(img)
+        elif card_type == "6HAVO":
+            draw.rectangle([(0,0), (target_w-1, target_h-1)], outline=(50, 205, 50), width=12)
+        elif card_type == "Examen Uitrijking":
+            draw.rectangle([(0,0), (target_w-1, target_h-1)], outline=(255, 215, 0), width=20)
+            draw.rectangle([(5,5), (target_w-6, target_h-6)], outline=(255, 255, 255), width=5)
+    # Hangout & Gaming Set
+    elif card_type == "IRL Autisten":
+        draw = ImageDraw.Draw(img)
+        draw.rectangle([(0,0), (target_w-1, target_h-1)], outline=(255, 250, 240), width=18)
+    elif "Gamemiddagen" in card_type or "Gamemiddag" in card_type:
+        draw = ImageDraw.Draw(img)
+        if "Barm" in card_type:
+            draw.rectangle([(0,0), (target_w-1, target_h-1)], outline=(138, 43, 226), width=14)
+        else:
+            draw.rectangle([(0,0), (target_w-1, target_h-1)], outline=(0, 255, 0), width=14)
+    else:
+        draw = ImageDraw.Draw(img)
+        
     rarity = card_data.get("rarity", "R")
-    color = {"R": (52, 152, 219), "SR": (255, 215, 0), "SSR": (255, 0, 255)}.get(rarity, (255,255,255))
-    draw.rectangle([(0,0), (target_w-1, target_h-1)], outline=color, width=10)
+    color = {"R": (52, 152, 219), "SR": (255, 215, 0), "SSR": (255, 0, 255), "USL": (255, 255, 255)}.get(rarity, (255,255,255))
+    
+    # If it wasn't one of the special custom borders, draw the standard rarity border
+    if card_type not in ["Texel", "Berlijn", "Tikibad", "Bobbejaanland", "Uitje", "Rookie 1-2-3 HAVO", "4HAVO", "5HAVO", "5HAVO EXAMENTIJD", "6HAVO", "Examen Uitrijking", "IRL Autisten"] and "Gamemiddag" not in card_type:
+        draw.rectangle([(0,0), (target_w-1, target_h-1)], outline=color, width=10)
     
     draw.rectangle([(0, target_h-50), (target_w, target_h)], fill=(0, 0, 0, 180))
     
@@ -865,11 +920,24 @@ async def generate_card_image(card_data: dict) -> io.BytesIO:
         "Speed": (135, 206, 235), "Stamina": (255, 165, 0),
         "Power": (255, 69, 0), "Guts": (255, 105, 180),
         "Intelligence": (50, 205, 50), "Friend": (255, 215, 0),
-        "Group": (147, 112, 219)
+        "Group": (147, 112, 219),
+        "Texel": (34, 139, 34), "Berlijn": (255, 0, 0),
+        "Tikibad": (0, 191, 255), "Uitje": (255, 182, 193),
+        "Bobbejaanland": (139, 69, 19), "IRL Autisten": (255, 250, 240)
     }
-    t_col = type_colors.get(card_type, (255,255,255))
+    t_col = type_colors.get(card_type, color)
     draw.ellipse([(target_w-45, 15), (target_w-15, 45)], fill=t_col, outline=(255,255,255), width=2)
-    draw.text((target_w-35, 20), card_type[0] if card_type else "?", fill=(255,255,255), font=font)
+    
+    # Type icon (first letter of type)
+    short_type = card_type[0] if card_type else "?"
+    if "HAVO" in card_type or "Examen" in card_type: short_type = "S" # School
+    if "Gamemiddag" in card_type: short_type = "G" # Gaming
+    
+    # Rarity Indicator Polygon
+    draw.polygon([(0,0), (60,0), (0,60)], fill=color)
+    draw.text((5, 5), rarity, fill=(0,0,0), font=font)
+    
+    draw.text((target_w-35, 20), short_type, fill=(255,255,255), font=font)
     
     buf = io.BytesIO()
     img.save(buf, format="PNG")
