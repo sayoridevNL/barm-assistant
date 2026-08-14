@@ -20,7 +20,7 @@ if MONGO_URI:
     mongo_db = mongo_client["barm_os"]
 
 app = Flask(__name__, static_folder='static', template_folder='templates')
-app.secret_key = os.getenv('FLASK_SECRET_KEY', os.urandom(24))
+app.secret_key = os.getenv('FLASK_SECRET_KEY', 'default_secret_key_barm_os_2026_fallback')
 
 DISCORD_CLIENT_ID = os.getenv('DISCORD_CLIENT_ID')
 DISCORD_CLIENT_SECRET = os.getenv('DISCORD_CLIENT_SECRET')
