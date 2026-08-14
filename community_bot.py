@@ -764,7 +764,7 @@ async def help_cmd(interaction: discord.Interaction) -> None:
 
 
 # ─────────────────────────────  Custom Suggestions  ─────────────────────────────
-CUSTOM_GUILD_ID = 1049396166250475612
+CUSTOM_GUILD_ID = 1366404929727762554
 SUGGESTION_CHANNEL_ID = 1171457664136532010
 SERVER_OWNER_ID = 879118301169602570
 
@@ -980,7 +980,7 @@ async def buy_card(interaction: discord.Interaction, pack: app_commands.Choice[i
     if not guild_id:
         return await interaction.response.send_message("❌ This command must be used in a server.", ephemeral=True)
         
-    if guild_id != 1049396166250475612:
+    if guild_id != 1366404929727762554:
         return await interaction.response.send_message("❌ Trading cards are not available in this server.", ephemeral=True)
         
     count = pack.value if pack else 1
@@ -1096,7 +1096,7 @@ async def inventory(interaction: discord.Interaction):
         await interaction.response.send_message("Must be used in a server.", ephemeral=True)
         return
         
-    if guild_id != 1049396166250475612:
+    if guild_id != 1366404929727762554:
         return await interaction.response.send_message("❌ Trading cards are not available in this server.", ephemeral=True)
 
     inv = await db_get_section(guild_id, "inventory")

@@ -693,7 +693,7 @@ def save_file(filename):
 # --- CARDS GACHA ROUTES ---
 import asyncio
 import shared
-CARDS_GUILD_ID = 1049396166250475612
+CARDS_GUILD_ID = 1366404929727762554
 
 def is_cards_admin():
     uid = session.get('user_id')

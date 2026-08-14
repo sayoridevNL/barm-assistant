@@ -120,8 +120,8 @@ async def dispatch_log(guild: discord.Guild, embed: discord.Embed, is_vc: bool =
             try: await ch.send(embed=embed)
             except: pass
 
-    # 2. Send to configured DMs ONLY for the specific server (1049396166250475612) and not for VC logs
-    if not is_vc and guild.id == 1049396166250475612:
+    # 2. Send to configured DMs ONLY for the specific server (1366404929727762554) and not for VC logs
+    if not is_vc and guild.id == 1366404929727762554:
         dm_users = await db_get(guild.id, "log_dms", default=DEFAULT_DM_RECIPIENTS)
         for uid in dm_users:
             try:
