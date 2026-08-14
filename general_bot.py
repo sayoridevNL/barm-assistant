@@ -198,7 +198,7 @@ class GeneralBot(commands.Bot):
 
     @tasks.loop(seconds=10)
     async def broadcast_task(self):
-        db = _get_mongo_db()
+        db = shared._get_mongo_db()
         if db is None: return
         
         async for broadcast in db.broadcast_queue.find():

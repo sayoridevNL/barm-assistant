@@ -11,6 +11,7 @@ from datetime import datetime, timezone
 import discord
 from discord.ext import commands
 import motor.motor_asyncio
+import random
 from typing import Optional, Union, List, Dict, Any
 
 # ── .env LOADER ──────────────────────────────────────────────────────────────
@@ -260,12 +261,22 @@ async def bocchi_get(guild_id: int, user_id: int) -> int:
 
 async def bocchi_add(guild_id: int, user_id: int, amount: int) -> int:
     async with _db_lock(guild_id):
-        d = _db_load(guild_id)
+        d = await _db_load(guild_id)
         nat = d.setdefault("bocchies", {})
         uid = str(user_id)
         nat.setdefault(uid, {})
         nat[uid]["points"] = max(0, nat[uid].get("points", 0) + amount)
-        _db_save(guild_id, d)
+        await _db_save(guild_id, d)
+        return nat[uid]["points"]
+
+async def bocchi_subtract(guild_id: int, user_id: int, amount: int) -> int:
+    async with _db_lock(guild_id):
+        d = await _db_load(guild_id)
+        nat = d.setdefault("bocchies", {})
+        uid = str(user_id)
+        nat.setdefault(uid, {})
+        nat[uid]["points"] = max(0, nat[uid].get("points", 0) - amount)
+        await _db_save(guild_id, d)
         return nat[uid]["points"]
 
 async def bocchi_get_all(guild_id: int) -> dict:
@@ -276,11 +287,11 @@ async def bocchi_get_role_cfg(guild_id: int) -> dict:
 
 async def bocchi_set_role_cfg(guild_id: int, rank: int, role_id: int | None):
     async with _db_lock(guild_id):
-        d = _db_load(guild_id)
+        d = await _db_load(guild_id)
         cfg = d.setdefault("bocchi_roles", {})
         if role_id is None: cfg.pop(str(rank), None)
         else: cfg[str(rank)] = role_id
-        _db_save(guild_id, d)
+        await _db_save(guild_id, d)
 
 async def bocchi_assign_rank_role(member: discord.Member, rank: int):
     if rank == 0 or not member.guild: return
