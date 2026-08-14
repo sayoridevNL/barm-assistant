@@ -953,14 +953,16 @@ async def generate_card_image(card_data: dict) -> io.BytesIO:
     app_commands.Choice(name="Massive Pack (20 Cards - 2000 Sayories)", value=20)
 ])
 async def buy_card(interaction: discord.Interaction, pack: app_commands.Choice[int] = None):
+    guild_id = interaction.guild_id
+    if not guild_id:
+        return await interaction.response.send_message("❌ This command must be used in a server.", ephemeral=True)
+        
+    if guild_id != 1049396166250475612:
+        return await interaction.response.send_message("❌ Trading cards are not available in this server.", ephemeral=True)
+        
     count = pack.value if pack else 1
     cost = 100 * count
     
-    guild_id = interaction.guild_id
-    if not guild_id:
-        await interaction.response.send_message("Must be used in a server.", ephemeral=True)
-        return
-
     # Check balance using shared global logic to ensure parity with dashboard
     import shared
     bal = await shared.g_eco_get(interaction.user.id)
@@ -1072,7 +1074,7 @@ async def inventory(interaction: discord.Interaction):
         return
         
     if guild_id != 1049396166250475612:
-        guild_id = 1049396166250475612
+        return await interaction.response.send_message("❌ Trading cards are not available in this server.", ephemeral=True)
 
     inv = await db_get_section(guild_id, "inventory")
     user_inv = inv.get(str(interaction.user.id), {})

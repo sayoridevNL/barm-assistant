@@ -733,7 +733,7 @@ def cards_templates():
 def cards_inventory():
     user_id = session.get('user_id')
     if not user_id: return jsonify({'error': 'Unauthorized'}), 401
-    inv = db_get_section_sync(CARDS_GUILD_ID, 'cards_inventory').get(str(user_id), [])
+    inv = db_get_section_sync(CARDS_GUILD_ID, 'cards_inventory').get(str(user_id), {})
     return jsonify(inv)
 
 @app.route('/api/cards/pull', methods=['POST'])
@@ -809,7 +809,7 @@ def cards_pull():
         
     _eco=get_global_section_sync('economy'); _usr=_eco.setdefault(str(user_id),{}); _usr['balance']=_usr.get('balance',0) - cost; save_global_section_sync('economy', _eco)
     
-    inv = db_get_section_sync(CARDS_GUILD_ID, 'cards_inventory').get(str(user_id), [])
+    inv = db_get_section_sync(CARDS_GUILD_ID, 'cards_inventory').get(str(user_id), {})
     cards_list = inv.get('cards', [])
     cards_list.extend(pulled_items)
     inv['cards'] = cards_list
