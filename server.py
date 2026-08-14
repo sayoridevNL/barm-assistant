@@ -39,9 +39,6 @@ def run_async(coro):
 MONGO_URI = os.getenv("MONGODB_URI")
 mongo_client = None
 mongo_db = None
-if MONGO_URI:
-    mongo_client = pymongo.MongoClient(MONGO_URI)
-    mongo_db = mongo_client["barm_os"]
 
 app = Flask(__name__, static_folder='static', template_folder='templates')
 from werkzeug.middleware.proxy_fix import ProxyFix
@@ -210,9 +207,31 @@ def logout():
     session.clear()
 
 
+
+def _get_mongo_db_sync():
+    global mongo_client, mongo_db
+    if mongo_db is None and MONGO_URI:
+        import pymongo
+        mongo_client = pymongo.MongoClient(MONGO_URI)
+        mongo_db = mongo_client["barm_os"]
+    return mongo_db
+
+def db_get_section_sync(guild_id, section):
+    db = _get_mongo_db_sync()
+    if db is not None:
+        doc = db.guilds.find_one({"_id": str(guild_id)})
+        if doc: return doc.get(section, {})
+    return {}
+
+def db_save_section_sync(guild_id, section, data):
+    db = _get_mongo_db_sync()
+    if db is not None:
+        db.guilds.update_one({"_id": str(guild_id)}, {"$set": {section: data}}, upsert=True)
+
 def get_global_section_sync(section):
-    if mongo_db is not None:
-        doc = mongo_db.global_data.find_one({"_id": section})
+    db = _get_mongo_db_sync()
+    if db is not None:
+        doc = db.global_data.find_one({"_id": section})
         return doc.get("data", {}) if doc else {}
     try:
         with open('data/global.json', 'r', encoding='utf-8') as f:
@@ -221,8 +240,9 @@ def get_global_section_sync(section):
         return {}
 
 def save_global_section_sync(section, data):
-    if mongo_db is not None:
-        mongo_db.global_data.update_one({"_id": section}, {"$set": {"data": data}}, upsert=True)
+    db = _get_mongo_db_sync()
+    if db is not None:
+        db.global_data.update_one({"_id": section}, {"$set": {"data": data}}, upsert=True)
     else:
         try:
             with open('data/global.json', 'r', encoding='utf-8') as f:
@@ -684,9 +704,9 @@ def cards_settings():
     if not is_cards_admin(): return jsonify({'error': 'Unauthorized'}), 401
     if request.method == 'POST':
         data = request.json or {}
-        run_async(shared.cards_save_settings(CARDS_GUILD_ID, data))
+        db_save_section_sync(CARDS_GUILD_ID, 'cards_settings', data)
         return jsonify({'success': True})
-    settings = run_async(shared.cards_get_settings(CARDS_GUILD_ID))
+    settings = db_get_section_sync(CARDS_GUILD_ID, 'cards_settings')
     return jsonify(settings)
 
 @app.route('/api/cards/rarities', methods=['GET', 'POST'])
@@ -694,9 +714,9 @@ def cards_rarities():
     if not is_cards_admin(): return jsonify({'error': 'Unauthorized'}), 401
     if request.method == 'POST':
         data = request.json or {}
-        run_async(shared.cards_save_rarities(CARDS_GUILD_ID, data))
+        db_save_section_sync(CARDS_GUILD_ID, 'cards_rarities', data)
         return jsonify({'success': True})
-    rarities = run_async(shared.cards_get_rarities(CARDS_GUILD_ID))
+    rarities = db_get_section_sync(CARDS_GUILD_ID, 'cards_rarities')
     return jsonify(rarities)
 
 @app.route('/api/cards/templates', methods=['GET', 'POST'])
@@ -704,16 +724,16 @@ def cards_templates():
     if not is_cards_admin(): return jsonify({'error': 'Unauthorized'}), 401
     if request.method == 'POST':
         data = request.json or []
-        run_async(shared.cards_save_templates(CARDS_GUILD_ID, data))
+        db_save_section_sync(CARDS_GUILD_ID, 'cards_templates', data)
         return jsonify({'success': True})
-    templates = run_async(shared.cards_get_templates(CARDS_GUILD_ID))
+    templates = db_get_section_sync(CARDS_GUILD_ID, 'cards_templates')
     return jsonify(templates)
 
 @app.route('/api/cards/inventory', methods=['GET'])
 def cards_inventory():
     user_id = session.get('user_id')
     if not user_id: return jsonify({'error': 'Unauthorized'}), 401
-    inv = run_async(shared.cards_get_inventory(CARDS_GUILD_ID, int(user_id)))
+    inv = db_get_section_sync(CARDS_GUILD_ID, 'cards_inventory').get(str(user_id), [])
     return jsonify(inv)
 
 @app.route('/api/cards/pull', methods=['POST'])
@@ -726,21 +746,21 @@ def cards_pull():
     if count not in [1, 3, 5, 10, 20]:
         count = 1
         
-    settings = run_async(shared.cards_get_settings(CARDS_GUILD_ID))
+    settings = db_get_section_sync(CARDS_GUILD_ID, 'cards_settings')
     if not settings.get('enabled', True):
         return jsonify({'error': 'Card pulls are currently disabled'}), 400
         
     cost = 100 * count
-    sayories = run_async(shared.g_eco_get(int(user_id)))
+    sayories = get_global_section_sync('economy').get(str(user_id), {}).get('balance', 0)
     if sayories < cost:
         return jsonify({'error': f'Not enough Sayories ({cost} required)'}), 400
         
-    templates = run_async(shared.cards_get_templates(CARDS_GUILD_ID))
+    templates = db_get_section_sync(CARDS_GUILD_ID, 'cards_templates')
     if not templates:
         return jsonify({'error': 'No cards available to pull'}), 400
         
     # Get rarities for weighted drops
-    rarities = run_async(shared.cards_get_rarities(CARDS_GUILD_ID))
+    rarities = db_get_section_sync(CARDS_GUILD_ID, 'cards_rarities')
     if isinstance(rarities, dict): rarities = rarities.get("rarities", [])
     if not rarities:
         rarities = [
@@ -787,15 +807,15 @@ def cards_pull():
         new_item = {'id': str(uuid.uuid4()), 'template_id': card.get('id', str(uuid.uuid4())), 'timestamp': int(time.time()), 'locked': False}
         pulled_items.append(new_item)
         
-    run_async(shared.g_eco_add(int(user_id), -cost))
+    _eco=get_global_section_sync('economy'); _usr=_eco.setdefault(str(user_id),{}); _usr['balance']=_usr.get('balance',0) - cost; save_global_section_sync('economy', _eco)
     
-    inv = run_async(shared.cards_get_inventory(CARDS_GUILD_ID, int(user_id)))
+    inv = db_get_section_sync(CARDS_GUILD_ID, 'cards_inventory').get(str(user_id), [])
     cards_list = inv.get('cards', [])
     cards_list.extend(pulled_items)
     inv['cards'] = cards_list
-    run_async(shared.cards_save_inventory(CARDS_GUILD_ID, int(user_id), inv))
+    _invs=db_get_section_sync(CARDS_GUILD_ID, 'cards_inventory'); _invs[str(user_id)]=inv; db_save_section_sync(CARDS_GUILD_ID, 'cards_inventory', _invs)
     
-    new_sayories = run_async(shared.g_eco_get(int(user_id)))
+    new_sayories = get_global_section_sync('economy').get(str(user_id), {}).get('balance', 0)
     
     return jsonify({'success': True, 'pulled_cards': pulled_items, 'templates': pulled_templates, 'new_balance': new_sayories})
 
