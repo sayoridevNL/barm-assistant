@@ -9,6 +9,9 @@ import random
 import asyncio
 import io
 import json
+import time
+import uuid
+from typing import Optional
 import aiohttp
 
 import discord
@@ -52,6 +55,19 @@ class CommunityBot(commands.Bot):
             await self.load_extension("sports_tracker")
         except Exception as exc:
             print(f"Failed to load sports_tracker: {exc}")
+            import traceback
+            traceback.print_exc()
+        try:
+            await self.add_cog(MarriageSystem(self))
+            for name, meta in ACTIONS.items():
+                pretty = {"kiss": "Kiss", "hug": "Hug", "kill": "Playfully 'defeat' (duel)",
+                          "nom": "Nom", "lick": "Lick", "tickle": "Tickle",
+                          "touches": "Friendly touch/high-five", "griddy": "Griddy duel + dance"}[name]
+                self.tree.add_command(self.get_cog("MarriageSystem")._register_action(
+                    name, f"{pretty} another user (playful, non-graphic)"
+                ))
+        except Exception as exc:
+            print(f"Failed to set up marriage system: {exc}")
             import traceback
             traceback.print_exc()
 
@@ -114,6 +130,637 @@ class CommunityBot(commands.Bot):
         self.vc_payout_loop.start()
         self.weekly_reset.start()
         await self.change_presence(activity=discord.CustomActivity(name=BOT_INFO["community"]["status"]))
+
+# ══════════════════════════════════════════════════════════════════════════
+# MARRIAGE SYSTEM — playful interaction commands + fictional consensual
+# marriage/divorce system (halal = 2 people, harem = 3 or 4). Persists via
+# shared.py's db_get_section/db_save_section, same pattern as the rest of
+# this file (e.g. the cards gacha system below).
+# ══════════════════════════════════════════════════════════════════════════
+# ── Config (server owners can tune these; see CONFIG section at bottom) ──────
+ACTION_COOLDOWN_SECONDS = 8.0
+PROPOSAL_EXPIRY_SECONDS = 15 * 60
+DIVORCE_EXPIRY_SECONDS = 24 * 60 * 60
+JUDGE_ROLE_NAMES = {"judge", "marriage judge", "mod", "moderator"}  # fallback if no configured role
+
+MODE_REQUIRED_COUNT = {
+    "two_person": 2,
+    "three_person": 3,
+    "four_person": 4,
+}
+MODE_LABEL = {
+    "two_person": "Halal Marriage 💍",
+    "three_person": "Harem Marriage (Trio) 💞",
+    "four_person": "Squad Marriage (Harem, 4) 💞",
+}
+
+
+# Uses shared.py's db_get_section/db_save_section, which persist to Mongo
+# when MONGODB_URI is set, or to data/<guild_id>.json otherwise — same store
+# every other bot module in this project already uses. Sections used here:
+#   "marriages"         -> {marriage_id: {...}}
+#   "marriage_divorces" -> {case_id: {...}}
+#   "marriage_config"   -> {...}
+# db_get_section/db_save_section each lock internally per-guild, but a
+# read-modify-write across the two calls isn't atomic on its own, so we add
+# an in-process lock around each read-modify-write sequence below.
+
+_guild_locks: dict[int, asyncio.Lock] = {}
+
+
+def _lock_for(guild_id: int) -> asyncio.Lock:
+    if guild_id not in _guild_locks:
+        _guild_locks[guild_id] = asyncio.Lock()
+    return _guild_locks[guild_id]
+
+
+def _default_config() -> dict:
+    return {
+        "enabled": True,
+        "allow_bots": False,
+        "allowed_modes": ["two_person", "three_person", "four_person"],
+        "proposal_expiry": PROPOSAL_EXPIRY_SECONDS,
+        "divorce_expiry": DIVORCE_EXPIRY_SECONDS,
+        "judge_role_id": None,
+        "log_channel_id": None,
+        "shared_economy_enabled": False,
+    }
+
+
+async def get_config(guild_id: int) -> dict:
+    stored = await db_get_section(guild_id, "marriage_config")
+    cfg = _default_config()
+    cfg.update(stored or {})
+    return cfg
+
+
+async def set_config(guild_id: int, **updates) -> dict:
+    async with _lock_for(guild_id):
+        cfg = _default_config()
+        cfg.update(await db_get_section(guild_id, "marriage_config") or {})
+        cfg.update(updates)
+        await db_save_section(guild_id, "marriage_config", cfg)
+        return cfg
+
+
+def _active_marriage_for(marriages: dict, user_id: int):
+    for mid, m in marriages.items():
+        if m["status"] == "active" and user_id in m["participants"]:
+            return mid, m
+    return None, None
+
+
+def _active_proposal_involving(marriages: dict, user_ids: set[int]):
+    for mid, m in marriages.items():
+        if m["status"] == "pending" and user_ids & set(m["participants"]):
+            return mid, m
+    return None, None
+
+
+class MarriageDB:
+    """Thin async-safe wrapper around the per-guild JSON store."""
+
+    @staticmethod
+    async def create_proposal(guild_id: int, mode: str, creator_id: int, participants: list[int]) -> dict:
+        async with _lock_for(guild_id):
+            marriages = await db_get_section(guild_id, "marriages")
+            cfg = await get_config(guild_id)
+            now = int(time.time())
+            marriage_id = str(uuid.uuid4())
+            record = {
+                "id": marriage_id,
+                "guild_id": guild_id,
+                "mode": mode,
+                "required_count": MODE_REQUIRED_COUNT[mode],
+                "participants": list(dict.fromkeys(participants)),  # dedupe, keep order
+                "accepted": [creator_id],  # proposer implicitly consents by proposing
+                "proposal_creator_id": creator_id,
+                "status": "pending",
+                "created_at": now,
+                "expires_at": now + int(cfg["proposal_expiry"]),
+                "activated_at": None,
+            }
+            marriages[marriage_id] = record
+            await db_save_section(guild_id, "marriages", marriages)
+            return record
+
+    @staticmethod
+    async def accept(guild_id: int, marriage_id: str, user_id: int) -> tuple[bool, str, Optional[dict]]:
+        async with _lock_for(guild_id):
+            marriages = await db_get_section(guild_id, "marriages")
+            m = marriages.get(marriage_id)
+            if not m or m["status"] != "pending":
+                return False, "not_found", None
+            if int(time.time()) > m["expires_at"]:
+                m["status"] = "expired"
+                await db_save_section(guild_id, "marriages", marriages)
+                return False, "expired", None
+            if user_id not in m["participants"]:
+                return False, "not_a_participant", None
+            if user_id in m["accepted"]:
+                return False, "already_accepted", m
+            m["accepted"].append(user_id)
+            activated = False
+            if set(m["accepted"]) == set(m["participants"]) and len(m["accepted"]) == m["required_count"]:
+                m["status"] = "active"
+                m["activated_at"] = int(time.time())
+                activated = True
+            await db_save_section(guild_id, "marriages", marriages)
+            return True, "activated" if activated else "accepted", m
+
+    @staticmethod
+    async def reject(guild_id: int, marriage_id: str, user_id: int) -> tuple[bool, str, Optional[dict]]:
+        async with _lock_for(guild_id):
+            marriages = await db_get_section(guild_id, "marriages")
+            m = marriages.get(marriage_id)
+            if not m or m["status"] != "pending":
+                return False, "not_found", None
+            if user_id not in m["participants"]:
+                return False, "not_a_participant", None
+            m["status"] = "rejected"
+            m["rejected_by"] = user_id
+            await db_save_section(guild_id, "marriages", marriages)
+            return True, "rejected", m
+
+    @staticmethod
+    async def cancel(guild_id: int, marriage_id: str, user_id: int) -> tuple[bool, str]:
+        async with _lock_for(guild_id):
+            marriages = await db_get_section(guild_id, "marriages")
+            m = marriages.get(marriage_id)
+            if not m or m["status"] != "pending":
+                return False, "not_found"
+            if m["proposal_creator_id"] != user_id:
+                return False, "not_creator"
+            m["status"] = "cancelled"
+            await db_save_section(guild_id, "marriages", marriages)
+            return True, "cancelled"
+
+    @staticmethod
+    async def get_active_for_user(guild_id: int, user_id: int) -> Optional[dict]:
+        marriages = await db_get_section(guild_id, "marriages")
+        _, m = _active_marriage_for(marriages, user_id)
+        return m
+
+    @staticmethod
+    async def start_divorce(guild_id: int, marriage_id: str, requester_id: int, reason: str) -> tuple[bool, str, Optional[dict]]:
+        async with _lock_for(guild_id):
+            marriages = await db_get_section(guild_id, "marriages")
+            m = marriages.get(marriage_id)
+            if not m or m["status"] != "active":
+                return False, "not_active", None
+            divorces = await db_get_section(guild_id, "marriage_divorces")
+            for d in divorces.values():
+                if d["marriage_id"] == marriage_id and d["status"] == "pending":
+                    return False, "already_pending", None
+            if requester_id not in m["participants"]:
+                return False, "not_a_participant", None
+            cfg = await get_config(guild_id)
+            case_id = str(uuid.uuid4())
+            now = int(time.time())
+            case = {
+                "id": case_id,
+                "marriage_id": marriage_id,
+                "guild_id": guild_id,
+                "requester_id": requester_id,
+                "reason": reason or None,
+                "status": "pending",
+                "judge_id": None,
+                "decision": None,
+                "created_at": now,
+                "expires_at": now + int(cfg["divorce_expiry"]),
+                "decided_at": None,
+            }
+            divorces[case_id] = case
+            await db_save_section(guild_id, "marriage_divorces", divorces)
+            return True, "created", case
+
+    @staticmethod
+    async def judge_decide(guild_id: int, case_id: str, judge_id: int, approve: bool, involved_can_judge: bool) -> tuple[bool, str, Optional[dict]]:
+        async with _lock_for(guild_id):
+            divorces = await db_get_section(guild_id, "marriage_divorces")
+            case = divorces.get(case_id)
+            if not case or case["status"] != "pending":
+                return False, "not_found", None
+            if int(time.time()) > case["expires_at"]:
+                case["status"] = "expired"
+                await db_save_section(guild_id, "marriage_divorces", divorces)
+                return False, "expired", None
+            marriages = await db_get_section(guild_id, "marriages")
+            marriage = marriages.get(case["marriage_id"])
+            if marriage and judge_id in marriage["participants"] and not involved_can_judge:
+                return False, "involved_spouse", None
+            case["judge_id"] = judge_id
+            case["decision"] = "approved" if approve else "rejected"
+            case["status"] = "decided"
+            case["decided_at"] = int(time.time())
+            await db_save_section(guild_id, "marriage_divorces", divorces)
+            if approve and marriage:
+                marriage["status"] = "divorced"
+                marriage["archived_at"] = int(time.time())
+                await db_save_section(guild_id, "marriages", marriages)
+            return True, case["decision"], case
+
+    @staticmethod
+    async def cancel_divorce(guild_id: int, case_id: str, user_id: int) -> tuple[bool, str]:
+        async with _lock_for(guild_id):
+            divorces = await db_get_section(guild_id, "marriage_divorces")
+            case = divorces.get(case_id)
+            if not case or case["status"] != "pending":
+                return False, "not_found"
+            if case["requester_id"] != user_id:
+                return False, "not_requester"
+            case["status"] = "cancelled"
+            await db_save_section(guild_id, "marriage_divorces", divorces)
+            return True, "cancelled"
+
+
+def is_judge(member: discord.Member, cfg: dict) -> bool:
+    if cfg.get("judge_role_id"):
+        return any(r.id == cfg["judge_role_id"] for r in member.roles)
+    return member.guild_permissions.moderate_members or any(
+        r.name.lower() in JUDGE_ROLE_NAMES for r in member.roles
+    )
+
+
+# ── Proposal view (Accept / Reject / Cancel) ──────────────────────────────────
+
+class ProposalView(discord.ui.View):
+    def __init__(self, guild_id: int, marriage_id: str, participants: list[int], creator_id: int):
+        super().__init__(timeout=PROPOSAL_EXPIRY_SECONDS)
+        self.guild_id = guild_id
+        self.marriage_id = marriage_id
+        self.participants = set(participants)
+        self.creator_id = creator_id
+
+    async def _refresh_embed(self, interaction: discord.Interaction, m: dict, extra_note: str = ""):
+        accepted = set(m["accepted"])
+        lines = []
+        for uid in m["participants"]:
+            mark = "✅" if uid in accepted else "⏳"
+            lines.append(f"{mark} <@{uid}>")
+        embed = (EmbedBuilder(color=Palette.SUCCESS if m["status"] == "active" else Palette.PRIMARY)
+                 .title(f"{MODE_LABEL.get(m['mode'], 'Marriage Proposal')}")
+                 .description(
+                     f"Proposed by <@{m['proposal_creator_id']}>\n\n"
+                     + "\n".join(lines)
+                     + (f"\n\n{extra_note}" if extra_note else "")
+                 )
+                 .footer(f"Status: {m['status']}").build())
+        if m["status"] in ("active", "rejected", "cancelled", "expired"):
+            for child in self.children:
+                child.disabled = True
+        await interaction.response.edit_message(embed=embed, view=self)
+
+    @discord.ui.button(label="Accept", style=discord.ButtonStyle.success, custom_id="marry_accept")
+    async def accept_btn(self, interaction: discord.Interaction, button: discord.ui.Button):
+        if interaction.user.id not in self.participants:
+            return await interaction.response.send_message(
+                "This proposal isn't addressed to you.", ephemeral=True
+            )
+        ok, reason, m = await MarriageDB.accept(self.guild_id, self.marriage_id, interaction.user.id)
+        if not ok:
+            msg = {
+                "not_found": "This proposal is no longer active.",
+                "expired": "This proposal has expired.",
+                "not_a_participant": "You aren't part of this proposal.",
+                "already_accepted": "You've already accepted this proposal.",
+            }.get(reason, "Couldn't process that.")
+            return await interaction.response.send_message(msg, ephemeral=True)
+        note = "🎉 Everyone has accepted — the marriage is now active!" if reason == "activated" else f"<@{interaction.user.id}> accepted!"
+        await self._refresh_embed(interaction, m, note)
+
+    @discord.ui.button(label="Reject", style=discord.ButtonStyle.danger, custom_id="marry_reject")
+    async def reject_btn(self, interaction: discord.Interaction, button: discord.ui.Button):
+        if interaction.user.id not in self.participants:
+            return await interaction.response.send_message(
+                "This proposal isn't addressed to you.", ephemeral=True
+            )
+        ok, reason, m = await MarriageDB.reject(self.guild_id, self.marriage_id, interaction.user.id)
+        if not ok:
+            return await interaction.response.send_message("This proposal is no longer active.", ephemeral=True)
+        await self._refresh_embed(interaction, m, f"💔 <@{interaction.user.id}> rejected the proposal.")
+
+    @discord.ui.button(label="Cancel", style=discord.ButtonStyle.secondary, custom_id="marry_cancel")
+    async def cancel_btn(self, interaction: discord.Interaction, button: discord.ui.Button):
+        if interaction.user.id != self.creator_id:
+            return await interaction.response.send_message(
+                "Only the person who made the proposal can cancel it.", ephemeral=True
+            )
+        ok, reason = await MarriageDB.cancel(self.guild_id, self.marriage_id, interaction.user.id)
+        if not ok:
+            return await interaction.response.send_message("This proposal is no longer active.", ephemeral=True)
+        store = _load_store(self.guild_id)
+        m = store["marriages"][self.marriage_id]
+        await self._refresh_embed(interaction, m, "🚫 Proposal cancelled.")
+
+
+class DivorceView(discord.ui.View):
+    def __init__(self, guild_id: int, case_id: str, requester_id: int):
+        super().__init__(timeout=DIVORCE_EXPIRY_SECONDS)
+        self.guild_id = guild_id
+        self.case_id = case_id
+        self.requester_id = requester_id
+
+    async def _resolve(self, interaction: discord.Interaction, approve: bool):
+        cfg = await get_config(self.guild_id)
+        member = interaction.user
+        if not isinstance(member, discord.Member):
+            return await interaction.response.send_message("This can only be used in a server.", ephemeral=True)
+        if not is_judge(member, cfg):
+            return await interaction.response.send_message(
+                "You don't have permission to judge this case.", ephemeral=True
+            )
+        ok, decision, case = await MarriageDB.judge_decide(
+            self.guild_id, self.case_id, member.id, approve, involved_can_judge=False
+        )
+        if not ok:
+            msg = {
+                "not_found": "This case is no longer pending.",
+                "expired": "This divorce case has expired.",
+                "involved_spouse": "A spouse in this marriage can't judge their own case.",
+            }.get(decision, "Couldn't process that.")
+            return await interaction.response.send_message(msg, ephemeral=True)
+        for child in self.children:
+            child.disabled = True
+        result = "✅ Divorce **approved** — the marriage has been archived." if decision == "approved" else "❌ Divorce **rejected** — the marriage remains active."
+        embed = (EmbedBuilder(color=Palette.SUCCESS if decision == "approved" else Palette.DANGER)
+                 .title("⚖️ Divorce Case Decided")
+                 .description(f"{result}\n\nJudged by {member.mention}").build())
+        await interaction.response.edit_message(embed=embed, view=self)
+
+    @discord.ui.button(label="Approve Divorce", style=discord.ButtonStyle.danger, custom_id="divorce_approve")
+    async def approve_btn(self, interaction: discord.Interaction, button: discord.ui.Button):
+        await self._resolve(interaction, approve=True)
+
+    @discord.ui.button(label="Reject Divorce", style=discord.ButtonStyle.success, custom_id="divorce_reject")
+    async def reject_btn(self, interaction: discord.Interaction, button: discord.ui.Button):
+        await self._resolve(interaction, approve=False)
+
+    @discord.ui.button(label="Cancel Case", style=discord.ButtonStyle.secondary, custom_id="divorce_cancel")
+    async def cancel_btn(self, interaction: discord.Interaction, button: discord.ui.Button):
+        if interaction.user.id != self.requester_id:
+            return await interaction.response.send_message(
+                "Only the person who filed can cancel this case.", ephemeral=True
+            )
+        ok, _ = await MarriageDB.cancel_divorce(self.guild_id, self.case_id, interaction.user.id)
+        if not ok:
+            return await interaction.response.send_message("This case is no longer pending.", ephemeral=True)
+        for child in self.children:
+            child.disabled = True
+        embed = EmbedBuilder(color=Palette.INFO).title("Case Cancelled").description("The divorce case was withdrawn.").build()
+        await interaction.response.edit_message(embed=embed, view=self)
+
+
+# ── Cog ────────────────────────────────────────────────────────────────────
+
+ACTIONS = {
+    "kiss": {"verb": "kisses", "emoji": "💋", "self_msg": "You can't kiss yourself... or can you? Pick someone else!"},
+    "hug": {"verb": "gives a warm hug to", "emoji": "🤗", "self_msg": "Aww, self-hugs are nice, but pick a friend to hug!"},
+    "kill": {"verb": "dramatically defeats", "emoji": "⚔️", "self_msg": "You can't duel yourself! Pick an opponent.",
+              "suffix": " in a video-game-style duel — they respawn safely a moment later. 🎮"},
+    "nom": {"verb": "playfully noms", "emoji": "😋", "self_msg": "You can't nom yourself! Pick a snack— I mean, a friend."},
+    "lick": {"verb": "gives a playful lick to", "emoji": "👅", "self_msg": "Can't lick yourself, pick someone else!",
+              "consent_note": "*(If you'd rather not be licked, just let them know! 😅)*"},
+    "tickle": {"verb": "tickles", "emoji": "🤭", "self_msg": "Ticking yourself doesn't really work, does it? Pick a friend!"},
+    "touches": {"verb": "gives a friendly high-five to", "emoji": "🙌", "self_msg": "High-five yourself? Try picking a friend!"},
+    "griddy": {"verb": "beats", "emoji": "🕺", "self_msg": "Can't griddy on yourself! Pick an opponent.",
+                "suffix": " in a friendly cartoon showdown, then hits the Griddy in celebration! 🕺💃"},
+}
+
+
+class MarriageSystem(commands.Cog):
+    def __init__(self, bot: commands.Bot):
+        self.bot = bot
+        self.action_cd = CooldownMap(default_ttl=ACTION_COOLDOWN_SECONDS)
+
+    # ── Interaction commands ────────────────────────────────────────────────
+    async def _do_action(self, interaction: discord.Interaction, action: str, user: discord.Member):
+        cfg = ACTIONS[action]
+        actor = interaction.user
+
+        if user.id == actor.id:
+            return await interaction.response.send_message(cfg["self_msg"], ephemeral=True)
+        if user.id == self.bot.user.id:
+            return await interaction.response.send_message(
+                "I appreciate the thought, but let's pick a human friend instead!", ephemeral=True
+            )
+        if user.bot:
+            return await interaction.response.send_message(
+                "That user is a bot — try picking a real member!", ephemeral=True
+            )
+
+        if not self.action_cd.check(actor.id):
+            remaining = self.action_cd.remaining(actor.id)
+            return await interaction.response.send_message(
+                f"Slow down! Try again in {remaining:.0f}s.", ephemeral=True
+            )
+
+        desc = f"{cfg['emoji']} **{actor.display_name}** {cfg['verb']} **{user.display_name}**!"
+        desc += cfg.get("suffix", "")
+        if cfg.get("consent_note"):
+            desc += f"\n\n{cfg['consent_note']}"
+
+        embed = (EmbedBuilder(color=Palette.PRIMARY)
+                 .description(desc)
+                 .footer("Barm assistant 🐴").build())
+        try:
+            await interaction.response.send_message(embed=embed)
+        except discord.Forbidden:
+            pass
+        except discord.HTTPException:
+            if not interaction.response.is_done():
+                await interaction.response.send_message(desc)
+
+    def _register_action(self, name: str, description: str):
+        @app_commands.command(name=name, description=description)
+        @app_commands.describe(user="Who to target")
+        async def _cmd(interaction: discord.Interaction, user: discord.Member):
+            await self._do_action(interaction, name, user)
+        _cmd.name = name
+        return _cmd
+
+    # ── /marry group ────────────────────────────────────────────────────────
+    marry = app_commands.Group(name="marry", description="Fictional marriage system commands")
+
+    @marry.command(name="propose", description="Propose a two-person (halal) marriage to another user")
+    @app_commands.describe(user="Who you're proposing to")
+    async def propose(self, interaction: discord.Interaction, user: discord.Member):
+        await self._start_proposal(interaction, "two_person", [interaction.user.id, user.id])
+
+    @marry.command(name="group", description="Propose a 3- or 4-person harem marriage")
+    @app_commands.describe(
+        size="Final group size (3 or 4, including you)",
+        user1="First person to propose to", user2="Second person to propose to",
+        user3="Third person to propose to (only for size 4)",
+    )
+    @app_commands.choices(size=[
+        app_commands.Choice(name="3 (trio)", value=3),
+        app_commands.Choice(name="4 (squad)", value=4),
+    ])
+    async def group(
+        self, interaction: discord.Interaction, size: app_commands.Choice[int],
+        user1: discord.Member, user2: discord.Member, user3: Optional[discord.Member] = None,
+    ):
+        needed = size.value
+        targets = [user1, user2] + ([user3] if user3 else [])
+        if len(targets) != needed - 1:
+            return await interaction.response.send_message(
+                f"A size-{needed} marriage needs exactly {needed - 1} other people. You gave {len(targets)}.",
+                ephemeral=True,
+            )
+        mode = "three_person" if needed == 3 else "four_person"
+        await self._start_proposal(interaction, mode, [interaction.user.id] + [t.id for t in targets])
+
+    async def _start_proposal(self, interaction: discord.Interaction, mode: str, participant_ids: list[int]):
+        guild = interaction.guild
+        if guild is None:
+            return await interaction.response.send_message("This must be used in a server.", ephemeral=True)
+
+        cfg = await get_config(guild.id)
+        if not cfg["enabled"]:
+            return await interaction.response.send_message("Marriage features are disabled on this server.", ephemeral=True)
+        if mode not in cfg["allowed_modes"]:
+            return await interaction.response.send_message("That marriage mode isn't allowed on this server.", ephemeral=True)
+
+        if len(set(participant_ids)) != len(participant_ids):
+            return await interaction.response.send_message("You can't propose to the same person twice.", ephemeral=True)
+
+        for uid in participant_ids:
+            member = guild.get_member(uid)
+            if member is None:
+                return await interaction.response.send_message("All participants must be members of this server.", ephemeral=True)
+            if member.bot and not cfg["allow_bots"]:
+                return await interaction.response.send_message("Bots can't participate in marriages here.", ephemeral=True)
+
+        async with _lock_for(guild.id):
+            marriages = await db_get_section(guild.id, "marriages")
+            for uid in participant_ids:
+                mid, _ = _active_marriage_for(marriages, uid)
+                if mid:
+                    return await interaction.response.send_message(
+                        f"<@{uid}> is already in an active marriage.", ephemeral=True
+                    )
+            mid, _ = _active_proposal_involving(marriages, set(participant_ids))
+            if mid:
+                return await interaction.response.send_message(
+                    "One or more of these users already has a pending proposal.", ephemeral=True
+                )
+
+        record = await MarriageDB.create_proposal(guild.id, mode, interaction.user.id, participant_ids)
+
+        lines = [f"⏳ <@{uid}>" if uid != interaction.user.id else f"✅ <@{uid}> (proposer)" for uid in participant_ids]
+        embed = (EmbedBuilder(color=Palette.PRIMARY)
+                 .title(f"💌 Marriage Proposal — {MODE_LABEL[mode]}")
+                 .description(
+                     f"<@{interaction.user.id}> has proposed!\n\n" + "\n".join(lines) +
+                     f"\n\nAll participants must click **Accept**. This proposal expires <t:{record['expires_at']}:R>."
+                 ).build())
+        view = ProposalView(guild.id, record["id"], participant_ids, interaction.user.id)
+        await interaction.response.send_message(
+            content=" ".join(f"<@{uid}>" for uid in participant_ids if uid != interaction.user.id),
+            embed=embed, view=view,
+        )
+
+    @marry.command(name="status", description="View your current marriage, or another user's")
+    @app_commands.describe(user="Whose marriage to check (defaults to you)")
+    async def status(self, interaction: discord.Interaction, user: Optional[discord.Member] = None):
+        target = user or interaction.user
+        guild = interaction.guild
+        if guild is None:
+            return await interaction.response.send_message("This must be used in a server.", ephemeral=True)
+        m = await MarriageDB.get_active_for_user(guild.id, target.id)
+        if not m:
+            return await interaction.response.send_message(f"{target.display_name} isn't currently married.", ephemeral=True)
+        members = "\n".join(f"• <@{uid}>" for uid in m["participants"])
+        embed = (EmbedBuilder(color=Palette.SUCCESS)
+                 .title(MODE_LABEL[m["mode"]])
+                 .description(f"{members}\n\nMarried since <t:{m['activated_at']}:D>").build())
+        await interaction.response.send_message(embed=embed)
+
+    @marry.command(name="members", description="List every participant in a marriage")
+    @app_commands.describe(user="Any participant of the marriage to look up")
+    async def members(self, interaction: discord.Interaction, user: Optional[discord.Member] = None):
+        await self.status(interaction, user)
+
+    @marry.command(name="divorce", description="Start a divorce case for your marriage")
+    @app_commands.describe(reason="Optional reason for the record")
+    async def divorce(self, interaction: discord.Interaction, reason: Optional[str] = None):
+        guild = interaction.guild
+        if guild is None:
+            return await interaction.response.send_message("This must be used in a server.", ephemeral=True)
+        m = await MarriageDB.get_active_for_user(guild.id, interaction.user.id)
+        if not m:
+            return await interaction.response.send_message("You aren't currently married.", ephemeral=True)
+        ok, reason_code, case = await MarriageDB.start_divorce(guild.id, m["id"], interaction.user.id, reason or "")
+        if not ok:
+            msg = {"already_pending": "A divorce case is already pending for this marriage."}.get(
+                reason_code, "Couldn't start a divorce case."
+            )
+            return await interaction.response.send_message(msg, ephemeral=True)
+
+        embed = (EmbedBuilder(color=Palette.WARNING)
+                 .title("⚖️ Divorce Case Filed")
+                 .description(
+                     f"<@{interaction.user.id}> has requested a divorce.\n"
+                     + (f"Reason: {reason}\n" if reason else "")
+                     + f"\nA judge (server moderator) needs to review this case. Expires <t:{case['expires_at']}:R>."
+                 ).build())
+        view = DivorceView(guild.id, case["id"], interaction.user.id)
+        await interaction.response.send_message(
+            content=" ".join(f"<@{uid}>" for uid in m["participants"] if uid != interaction.user.id),
+            embed=embed, view=view,
+        )
+        cfg = await get_config(guild.id)
+        if cfg.get("log_channel_id"):
+            ch = guild.get_channel(cfg["log_channel_id"])
+            if ch:
+                try:
+                    await ch.send(embed=embed)
+                except Exception:
+                    pass
+
+    @marry.command(name="cancel", description="Cancel a proposal you created")
+    async def cancel(self, interaction: discord.Interaction):
+        await interaction.response.send_message(
+            "Use the **Cancel** button on your original proposal message to withdraw it.", ephemeral=True
+        )
+
+    @marry.command(name="config", description="[Admin] Configure the marriage system for this server")
+    @app_commands.describe(
+        enabled="Turn the marriage system on/off",
+        allow_bots="Allow bots as marriage participants",
+        judge_role="Role allowed to judge divorce cases",
+        log_channel="Channel to log divorce filings to",
+    )
+    @app_commands.checks.has_permissions(manage_guild=True)
+    async def config_cmd(
+        self, interaction: discord.Interaction,
+        enabled: Optional[bool] = None, allow_bots: Optional[bool] = None,
+        judge_role: Optional[discord.Role] = None, log_channel: Optional[discord.TextChannel] = None,
+    ):
+        guild = interaction.guild
+        if guild is None:
+            return await interaction.response.send_message("This must be used in a server.", ephemeral=True)
+        updates = {}
+        if enabled is not None:
+            updates["enabled"] = enabled
+        if allow_bots is not None:
+            updates["allow_bots"] = allow_bots
+        if judge_role is not None:
+            updates["judge_role_id"] = judge_role.id
+        if log_channel is not None:
+            updates["log_channel_id"] = log_channel.id
+        cfg = await set_config(guild.id, **updates) if updates else await get_config(guild.id)
+        embed = (EmbedBuilder(color=Palette.INFO)
+                 .title("💍 Marriage System Config")
+                 .field("Enabled", str(cfg["enabled"]))
+                 .field("Bots allowed", str(cfg["allow_bots"]))
+                 .field("Judge role", f"<@&{cfg['judge_role_id']}>" if cfg["judge_role_id"] else "Mods (Moderate Members)")
+                 .field("Log channel", f"<#{cfg['log_channel_id']}>" if cfg["log_channel_id"] else "None")
+                 .build())
+        await interaction.response.send_message(embed=embed, ephemeral=True)
+
+
 
 bot = CommunityBot()
 tree = bot.tree
