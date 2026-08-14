@@ -14,21 +14,26 @@ load_dotenv()
 
 import asyncio
 import threading
-_server_loop = asyncio.new_event_loop()
+_server_loop = None
 _loop_started = False
 _loop_lock = threading.Lock()
 
 def _run_server_loop():
+    global _server_loop
+    _server_loop = asyncio.new_event_loop()
     asyncio.set_event_loop(_server_loop)
     _server_loop.run_forever()
 
 def run_async(coro):
-    global _loop_started
+    global _loop_started, _server_loop
     if not _loop_started:
         with _loop_lock:
             if not _loop_started:
                 threading.Thread(target=_run_server_loop, daemon=True).start()
                 _loop_started = True
+                import time
+                while _server_loop is None or not _server_loop.is_running():
+                    time.sleep(0.01)
     future = asyncio.run_coroutine_threadsafe(coro, _server_loop)
     return future.result()
 MONGO_URI = os.getenv("MONGODB_URI")
