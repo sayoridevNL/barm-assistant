@@ -982,8 +982,18 @@ window.addRarity = function() {
     if(name) {
         const chance = parseFloat(prompt("Drop Chance % (e.g. 50):")) || 0;
         tcRarities.push({ id: Date.now(), name, chance, color: 'white' });
-        renderTcRarities();
-        updateTcRaritySelect();
+        
+        fetch('/api/cards/rarities', {
+            method: 'POST',
+            headers: {'Content-Type': 'application/json'},
+            body: JSON.stringify(tcRarities)
+        }).then(r => {
+            if(r.ok) {
+                renderTcRarities();
+                updateTcRaritySelect();
+                showToast('Rarity saved!', 'success');
+            }
+        });
     }
 }
 
@@ -1007,9 +1017,24 @@ window.saveNewCard = function() {
     
     if(!title) return showToast('Invalid input', 'error');
     
-    tcCards.push({ title, img, type, rarity });
-    showToast('Card saved!', 'success');
-    fetchTcData();
+    const newCard = { id: Date.now(), title, img, type, rarity };
+    tcTemplatesCache.push(newCard);
+    
+    fetch('/api/cards/templates', {
+        method: 'POST',
+        headers: {'Content-Type': 'application/json'},
+        body: JSON.stringify(tcTemplatesCache)
+    }).then(res => {
+        if(res.ok) {
+            showToast('Card saved!', 'success');
+            fetchTcData();
+        } else {
+            showToast('Failed to save card', 'error');
+        }
+    }).catch(e => {
+        console.error(e);
+        showToast('Error saving card', 'error');
+    });
 }
 
 
@@ -1022,7 +1047,7 @@ function fetchTcData() {
         fetch('/api/cards/templates').then(r => r.ok ? r.json() : [])
     ]).then(([inv, templates]) => {
         tcInventoryCache = inv.cards || [];
-        tcTemplatesCache = templates || [];
+        tcTemplatesCache = Array.isArray(templates) ? templates : (templates.templates || []);
         renderTcCarousel();
     }).catch(e => console.error("Error fetching gacha data:", e));
 }
