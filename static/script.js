@@ -988,9 +988,13 @@ document.addEventListener('DOMContentLoaded', () => {
 
 // TC logic
 let tcRarities = [
-    { id: 1, name: 'R', color: 'cyan' },
-    { id: 2, name: 'SR', color: 'magenta' },
-    { id: 3, name: 'SSR', color: 'gold' }
+    { id: 1, name: 'C', color: 'gray' },
+    { id: 2, name: 'UC', color: 'green' },
+    { id: 3, name: 'R', color: 'cyan' },
+    { id: 4, name: 'SR', color: 'magenta' },
+    { id: 5, name: 'SSR', color: 'gold' },
+    { id: 6, name: 'SSL', color: 'orange' },
+    { id: 7, name: 'USL', color: 'white' }
 ];
 let tcCards = [];
 let totalDropChance = 0;
