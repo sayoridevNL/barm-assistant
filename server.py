@@ -12,6 +12,16 @@ from dotenv import load_dotenv
 
 load_dotenv()
 
+import asyncio
+_server_loop = asyncio.new_event_loop()
+def _run_server_loop():
+    asyncio.set_event_loop(_server_loop)
+    _server_loop.run_forever()
+threading.Thread(target=_run_server_loop, daemon=True).start()
+
+def run_async(coro):
+    future = asyncio.run_coroutine_threadsafe(coro, _server_loop)
+    return future.result()
 MONGO_URI = os.getenv("MONGODB_URI")
 mongo_client = None
 mongo_db = None
