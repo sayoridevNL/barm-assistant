@@ -701,8 +701,8 @@ def is_cards_admin():
 
 @app.route('/api/cards/settings', methods=['GET', 'POST'])
 def cards_settings():
-    if not is_cards_admin(): return jsonify({'error': 'Unauthorized'}), 401
     if request.method == 'POST':
+        if not is_cards_admin(): return jsonify({'error': 'Unauthorized'}), 401
         data = request.json or {}
         db_save_section_sync(CARDS_GUILD_ID, 'cards_settings', data)
         return jsonify({'success': True})
@@ -711,8 +711,8 @@ def cards_settings():
 
 @app.route('/api/cards/rarities', methods=['GET', 'POST'])
 def cards_rarities():
-    if not is_cards_admin(): return jsonify({'error': 'Unauthorized'}), 401
     if request.method == 'POST':
+        if not is_cards_admin(): return jsonify({'error': 'Unauthorized'}), 401
         data = request.json or {}
         db_save_section_sync(CARDS_GUILD_ID, 'cards_rarities', data)
         return jsonify({'success': True})
@@ -721,8 +721,8 @@ def cards_rarities():
 
 @app.route('/api/cards/templates', methods=['GET', 'POST'])
 def cards_templates():
-    if not is_cards_admin(): return jsonify({'error': 'Unauthorized'}), 401
     if request.method == 'POST':
+        if not is_cards_admin(): return jsonify({'error': 'Unauthorized'}), 401
         data = request.json or []
         db_save_section_sync(CARDS_GUILD_ID, 'cards_templates', data)
         return jsonify({'success': True})

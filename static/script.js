@@ -1018,13 +1018,13 @@ let tcTemplatesCache = [];
 
 function fetchTcData() {
     Promise.all([
-        fetch('/api/cards/inventory').then(r => r.json()),
-        fetch('/api/cards/templates').then(r => r.json())
+        fetch('/api/cards/inventory').then(r => r.ok ? r.json() : {cards: []}),
+        fetch('/api/cards/templates').then(r => r.ok ? r.json() : [])
     ]).then(([inv, templates]) => {
         tcInventoryCache = inv.cards || [];
         tcTemplatesCache = templates || [];
-        fetchTcData();
-    });
+        renderTcCarousel();
+    }).catch(e => console.error("Error fetching gacha data:", e));
 }
 
 function renderTcCarousel() {
