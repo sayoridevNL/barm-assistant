@@ -660,9 +660,9 @@ def cards_settings():
     if not is_cards_admin(): return jsonify({'error': 'Unauthorized'}), 401
     if request.method == 'POST':
         data = request.json or {}
-        asyncio.run(shared.cards_save_settings(CARDS_GUILD_ID, data))
+        run_async(shared.cards_save_settings(CARDS_GUILD_ID, data))
         return jsonify({'success': True})
-    settings = asyncio.run(shared.cards_get_settings(CARDS_GUILD_ID))
+    settings = run_async(shared.cards_get_settings(CARDS_GUILD_ID))
     return jsonify(settings)
 
 @app.route('/api/cards/rarities', methods=['GET', 'POST'])
@@ -670,9 +670,9 @@ def cards_rarities():
     if not is_cards_admin(): return jsonify({'error': 'Unauthorized'}), 401
     if request.method == 'POST':
         data = request.json or {}
-        asyncio.run(shared.cards_save_rarities(CARDS_GUILD_ID, data))
+        run_async(shared.cards_save_rarities(CARDS_GUILD_ID, data))
         return jsonify({'success': True})
-    rarities = asyncio.run(shared.cards_get_rarities(CARDS_GUILD_ID))
+    rarities = run_async(shared.cards_get_rarities(CARDS_GUILD_ID))
     return jsonify(rarities)
 
 @app.route('/api/cards/templates', methods=['GET', 'POST'])
@@ -680,16 +680,16 @@ def cards_templates():
     if not is_cards_admin(): return jsonify({'error': 'Unauthorized'}), 401
     if request.method == 'POST':
         data = request.json or []
-        asyncio.run(shared.cards_save_templates(CARDS_GUILD_ID, data))
+        run_async(shared.cards_save_templates(CARDS_GUILD_ID, data))
         return jsonify({'success': True})
-    templates = asyncio.run(shared.cards_get_templates(CARDS_GUILD_ID))
+    templates = run_async(shared.cards_get_templates(CARDS_GUILD_ID))
     return jsonify(templates)
 
 @app.route('/api/cards/inventory', methods=['GET'])
 def cards_inventory():
     user_id = session.get('user_id')
     if not user_id: return jsonify({'error': 'Unauthorized'}), 401
-    inv = asyncio.run(shared.cards_get_inventory(CARDS_GUILD_ID, int(user_id)))
+    inv = run_async(shared.cards_get_inventory(CARDS_GUILD_ID, int(user_id)))
     return jsonify(inv)
 
 @app.route('/api/cards/pull', methods=['POST'])
@@ -702,21 +702,21 @@ def cards_pull():
     if count not in [1, 3, 5, 10, 20]:
         count = 1
         
-    settings = asyncio.run(shared.cards_get_settings(CARDS_GUILD_ID))
+    settings = run_async(shared.cards_get_settings(CARDS_GUILD_ID))
     if not settings.get('enabled', True):
         return jsonify({'error': 'Card pulls are currently disabled'}), 400
         
     cost = 100 * count
-    sayories = asyncio.run(shared.g_eco_get(int(user_id)))
+    sayories = run_async(shared.g_eco_get(int(user_id)))
     if sayories < cost:
         return jsonify({'error': f'Not enough Sayories ({cost} required)'}), 400
         
-    templates = asyncio.run(shared.cards_get_templates(CARDS_GUILD_ID))
+    templates = run_async(shared.cards_get_templates(CARDS_GUILD_ID))
     if not templates:
         return jsonify({'error': 'No cards available to pull'}), 400
         
     # Get rarities for weighted drops
-    rarities = asyncio.run(shared.cards_get_rarities(CARDS_GUILD_ID))
+    rarities = run_async(shared.cards_get_rarities(CARDS_GUILD_ID))
     if isinstance(rarities, dict): rarities = rarities.get("rarities", [])
     if not rarities:
         rarities = [
@@ -763,15 +763,15 @@ def cards_pull():
         new_item = {'id': str(uuid.uuid4()), 'template_id': card.get('id', str(uuid.uuid4())), 'timestamp': int(time.time()), 'locked': False}
         pulled_items.append(new_item)
         
-    asyncio.run(shared.g_eco_add(int(user_id), -cost))
+    run_async(shared.g_eco_add(int(user_id), -cost))
     
-    inv = asyncio.run(shared.cards_get_inventory(CARDS_GUILD_ID, int(user_id)))
+    inv = run_async(shared.cards_get_inventory(CARDS_GUILD_ID, int(user_id)))
     cards_list = inv.get('cards', [])
     cards_list.extend(pulled_items)
     inv['cards'] = cards_list
-    asyncio.run(shared.cards_save_inventory(CARDS_GUILD_ID, int(user_id), inv))
+    run_async(shared.cards_save_inventory(CARDS_GUILD_ID, int(user_id), inv))
     
-    new_sayories = asyncio.run(shared.g_eco_get(int(user_id)))
+    new_sayories = run_async(shared.g_eco_get(int(user_id)))
     
     return jsonify({'success': True, 'pulled_cards': pulled_items, 'templates': pulled_templates, 'new_balance': new_sayories})
 
