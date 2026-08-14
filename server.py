@@ -325,9 +325,10 @@ def publish_embed():
     if not title and not desc:
         return jsonify({'error': 'Title or description required'}), 400
 
-    if mongo_db is not None:
+    db = _get_mongo_db_sync()
+    if db is not None:
         import time
-        mongo_db.broadcast_queue.insert_one({
+        db.broadcast_queue.insert_one({
             'title': title,
             'desc': desc,
             'color': color,
@@ -432,8 +433,9 @@ def get_toto_battle():
     toto_key = f"toto_battle_{today_str}"
     
     battle = {}
-    if mongo_db is not None:
-        doc = mongo_db.global_data.find_one({"_id": toto_key})
+    db = _get_mongo_db_sync()
+    if db is not None:
+        doc = db.global_data.find_one({"_id": toto_key})
         if doc: battle = doc.get("data", {})
     else:
         from shared import _load_global_sync
@@ -472,8 +474,9 @@ def submit_toto_predict():
     today_str = datetime.now(NETHERLANDS_TZ).strftime("%Y%m%d")
     toto_key = f"toto_battle_{today_str}"
     
-    if mongo_db is not None:
-        doc = mongo_db.global_data.find_one({"_id": toto_key})
+    db = _get_mongo_db_sync()
+    if db is not None:
+        doc = db.global_data.find_one({"_id": toto_key})
         battle = doc.get("data", {}) if doc else {}
         if not battle or battle.get('resolved'): return jsonify({'error': 'Battle not active or already resolved'}), 400
         if int(user_id) not in [int(battle.get('p1', 0)), int(battle.get('p2', 0))]: return jsonify({'error': 'Not in battle'}), 403
@@ -482,7 +485,7 @@ def submit_toto_predict():
         if set(map(str, picks)) != valid_match_ids or any(choice not in {'1', 'X', '2'} for choice in picks.values()):
             return jsonify({'error': 'Choose one valid result for every match'}), 400
         battle.setdefault('picks', {})[str(user_id)] = {str(match_id): choice for match_id, choice in picks.items()}
-        mongo_db.global_data.update_one({"_id": toto_key}, {"$set": {"data": battle}}, upsert=True)
+        db.global_data.update_one({"_id": toto_key}, {"$set": {"data": battle}}, upsert=True)
     else:
         from shared import _load_global_sync, _save_global_sync, _global_lock
         gl_data = _load_global_sync()
@@ -520,15 +523,17 @@ def submit_suggestion():
     # Simple JSON fallback for web suggestions since shared.py's lock isn't thread-safe for flask
     WEB_SUGG_FILE = Path(__file__).parent / "data" / "web_suggestions.json"
     
-    if mongo_db is not None:
-        last_submit_doc = mongo_db.cooldowns.find_one({"_id": f"sugg_cd_{user_id}"})
-        last_submit = last_submit_doc["time"] if last_submit_doc else 0
-        if time.time() - last_submit < 3600:
-            rem = int(3600 - (time.time() - last_submit))
-            return jsonify({'error': f'Cooldown active. Try again in {rem//60} minutes.'}), 429
-            
-        mongo_db.cooldowns.update_one({"_id": f"sugg_cd_{user_id}"}, {"$set": {"time": time.time()}}, upsert=True)
-        mongo_db.web_suggestions.insert_one({
+    db = _get_mongo_db_sync()
+    if db is not None:
+        last_submit_doc = db.cooldowns.find_one({"_id": f"sugg_cd_{user_id}"})
+        if last_submit_doc:
+            last_submit = last_submit_doc.get("time", 0)
+            if time.time() - last_submit < 3600:
+                rem = int(3600 - (time.time() - last_submit))
+                return jsonify({'error': f'Cooldown active. Try again in {rem//60} minutes.'}), 429
+                
+        db.cooldowns.update_one({"_id": f"sugg_cd_{user_id}"}, {"$set": {"time": time.time()}}, upsert=True)
+        db.web_suggestions.insert_one({
             "user_id": user_id,
             "suggestion": suggestion,
             "timestamp": time.time()
