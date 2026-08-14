@@ -20,6 +20,8 @@ if MONGO_URI:
     mongo_db = mongo_client["barm_os"]
 
 app = Flask(__name__, static_folder='static', template_folder='templates')
+from werkzeug.middleware.proxy_fix import ProxyFix
+app.wsgi_app = ProxyFix(app.wsgi_app, x_for=1, x_proto=1, x_host=1, x_prefix=1)
 app.secret_key = os.getenv('FLASK_SECRET_KEY', 'default_secret_key_barm_os_2026_fallback')
 
 DISCORD_CLIENT_ID = os.getenv('DISCORD_CLIENT_ID')
