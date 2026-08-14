@@ -8,6 +8,7 @@ import discord
 from discord import app_commands
 from discord.ext import commands, tasks
 
+import shared
 from shared import *
 from theme import EmbedBuilder, Palette
 from ui_kit import install_error_handler
