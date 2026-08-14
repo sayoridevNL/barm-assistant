@@ -100,8 +100,15 @@ if not os.path.exists(LOCK_FILE):
     try:
         with open(LOCK_FILE, 'w') as f:
             f.write('started')
-        for bot in BOTS:
-            start_single_bot(bot)
+        
+        # Stagger the initial startup by 5 seconds per bot to prevent Discord Gateway IDENTIFY rate limits
+        import threading
+        def staggered_startup():
+            for bot in BOTS:
+                start_single_bot(bot)
+                time.sleep(5)
+                
+        threading.Thread(target=staggered_startup, daemon=True).start()
     except Exception:
         pass
 
@@ -109,10 +116,16 @@ if not os.path.exists(LOCK_FILE):
 @app.route('/')
 def index():
     # Watchdog: Pinging the website automatically restarts any dead bots
-    with bot_lock:
-        for bot in BOTS:
-            if not is_bot_running(bot):
-                start_single_bot(bot)
+    def watchdog_restart():
+        with bot_lock:
+            for bot in BOTS:
+                if not is_bot_running(bot):
+                    started, _ = start_single_bot(bot)
+                    if started:
+                        time.sleep(5)
+    
+    import threading
+    threading.Thread(target=watchdog_restart, daemon=True).start()
     
     return render_template('index.html', user_id=session.get('user_id'), username=session.get('username'), avatar=session.get('avatar'), is_admin=is_admin())
 

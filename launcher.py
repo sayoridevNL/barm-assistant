@@ -10,6 +10,9 @@ import sys
 if hasattr(sys.stdout, 'reconfigure'):
     sys.stdout.reconfigure(encoding='utf-8')
 
+import logging
+logging.basicConfig(level=logging.INFO)
+
 REQUIRED_PACKAGES = [
     ("discord", "discord.py"),
     ("PIL", "Pillow"),
