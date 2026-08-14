@@ -944,67 +944,125 @@ async def generate_card_image(card_data: dict) -> io.BytesIO:
     buf.seek(0)
     return buf
 
-@bot.tree.command(name="buy_card", description="Buy a gacha card for 150 Sayories")
-async def buy_card(interaction: discord.Interaction):
+@bot.tree.command(name="buy_card", description="Buy a gacha pack with Sayories")
+@app_commands.choices(pack=[
+    app_commands.Choice(name="Single Pull (100 Sayories)", value=1),
+    app_commands.Choice(name="Mini Pack (3 Cards - 300 Sayories)", value=3),
+    app_commands.Choice(name="Small Pack (5 Cards - 500 Sayories)", value=5),
+    app_commands.Choice(name="Medium Pack (10 Cards - 1000 Sayories)", value=10),
+    app_commands.Choice(name="Massive Pack (20 Cards - 2000 Sayories)", value=20)
+])
+async def buy_card(interaction: discord.Interaction, pack: app_commands.Choice[int] = None):
+    count = pack.value if pack else 1
+    cost = 100 * count
+    
     guild_id = interaction.guild_id
     if not guild_id:
         await interaction.response.send_message("Must be used in a server.", ephemeral=True)
         return
 
-    eco = await db_get_section(guild_id, "economy")
-    user_str = str(interaction.user.id)
-    
-    # check balance
-    bal = eco.get(user_str, {}).get("balance", 0)
-    if bal < 150:
-        embed = EmbedBuilder(color=Palette.DANGER).title("Not enough Sayories!").description(f"You need 150 Sayories. You have {bal}.").build()
+    # Check balance using shared global logic to ensure parity with dashboard
+    import shared
+    bal = await shared.g_eco_get(interaction.user.id)
+    if bal < cost:
+        embed = EmbedBuilder(color=Palette.DANGER).title("Not enough Sayories!").description(f"You need {cost} Sayories for this pack. You only have {bal}.").build()
         await interaction.response.send_message(embed=embed, ephemeral=True)
         return
 
-    # deduct balance
-    eco.setdefault(user_str, {})["balance"] = bal - 150
-    await db_save_section(guild_id, "economy", eco)
-    
-    # calculate drop
-    roll = random.random()
-    if roll < 0.02:
-        rarity = "SSR"
-    elif roll < 0.20:
-        rarity = "SR"
-    else:
-        rarity = "R"
-        
-    pool = [c for c in bot.cards_db if c.get("rarity") == rarity]
-    if not pool:
-        pool = bot.cards_db
-    if not pool:
-        await interaction.response.send_message("No cards available in the database.", ephemeral=True)
+    templates = await shared.cards_get_templates(guild_id)
+    if not templates:
+        await interaction.response.send_message("No cards exist in this server yet!", ephemeral=True)
         return
         
-    card = random.choice(pool)
-    
-    # save to inventory
-    inv = await db_get_section(guild_id, "inventory")
-    user_inv = inv.get(user_str, {})
-    card_id_str = str(card["id"])
-    user_inv[card_id_str] = user_inv.get(card_id_str, 0) + 1
-    inv[user_str] = user_inv
-    await db_save_section(guild_id, "inventory", inv)
-    
+    rarities = await shared.cards_get_rarities(guild_id)
+    if isinstance(rarities, dict): rarities = rarities.get("rarities", [])
+    if not rarities:
+        rarities = [
+            {'name': 'C', 'chance': 45.0}, {'name': 'UC', 'chance': 30.0},
+            {'name': 'R', 'chance': 15.0}, {'name': 'SR', 'chance': 6.0},
+            {'name': 'SSR', 'chance': 3.0}, {'name': 'SSL', 'chance': 0.9},
+            {'name': 'USL', 'chance': 0.1}
+        ]
+        
+    from collections import defaultdict
+    import random, time, uuid
+    cards_by_rarity = defaultdict(list)
+    for c in templates:
+        cards_by_rarity[c.get('rarity', 'C')].append(c)
+
     await interaction.response.defer()
     
-    # generate image
-    img_buf = await generate_card_image(card)
-    file = discord.File(img_buf, filename="card.png")
+    # deduct balance
+    await shared.g_eco_add(interaction.user.id, -cost)
     
-    embed = (EmbedBuilder(color=Palette.SUCCESS)
-             .title(f"You pulled a {rarity} card!")
-             .description(f"**{card.get('name')}**\nType: {card.get('type')}")
-             .image("attachment://card.png")
-             .footer(f"Remaining balance: {bal - 150}")
-             .build())
-             
-    await interaction.followup.send(embed=embed, file=file)
+    pulled_templates = []
+    pulled_items = []
+    
+    for _ in range(count):
+        rand_val = random.uniform(0, 100)
+        cumulative = 0.0
+        selected_rarity = None
+        for r in rarities:
+            r_chance = float(r.get('chance', 0))
+            if r_chance <= 0: continue
+            cumulative += r_chance
+            if rand_val <= cumulative:
+                selected_rarity = r.get('name')
+                break
+                
+        if not selected_rarity or not cards_by_rarity.get(selected_rarity):
+            card = random.choice(templates)
+        else:
+            card = random.choice(cards_by_rarity[selected_rarity])
+            
+        pulled_templates.append(card)
+        pulled_items.append({'id': str(uuid.uuid4()), 'template_id': card.get('id', str(uuid.uuid4())), 'timestamp': int(time.time()), 'locked': False})
+        
+    # Save to DB
+    inv = await shared.cards_get_inventory(guild_id, interaction.user.id)
+    cards_list = inv.get('cards', [])
+    cards_list.extend(pulled_items)
+    inv['cards'] = cards_list
+    await shared.cards_save_inventory(guild_id, interaction.user.id, inv)
+
+    # Generate Image
+    if count == 1:
+        buf = generate_card_image(pulled_templates[0])
+        file = discord.File(fp=buf, filename="card.png")
+        embed = EmbedBuilder(color=Palette.PRIMARY).title(f"🎉 Pulled: {pulled_templates[0].get('title', 'Unknown')}!").build()
+        embed.set_image(url="attachment://card.png")
+        await interaction.followup.send(embed=embed, file=file)
+    else:
+        # Create a grid for multiple cards
+        import math
+        from PIL import Image
+        
+        cols = 5 if count >= 5 else count
+        rows = math.ceil(count / cols)
+        
+        card_w, card_h = 300, 420
+        grid_w = cols * card_w + (cols - 1) * 10
+        grid_h = rows * card_h + (rows - 1) * 10
+        
+        grid_img = Image.new('RGB', (grid_w, grid_h), (20, 20, 20))
+        
+        import io
+        for idx, t in enumerate(pulled_templates):
+            c_buf = generate_card_image(t)
+            c_img = Image.open(c_buf)
+            
+            x = (idx % cols) * (card_w + 10)
+            y = (idx // cols) * (card_h + 10)
+            grid_img.paste(c_img, (x, y))
+            
+        out_buf = io.BytesIO()
+        grid_img.save(out_buf, format="PNG")
+        out_buf.seek(0)
+        
+        file = discord.File(fp=out_buf, filename="pack.png")
+        embed = EmbedBuilder(color=Palette.PRIMARY).title(f"🎉 You opened a {count}-Card Pack!").build()
+        embed.set_image(url="attachment://pack.png")
+        await interaction.followup.send(embed=embed, file=file)
 
 @bot.tree.command(name="inventory", description="View your card collection")
 async def inventory(interaction: discord.Interaction):

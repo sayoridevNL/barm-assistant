@@ -306,9 +306,6 @@
                                         <!-- Populated from rarities -->
                                     </select>
                                 </div>
-                                <div class="broadcast-form-group">
-                                    <input type="number" id="tc-drop-chance" placeholder="Drop Chance %" step="0.01">
-                                </div>
                                 <button class="btn-primary" onclick="saveNewCard()"><i class="fa-solid fa-floppy-disk"></i> Save Card</button>
                             </div>
                         </div>
@@ -317,14 +314,18 @@
                     <!-- Collector Hub -->
                     <div class="glass-panel">
                         <div class="section-header">
-                            <h2><i class="fa-solid fa-layer-group"></i> My Collection</h2>
-                            <p class="section-desc">View your discovered and undiscovered trading cards.</p>
+                            <h2><i class="fa-solid fa-layer-group"></i> My Collection (Pokedex)</h2>
+                            <p class="section-desc">View your discovered and undiscovered trading cards. Every existing card is listed here.</p>
                         </div>
-                        <div style="text-align: center; margin-bottom: 1rem;">
-                            <button class="btn-primary" onclick="pullCardGacha()"><i class="fa-solid fa-envelope-open-text"></i> Pull Card (100 Sayories)</button>
+                        <div style="text-align: center; margin-bottom: 2rem; display: flex; gap: 1rem; justify-content: center; flex-wrap: wrap;">
+                            <button class="btn-primary" onclick="pullCardGacha(1)"><i class="fa-solid fa-envelope"></i> Single (100)</button>
+                            <button class="btn-primary" onclick="pullCardGacha(3)" style="background: linear-gradient(135deg, #4CAF50, #2E7D32);"><i class="fa-solid fa-box"></i> Mini Pack (300)</button>
+                            <button class="btn-primary" onclick="pullCardGacha(5)" style="background: linear-gradient(135deg, #2196F3, #1565C0);"><i class="fa-solid fa-box-open"></i> Small Pack (500)</button>
+                            <button class="btn-primary" onclick="pullCardGacha(10)" style="background: linear-gradient(135deg, #9C27B0, #6A1B9A);"><i class="fa-solid fa-boxes-packing"></i> Medium Pack (1K)</button>
+                            <button class="btn-primary" onclick="pullCardGacha(20)" style="background: linear-gradient(135deg, #FF9800, #EF6C00);"><i class="fa-solid fa-truck-ramp-box"></i> Massive Pack (2K)</button>
                         </div>
-                        <div class="carousel-container" id="tc-carousel">
-                            <!-- Cards go here -->
+                        <div class="carousel-container" id="tc-carousel" style="display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 1.5rem; justify-items: center;">
+                            <!-- Cards go here in a grid instead of carousel for pokedex view -->
                         </div>
                     </div>
                 </div>

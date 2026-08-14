@@ -694,25 +694,84 @@ def cards_inventory():
 def cards_pull():
     user_id = session.get('user_id')
     if not user_id: return jsonify({'error': 'Unauthorized'}), 401
+    
+    data = request.json or {}
+    count = int(data.get('count', 1))
+    if count not in [1, 3, 5, 10, 20]:
+        count = 1
+        
     settings = asyncio.run(shared.cards_get_settings(CARDS_GUILD_ID))
-    if not settings.get('enabled', False):
+    if not settings.get('enabled', True):
         return jsonify({'error': 'Card pulls are currently disabled'}), 400
+        
+    cost = 100 * count
     sayories = asyncio.run(shared.g_eco_get(int(user_id)))
-    if sayories < 150:
-        return jsonify({'error': 'Not enough Sayories (150 required)'}), 400
+    if sayories < cost:
+        return jsonify({'error': f'Not enough Sayories ({cost} required)'}), 400
+        
     templates = asyncio.run(shared.cards_get_templates(CARDS_GUILD_ID))
     if not templates:
         return jsonify({'error': 'No cards available to pull'}), 400
+        
+    # Get rarities for weighted drops
+    rarities = asyncio.run(shared.cards_get_rarities(CARDS_GUILD_ID))
+    if isinstance(rarities, dict): rarities = rarities.get("rarities", [])
+    if not rarities:
+        rarities = [
+            {'name': 'C', 'chance': 45.0}, {'name': 'UC', 'chance': 30.0},
+            {'name': 'R', 'chance': 15.0}, {'name': 'SR', 'chance': 6.0},
+            {'name': 'SSR', 'chance': 3.0}, {'name': 'SSL', 'chance': 0.9},
+            {'name': 'USL', 'chance': 0.1}
+        ]
+        
+    # Group templates by rarity
+    from collections import defaultdict
+    cards_by_rarity = defaultdict(list)
+    for c in templates:
+        cards_by_rarity[c.get('rarity', 'C')].append(c)
+        
     import random, time, uuid
-    card = random.choice(templates)
-    asyncio.run(shared.g_eco_add(int(user_id), -150))
+    
+    pulled_items = []
+    pulled_templates = []
+    
+    for _ in range(count):
+        # Roll for rarity
+        rand_val = random.uniform(0, 100)
+        cumulative = 0.0
+        selected_rarity = None
+        
+        for r in rarities:
+            r_name = r.get('name')
+            r_chance = float(r.get('chance', 0))
+            if r_chance <= 0: continue
+            
+            cumulative += r_chance
+            if rand_val <= cumulative:
+                selected_rarity = r_name
+                break
+                
+        if not selected_rarity or not cards_by_rarity.get(selected_rarity):
+            # Fallback if rng failed or no cards in that rarity
+            card = random.choice(templates)
+        else:
+            card = random.choice(cards_by_rarity[selected_rarity])
+            
+        pulled_templates.append(card)
+        new_item = {'id': str(uuid.uuid4()), 'template_id': card.get('id', str(uuid.uuid4())), 'timestamp': int(time.time()), 'locked': False}
+        pulled_items.append(new_item)
+        
+    asyncio.run(shared.g_eco_add(int(user_id), -cost))
+    
     inv = asyncio.run(shared.cards_get_inventory(CARDS_GUILD_ID, int(user_id)))
-    new_item = {'id': str(uuid.uuid4()), 'template_id': card.get('id'), 'timestamp': int(time.time()), 'locked': False}
     cards_list = inv.get('cards', [])
-    cards_list.append(new_item)
+    cards_list.extend(pulled_items)
     inv['cards'] = cards_list
     asyncio.run(shared.cards_save_inventory(CARDS_GUILD_ID, int(user_id), inv))
-    return jsonify({'success': True, 'pulled_card': new_item, 'template': card, 'new_balance': sayories - 150})
+    
+    new_sayories = asyncio.run(shared.g_eco_get(int(user_id)))
+    
+    return jsonify({'success': True, 'pulled_cards': pulled_items, 'templates': pulled_templates, 'new_balance': new_sayories})
 
 if __name__ == '__main__':
     port = int(os.environ.get("PORT", 7860))

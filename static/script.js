@@ -988,13 +988,13 @@ document.addEventListener('DOMContentLoaded', () => {
 
 // TC logic
 let tcRarities = [
-    { id: 1, name: 'C', color: 'gray' },
-    { id: 2, name: 'UC', color: 'green' },
-    { id: 3, name: 'R', color: 'cyan' },
-    { id: 4, name: 'SR', color: 'magenta' },
-    { id: 5, name: 'SSR', color: 'gold' },
-    { id: 6, name: 'SSL', color: 'orange' },
-    { id: 7, name: 'USL', color: 'white' }
+    { id: 1, name: 'C', color: 'gray', chance: 45.0 },
+    { id: 2, name: 'UC', color: 'green', chance: 30.0 },
+    { id: 3, name: 'R', color: 'cyan', chance: 15.0 },
+    { id: 4, name: 'SR', color: 'magenta', chance: 6.0 },
+    { id: 5, name: 'SSR', color: 'gold', chance: 3.0 },
+    { id: 6, name: 'SSL', color: 'orange', chance: 0.9 },
+    { id: 7, name: 'USL', color: 'white', chance: 0.1 }
 ];
 let tcCards = [];
 let totalDropChance = 0;
@@ -1006,7 +1006,7 @@ function renderTcRarities() {
     tcRarities.forEach((r, i) => {
         const li = document.createElement('li');
         li.draggable = true;
-        li.innerHTML = `<span>${r.name}</span> <i class="fa-solid fa-grip-lines"></i>`;
+        li.innerHTML = `<span>${r.name} (${r.chance || 0}%)</span> <i class="fa-solid fa-grip-lines"></i>`;
         li.ondragstart = (e) => e.dataTransfer.setData('text/plain', i);
         li.ondragover = (e) => e.preventDefault();
         li.ondrop = (e) => {
@@ -1025,7 +1025,8 @@ function renderTcRarities() {
 window.addRarity = function() {
     const name = prompt("Rarity Name:");
     if(name) {
-        tcRarities.push({ id: Date.now(), name, color: 'white' });
+        const chance = parseFloat(prompt("Drop Chance % (e.g. 50):")) || 0;
+        tcRarities.push({ id: Date.now(), name, chance, color: 'white' });
         renderTcRarities();
         updateTcRaritySelect();
     }
@@ -1048,28 +1049,62 @@ window.saveNewCard = function() {
     const img = document.getElementById('tc-image').value;
     const type = document.getElementById('tc-type').value;
     const rarity = document.getElementById('tc-rarity-select').value;
-    const chance = parseFloat(document.getElementById('tc-drop-chance').value);
     
-    if(!title || isNaN(chance)) return showToast('Invalid input', 'error');
+    if(!title) return showToast('Invalid input', 'error');
     
-    totalDropChance += chance;
-    if(totalDropChance > 100) {
-        totalDropChance -= chance;
-        return showToast('Total drop chance exceeds 100%', 'error');
-    }
-    
-    tcCards.push({ title, img, type, rarity, chance });
+    tcCards.push({ title, img, type, rarity });
     showToast('Card saved!', 'success');
-    renderTcCarousel();
+    fetchTcData();
+}
+
+
+let tcInventoryCache = [];
+let tcTemplatesCache = [];
+
+function fetchTcData() {
+    Promise.all([
+        fetch('/api/cards/inventory').then(r => r.json()),
+        fetch('/api/cards/templates').then(r => r.json())
+    ]).then(([inv, templates]) => {
+        tcInventoryCache = inv.cards || [];
+        tcTemplatesCache = templates || [];
+        fetchTcData();
+    });
 }
 
 function renderTcCarousel() {
     const carousel = document.getElementById('tc-carousel');
     if(!carousel) return;
     carousel.innerHTML = '';
-    for(let i=0; i<5; i++) {
+    
+    if(tcTemplatesCache.length === 0) {
+        carousel.innerHTML = '<div style="grid-column: 1/-1; color:#aaa; padding:2rem;">No cards exist yet. Admins must create cards!</div>';
+        return;
+    }
+    
+    // Create a Set of owned template IDs
+    const ownedIds = new Set(tcInventoryCache.map(c => c.template_id));
+    
+    tcTemplatesCache.forEach(t => {
+        const owned = ownedIds.has(t.id);
         const c = document.createElement('div');
-        c.className = `tc-card ${i%2==0 ? 'discovered' : 'undiscovered'}`;
+        c.className = `tc-card ${owned ? 'discovered' : 'undiscovered'}`;
+        
+        let titleHtml = '';
+        if(owned) {
+            titleHtml = `<div style="position:absolute; bottom:5px; width:100%; text-align:center; color:white; font-size:0.8rem; font-weight:bold; text-shadow:1px 1px 2px black;">${t.title || t.name || 'Unknown'}</div>`;
+        }
+        
+        c.innerHTML = `
+            <img class="tc-image" src="${t.img || 'https://via.placeholder.com/200x280'}" />
+            <div class="tc-overlay"></div>
+            ${titleHtml}
+            <div class="tc-type-badge">${t.rarity || 'C'}</div>
+        `;
+        carousel.appendChild(c);
+    });
+}
+`;
         c.innerHTML = `
             <img class="tc-image" src="https://via.placeholder.com/200x280/17132a/ed5d9d?text=Card+${i}" />
             <div class="tc-overlay"></div>
@@ -1078,35 +1113,57 @@ function renderTcCarousel() {
     }
 }
 
-window.pullCardGacha = function() {
-    const overlay = document.getElementById('gacha-overlay');
-    const env = document.getElementById('gacha-envelope');
-    const reveal = document.getElementById('gacha-card-reveal');
+window.pullCardGacha = function(count = 1) {
+    if(count > 1 && !confirm(`Pull ${count} cards for ${count * 100} Sayories?`)) return;
     
-    overlay.classList.remove('hidden');
-    env.className = ''; 
-    setTimeout(() => {
-        env.classList.add('glow-SSR');
+    fetch('/api/cards/pull', {
+        method: 'POST',
+        headers: {'Content-Type': 'application/json'},
+        body: JSON.stringify({count})
+    }).then(res => res.json()).then(data => {
+        if(data.error) {
+            return showToast(data.error, 'error');
+        }
+        
+        const overlay = document.getElementById('gacha-overlay');
+        const env = document.getElementById('gacha-envelope');
+        const reveal = document.getElementById('gacha-card-reveal');
+        
+        // Show bulk pull animation
+        overlay.classList.remove('hidden');
+        env.className = ''; 
         setTimeout(() => {
-            env.classList.add('burst');
+            env.classList.add('glow-SSR');
             setTimeout(() => {
-                reveal.innerHTML = `<div class="tc-card discovered" style="width: 300px; height: 420px; transform: scale(1);"><img class="tc-image" src="https://via.placeholder.com/300x420/17132a/ed5d9d?text=New+Card" /><div class="tc-overlay"></div></div>`;
-                reveal.classList.remove('hidden');
+                env.classList.add('burst');
                 setTimeout(() => {
-                    overlay.classList.add('hidden');
-                    reveal.classList.add('hidden');
-                    reveal.innerHTML = '';
-                    showToast('Got a new card!', 'success');
-                }, 3000);
-            }, 500);
-        }, 1500);
-    }, 1000);
+                    let html = '<div style="display:flex; flex-wrap:wrap; gap:10px; justify-content:center; max-width:80vw; max-height:80vh; overflow-y:auto;">';
+                    data.templates.forEach(t => {
+                        html += `<div class="tc-card discovered" style="width: 150px; height: 210px; transform: scale(1);"><img class="tc-image" src="${t.img || 'https://via.placeholder.com/200x280'}" /><div class="tc-overlay"></div></div>`;
+                    });
+                    html += '</div><button class="btn-primary" onclick="closeGachaReveal()" style="margin-top:20px; position:absolute; bottom:20px;">Collect Cards</button>';
+                    reveal.innerHTML = html;
+                    reveal.classList.remove('hidden');
+                    
+                    // Update global sayories UI if it exists
+                    document.getElementById('eco-sayories') && (document.getElementById('eco-sayories').innerText = data.new_balance);
+                }, 500);
+            }, 1500);
+        }, 1000);
+    });
+}
+
+window.closeGachaReveal = function() {
+    document.getElementById('gacha-overlay').classList.add('hidden');
+    document.getElementById('gacha-card-reveal').classList.add('hidden');
+    document.getElementById('gacha-card-reveal').innerHTML = '';
+    fetchTcData();
 }
 
 document.addEventListener('DOMContentLoaded', () => {
     setTimeout(() => {
         renderTcRarities();
         updateTcRaritySelect();
-        renderTcCarousel();
+        fetchTcData();
     }, 500);
 });
