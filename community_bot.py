@@ -899,21 +899,35 @@ async def generate_card_image(card_data: dict) -> io.BytesIO:
         draw = ImageDraw.Draw(img)
         
     rarity = card_data.get("rarity", "R")
-    color = {"R": (52, 152, 219), "SR": (255, 215, 0), "SSR": (255, 0, 255), "USL": (255, 255, 255)}.get(rarity, (255,255,255))
+    
+    # Umamusume style rarity colors
+    # SSR: Rainbow/Gold (using deep gold/orange gradient-like colors)
+    # SR: Gold/Silver
+    # R: Silver/Blue
+    color = {"R": (192, 192, 192), "SR": (255, 215, 0), "SSR": (255, 140, 0), "USL": (255, 255, 255)}.get(rarity, (200, 200, 200))
+    inner_color = {"R": (135, 206, 235), "SR": (218, 165, 32), "SSR": (255, 0, 127), "USL": (200, 200, 255)}.get(rarity, (255,255,255))
     
     # If it wasn't one of the special custom borders, draw the standard rarity border
     if card_type not in ["Texel", "Berlijn", "Tikibad", "Bobbejaanland", "Uitje", "Rookie 1-2-3 HAVO", "4HAVO", "5HAVO", "5HAVO EXAMENTIJD", "6HAVO", "Examen Uitrijking", "IRL Autisten"] and "Gamemiddag" not in card_type:
-        draw.rectangle([(0,0), (target_w-1, target_h-1)], outline=color, width=10)
+        # Outer thick border
+        draw.rectangle([(0,0), (target_w-1, target_h-1)], outline=color, width=12)
+        # Inner accent border to give a "metallic/framed" look
+        draw.rectangle([(10,10), (target_w-11, target_h-11)], outline=inner_color, width=2)
     
-    draw.rectangle([(0, target_h-50), (target_w, target_h)], fill=(0, 0, 0, 180))
+    # Bottom name banner (gradient/colored instead of plain black)
+    draw.rectangle([(0, target_h-55), (target_w, target_h)], fill=(20, 20, 30, 230))
+    # A colored top strip for the name banner based on rarity
+    draw.rectangle([(0, target_h-55), (target_w, target_h-52)], fill=color)
     
     try:
         font = load_font("bold", 18)
+        font_sm = load_font("bold", 14)
     except:
         font = ImageFont.load_default()
+        font_sm = ImageFont.load_default()
     
     name = card_data.get("name", "Unknown Card")
-    draw.text((15, target_h-35), name, fill=(255,255,255), font=font)
+    draw.text((15, target_h-40), name, fill=(255,255,255), font=font)
     
     card_type = card_data.get("type", "Unknown")
     type_colors = {
@@ -926,18 +940,27 @@ async def generate_card_image(card_data: dict) -> io.BytesIO:
         "Bobbejaanland": (139, 69, 19), "IRL Autisten": (255, 250, 240)
     }
     t_col = type_colors.get(card_type, color)
-    draw.ellipse([(target_w-45, 15), (target_w-15, 45)], fill=t_col, outline=(255,255,255), width=2)
+    
+    # Support Card Type Ribbon (Top Right)
+    draw.polygon([(target_w-50, 0), (target_w, 0), (target_w, 50), (target_w-25, 40), (target_w-50, 50)], fill=t_col)
+    draw.polygon([(target_w-45, 0), (target_w, 0), (target_w, 45), (target_w-25, 36), (target_w-45, 45)], outline=(255,255,255), width=2)
     
     # Type icon (first letter of type)
     short_type = card_type[0] if card_type else "?"
     if "HAVO" in card_type or "Examen" in card_type: short_type = "S" # School
     if "Gamemiddag" in card_type: short_type = "G" # Gaming
     
-    # Rarity Indicator Polygon
-    draw.polygon([(0,0), (60,0), (0,60)], fill=color)
-    draw.text((5, 5), rarity, fill=(0,0,0), font=font)
+    draw.text((target_w-32, 8), short_type, fill=(255,255,255), font=font)
     
-    draw.text((target_w-35, 20), short_type, fill=(255,255,255), font=font)
+    # Rarity Indicator Ribbon (Top Left)
+    draw.polygon([(0,0), (65,0), (55, 30), (0,30)], fill=color)
+    draw.polygon([(0,0), (65,0), (55, 30), (0,30)], outline=(255,255,255), width=2)
+    draw.text((10, 6), rarity, fill=(0,0,0), font=font)
+    
+    # Level Badge (Bottom Right above banner)
+    lv = "Lv.50" if rarity == "SSR" else ("Lv.45" if rarity == "SR" else "Lv.40")
+    draw.rectangle([(target_w-55, target_h-75), (target_w-5, target_h-60)], fill=(0,0,0,180), outline=color, width=1)
+    draw.text((target_w-48, target_h-75), lv, fill=(255,255,255), font=font_sm)
     
     buf = io.BytesIO()
     img.save(buf, format="PNG")
