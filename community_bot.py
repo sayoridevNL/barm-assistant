@@ -222,8 +222,8 @@ class MarriageDB:
 
     @staticmethod
     async def create_proposal(guild_id: int, mode: str, creator_id: int, participants: list[int]) -> dict:
-        async with _lock_for(guild_id):
-            marriages = await db_get_section(guild_id, "marriages")
+        async with _global_lock:
+            marriages = await global_get_section("marriages")
             cfg = await get_config(guild_id)
             now = int(time.time())
             marriage_id = str(uuid.uuid4())
@@ -241,19 +241,19 @@ class MarriageDB:
                 "activated_at": None,
             }
             marriages[marriage_id] = record
-            await db_save_section(guild_id, "marriages", marriages)
+            await global_save_section("marriages", marriages)
             return record
 
     @staticmethod
     async def accept(guild_id: int, marriage_id: str, user_id: int) -> tuple[bool, str, Optional[dict]]:
-        async with _lock_for(guild_id):
-            marriages = await db_get_section(guild_id, "marriages")
+        async with _global_lock:
+            marriages = await global_get_section("marriages")
             m = marriages.get(marriage_id)
             if not m or m["status"] != "pending":
                 return False, "not_found", None
             if int(time.time()) > m["expires_at"]:
                 m["status"] = "expired"
-                await db_save_section(guild_id, "marriages", marriages)
+                await global_save_section("marriages", marriages)
                 return False, "expired", None
             if user_id not in m["participants"]:
                 return False, "not_a_participant", None
@@ -265,13 +265,13 @@ class MarriageDB:
                 m["status"] = "active"
                 m["activated_at"] = int(time.time())
                 activated = True
-            await db_save_section(guild_id, "marriages", marriages)
+            await global_save_section("marriages", marriages)
             return True, "activated" if activated else "accepted", m
 
     @staticmethod
     async def reject(guild_id: int, marriage_id: str, user_id: int) -> tuple[bool, str, Optional[dict]]:
-        async with _lock_for(guild_id):
-            marriages = await db_get_section(guild_id, "marriages")
+        async with _global_lock:
+            marriages = await global_get_section("marriages")
             m = marriages.get(marriage_id)
             if not m or m["status"] != "pending":
                 return False, "not_found", None
@@ -279,36 +279,36 @@ class MarriageDB:
                 return False, "not_a_participant", None
             m["status"] = "rejected"
             m["rejected_by"] = user_id
-            await db_save_section(guild_id, "marriages", marriages)
+            await global_save_section("marriages", marriages)
             return True, "rejected", m
 
     @staticmethod
     async def cancel(guild_id: int, marriage_id: str, user_id: int) -> tuple[bool, str]:
-        async with _lock_for(guild_id):
-            marriages = await db_get_section(guild_id, "marriages")
+        async with _global_lock:
+            marriages = await global_get_section("marriages")
             m = marriages.get(marriage_id)
             if not m or m["status"] != "pending":
                 return False, "not_found"
             if m["proposal_creator_id"] != user_id:
                 return False, "not_creator"
             m["status"] = "cancelled"
-            await db_save_section(guild_id, "marriages", marriages)
+            await global_save_section("marriages", marriages)
             return True, "cancelled"
 
     @staticmethod
     async def get_active_for_user(guild_id: int, user_id: int) -> Optional[dict]:
-        marriages = await db_get_section(guild_id, "marriages")
+        marriages = await global_get_section("marriages")
         _, m = _active_marriage_for(marriages, user_id)
         return m
 
     @staticmethod
     async def start_divorce(guild_id: int, marriage_id: str, requester_id: int, reason: str) -> tuple[bool, str, Optional[dict]]:
-        async with _lock_for(guild_id):
-            marriages = await db_get_section(guild_id, "marriages")
+        async with _global_lock:
+            marriages = await global_get_section("marriages")
             m = marriages.get(marriage_id)
             if not m or m["status"] != "active":
                 return False, "not_active", None
-            divorces = await db_get_section(guild_id, "marriage_divorces")
+            divorces = await global_get_section("marriage_divorces")
             for d in divorces.values():
                 if d["marriage_id"] == marriage_id and d["status"] == "pending":
                     return False, "already_pending", None
@@ -331,21 +331,21 @@ class MarriageDB:
                 "decided_at": None,
             }
             divorces[case_id] = case
-            await db_save_section(guild_id, "marriage_divorces", divorces)
+            await global_save_section("marriage_divorces", divorces)
             return True, "created", case
 
     @staticmethod
     async def judge_decide(guild_id: int, case_id: str, judge_id: int, approve: bool, involved_can_judge: bool) -> tuple[bool, str, Optional[dict]]:
-        async with _lock_for(guild_id):
-            divorces = await db_get_section(guild_id, "marriage_divorces")
+        async with _global_lock:
+            divorces = await global_get_section("marriage_divorces")
             case = divorces.get(case_id)
             if not case or case["status"] != "pending":
                 return False, "not_found", None
             if int(time.time()) > case["expires_at"]:
                 case["status"] = "expired"
-                await db_save_section(guild_id, "marriage_divorces", divorces)
+                await global_save_section("marriage_divorces", divorces)
                 return False, "expired", None
-            marriages = await db_get_section(guild_id, "marriages")
+            marriages = await global_get_section("marriages")
             marriage = marriages.get(case["marriage_id"])
             if marriage and judge_id in marriage["participants"] and not involved_can_judge:
                 return False, "involved_spouse", None
@@ -353,24 +353,24 @@ class MarriageDB:
             case["decision"] = "approved" if approve else "rejected"
             case["status"] = "decided"
             case["decided_at"] = int(time.time())
-            await db_save_section(guild_id, "marriage_divorces", divorces)
+            await global_save_section("marriage_divorces", divorces)
             if approve and marriage:
                 marriage["status"] = "divorced"
                 marriage["archived_at"] = int(time.time())
-                await db_save_section(guild_id, "marriages", marriages)
+                await global_save_section("marriages", marriages)
             return True, case["decision"], case
 
     @staticmethod
     async def cancel_divorce(guild_id: int, case_id: str, user_id: int) -> tuple[bool, str]:
-        async with _lock_for(guild_id):
-            divorces = await db_get_section(guild_id, "marriage_divorces")
+        async with _global_lock:
+            divorces = await global_get_section("marriage_divorces")
             case = divorces.get(case_id)
             if not case or case["status"] != "pending":
                 return False, "not_found"
             if case["requester_id"] != user_id:
                 return False, "not_requester"
             case["status"] = "cancelled"
-            await db_save_section(guild_id, "marriage_divorces", divorces)
+            await global_save_section("marriage_divorces", divorces)
             return True, "cancelled"
 
 
@@ -632,8 +632,8 @@ class MarriageSystem(commands.Cog):
             if member.bot and not cfg["allow_bots"]:
                 return await interaction.response.send_message("Bots can't participate in marriages here.", ephemeral=True)
 
-        async with _lock_for(guild.id):
-            marriages = await db_get_section(guild.id, "marriages")
+        async with _global_lock:
+            marriages = await global_get_section("marriages")
             for uid in participant_ids:
                 mid, _ = _active_marriage_for(marriages, uid)
                 if mid:
