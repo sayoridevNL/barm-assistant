@@ -18,7 +18,7 @@ from shared import _get_mongo_db
 load_dotenv()
 
 logging.basicConfig(level=logging.INFO)
-logger = logging.getLogger("channel-linker")
+logger = logging.getLogger("kinect")
 
 intents = discord.Intents.default()
 intents.message_content = True
@@ -28,7 +28,7 @@ intents.members = True
 bot = discord.Client(intents=intents)
 tree = app_commands.CommandTree(bot)
 
-WEBHOOK_NAME_TAG = "channel-linker"
+WEBHOOK_NAME_TAG = "kinect"
 
 # In-memory caches so we don't hit MongoDB or the Discord API for every message.
 link_cache = {}      # channel_id (str) -> {"target_channel_id": str, "target_guild_id": str} or None

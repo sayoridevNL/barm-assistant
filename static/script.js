@@ -23,7 +23,7 @@ document.addEventListener('DOMContentLoaded', () => {
     let statusInterval;
     const BOT_NAMES = [
         "music_bot", "moderation_bot", "community_bot", 
-        "gambling_bot", "umamusume_bot", "general_bot", "channel_linker_bot"
+        "gambling_bot", "umamusume_bot", "general_bot", "kinect_bot"
     ];
 
     const BOT_ICONS = {
@@ -33,7 +33,7 @@ document.addEventListener('DOMContentLoaded', () => {
         "gambling_bot": "fa-dice",
         "umamusume_bot": "fa-horse",
         "general_bot": "fa-robot",
-        "channel_linker_bot": "fa-link"
+        "kinect_bot": "fa-link"
     };
 
     // --- Toast Utility ---
