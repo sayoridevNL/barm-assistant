@@ -7,6 +7,6 @@ gunicorn
 pilmoji
 wavelink
 requests
-motor[srv]
+motor
 dnspython
 tzdata
