@@ -12,7 +12,7 @@ import shared
 from shared import *
 from theme import EmbedBuilder, Palette
 from ui_kit import install_error_handler
-from PIL import Image, ImageDraw, ImageFilter, ImageFont
+from PIL import Image, ImageDraw, ImageFilter
 from ui_kit import (
     draw_gradient, draw_starfield, circular_avatar, load_font,
     draw_text_with_fallback, to_discord_file, truncate_text_pixels

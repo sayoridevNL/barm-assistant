@@ -12,7 +12,7 @@ import discord
 from discord.ext import commands
 import motor.motor_asyncio
 import random
-from typing import Optional, Union, List, Dict, Any
+
 
 # ── .env LOADER ──────────────────────────────────────────────────────────────
 BASE_DIR = Path(__file__).resolve().parent

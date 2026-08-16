@@ -5,7 +5,6 @@ Mirrors messages between two linked channels (possibly in different guilds)
 using webhooks, preserving the original author's display name and avatar.
 """
 
-import os
 import logging
 from datetime import datetime, timezone
 

@@ -12,7 +12,7 @@ from discord.ext import commands
 
 from shared import *
 from theme import EmbedBuilder, Palette
-from ui_kit import Paginator, ask_confirm, install_error_handler
+from ui_kit import Paginator, install_error_handler
 
 def _wiki_icon(name: str) -> str:
     slug = name.replace(" ", "_").replace("'", "%27")
@@ -278,7 +278,7 @@ async def pull_trainee_cmd(interaction: discord.Interaction, banner: str, amount
         await interaction.followup.send(content="## 🌸 THE GATES BURST OPEN... A NEW UMA APPEARS! 🌸", embed=embed)
     else:
         embeds = []
-        for i, pd in enumerate(pulls_display):
+        for _i, pd in enumerate(pulls_display):
             uma = pd["uma"]
             color = _UMA_RARITY_COLORS[uma["rarity"]]
             remoji = _UMA_RARITY_EMOJI[uma["rarity"]]
@@ -380,7 +380,7 @@ async def pull_support_cmd(interaction: discord.Interaction, banner: str, amount
         await interaction.followup.send(content="## 🎴 A NEW SUPPORTER JOINS YOUR DECK! 🎴", embed=embed)
     else:
         embeds = []
-        for i, pd in enumerate(pulls_display):
+        for _i, pd in enumerate(pulls_display):
             card = pd["card"]
             color = _SUPPORT_RARITY_COLORS[card["rarity"]]
             remoji = _SUPPORT_RARITY_EMOJI[card["rarity"]]

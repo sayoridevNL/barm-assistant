@@ -12,7 +12,7 @@ from discord.ext import commands
 
 from shared import *
 from theme import EmbedBuilder, Palette
-from ui_kit import ask_confirm, install_error_handler
+from ui_kit import install_error_handler
 
 SPOTIFY_DB_FILE = "spotify_stats.json"
 SPOTIFY_PER_PAGE = 15
@@ -99,14 +99,11 @@ async def play(interaction: discord.Interaction, query: str):
 
         # Playable.search can return a Playlist or a list of Playables
         if isinstance(tracks, wavelink.Playlist):
-            added = len(tracks.tracks)
             player.queue.put(tracks)
-            msg = f"Added **{added}** tracks from playlist **{tracks.name}**."
             track = tracks.tracks[0]
         else:
             track: wavelink.Playable = tracks[0]
             player.queue.put(track)
-            msg = f"Added **{track.title}** to the queue."
 
         if not player.playing:
             await player.play(player.queue.get())

@@ -5,15 +5,13 @@ import json
 import threading
 import time
 import requests
-import pymongo
 from zoneinfo import ZoneInfo
-from flask import Flask, request, jsonify, render_template, session, send_from_directory, redirect
+from flask import Flask, request, jsonify, render_template, session, redirect
 from dotenv import load_dotenv
 
 load_dotenv()
 
 import asyncio
-import threading
 _server_loop = None
 _loop_started = False
 _loop_lock = threading.Lock()
@@ -43,7 +41,10 @@ mongo_db = None
 app = Flask(__name__, static_folder='static', template_folder='templates')
 from werkzeug.middleware.proxy_fix import ProxyFix
 app.wsgi_app = ProxyFix(app.wsgi_app, x_for=1, x_proto=1, x_host=1, x_prefix=1)
-app.secret_key = os.getenv('FLASK_SECRET_KEY', 'default_secret_key_barm_os_2026_fallback')
+FLASK_SECRET_KEY = os.getenv('FLASK_SECRET_KEY')
+if not FLASK_SECRET_KEY:
+    raise SystemExit("Set the FLASK_SECRET_KEY environment variable.")
+app.secret_key = FLASK_SECRET_KEY
 
 DISCORD_CLIENT_ID = os.getenv('DISCORD_CLIENT_ID')
 DISCORD_CLIENT_SECRET = os.getenv('DISCORD_CLIENT_SECRET')
@@ -66,10 +67,10 @@ BOTS = [
     "kinect_bot",
 ]
 
-bot_processes = {bot: None for bot in BOTS}
+bot_processes = dict.fromkeys(BOTS)
 bot_lock = threading.Lock()
-bot_restart_delays = {bot: 10 for bot in BOTS}
-bot_last_start = {bot: 0 for bot in BOTS}
+bot_restart_delays = dict.fromkeys(BOTS, 10)
+bot_last_start = dict.fromkeys(BOTS, 0)
 
 def is_bot_running(bot_name):
     process = bot_processes.get(bot_name)
@@ -426,9 +427,7 @@ def get_toto_battle():
     if user_id not in TOTO_PARTICIPANT_IDS:
         return jsonify({'eligible': False, 'active': False})
         
-    import time, json
     from datetime import datetime
-    from pathlib import Path
     
     today_str = datetime.now(NETHERLANDS_TZ).strftime("%Y%m%d")
     toto_key = f"toto_battle_{today_str}"
@@ -470,7 +469,6 @@ def submit_toto_predict():
     if not isinstance(picks, dict):
         return jsonify({'error': 'Predictions must be an object'}), 400
     
-    import time, json
     from datetime import datetime
     today_str = datetime.now(NETHERLANDS_TZ).strftime("%Y%m%d")
     toto_key = f"toto_battle_{today_str}"
@@ -488,7 +486,7 @@ def submit_toto_predict():
         battle.setdefault('picks', {})[str(user_id)] = {str(match_id): choice for match_id, choice in picks.items()}
         db.global_data.update_one({"_id": toto_key}, {"$set": {"data": battle}}, upsert=True)
     else:
-        from shared import _load_global_sync, _save_global_sync, _global_lock
+        from shared import _load_global_sync, _save_global_sync
         gl_data = _load_global_sync()
         battle = gl_data.get(toto_key, {})
         if not battle or battle.get('resolved'): return jsonify({'error': 'Battle not active or already resolved'}), 400
@@ -697,8 +695,6 @@ def save_file(filename):
 
 
 # --- CARDS GACHA ROUTES ---
-import asyncio
-import shared
 CARDS_GUILD_ID = 1366404929727762554
 
 def is_cards_admin():

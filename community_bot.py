@@ -17,7 +17,7 @@ import aiohttp
 import discord
 from discord import app_commands
 from discord.ext import commands, tasks
-from PIL import Image, ImageDraw, ImageFilter
+from PIL import Image, ImageDraw
 
 from shared import *
 from theme import EmbedBuilder, Palette, Emojis, progress_bar
@@ -59,7 +59,7 @@ class CommunityBot(commands.Bot):
             traceback.print_exc()
         try:
             await self.add_cog(MarriageSystem(self))
-            for name, meta in ACTIONS.items():
+            for name, _meta in ACTIONS.items():
                 pretty = {"kiss": "Kiss", "hug": "Hug", "kill": "Playfully 'defeat' (duel)",
                           "nom": "Nom", "lick": "Lick", "tickle": "Tickle",
                           "touches": "Friendly touch/high-five", "griddy": "Griddy duel + dance"}[name]
