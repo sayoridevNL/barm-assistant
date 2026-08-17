@@ -17,7 +17,7 @@ import aiohttp
 import discord
 from discord import app_commands
 from discord.ext import commands, tasks
-from PIL import Image, ImageDraw
+from PIL import Image, ImageDraw, ImageFont
 
 from shared import *
 from theme import EmbedBuilder, Palette, Emojis, progress_bar
@@ -203,16 +203,16 @@ async def set_config(guild_id: int, **updates) -> dict:
         return cfg
 
 
-def _active_marriage_for(marriages: dict, user_id: int):
+def _active_marriage_for(marriages: dict, guild_id: int, user_id: int):
     for mid, m in marriages.items():
-        if m["status"] == "active" and user_id in m["participants"]:
+        if m["guild_id"] == guild_id and m["status"] == "active" and user_id in m["participants"]:
             return mid, m
     return None, None
 
 
-def _active_proposal_involving(marriages: dict, user_ids: set[int]):
+def _active_proposal_involving(marriages: dict, guild_id: int, user_ids: set[int]):
     for mid, m in marriages.items():
-        if m["status"] == "pending" and user_ids & set(m["participants"]):
+        if m["guild_id"] == guild_id and m["status"] == "pending" and user_ids & set(m["participants"]):
             return mid, m
     return None, None
 
@@ -222,7 +222,7 @@ class MarriageDB:
 
     @staticmethod
     async def create_proposal(guild_id: int, mode: str, creator_id: int, participants: list[int]) -> dict:
-        async with _global_lock:
+        async with _lock_for(guild_id):
             marriages = await global_get_section("marriages")
             cfg = await get_config(guild_id)
             now = int(time.time())
@@ -246,7 +246,7 @@ class MarriageDB:
 
     @staticmethod
     async def accept(guild_id: int, marriage_id: str, user_id: int) -> tuple[bool, str, Optional[dict]]:
-        async with _global_lock:
+        async with _lock_for(guild_id):
             marriages = await global_get_section("marriages")
             m = marriages.get(marriage_id)
             if not m or m["status"] != "pending":
@@ -270,7 +270,7 @@ class MarriageDB:
 
     @staticmethod
     async def reject(guild_id: int, marriage_id: str, user_id: int) -> tuple[bool, str, Optional[dict]]:
-        async with _global_lock:
+        async with _lock_for(guild_id):
             marriages = await global_get_section("marriages")
             m = marriages.get(marriage_id)
             if not m or m["status"] != "pending":
@@ -283,27 +283,27 @@ class MarriageDB:
             return True, "rejected", m
 
     @staticmethod
-    async def cancel(guild_id: int, marriage_id: str, user_id: int) -> tuple[bool, str]:
-        async with _global_lock:
+    async def cancel(guild_id: int, marriage_id: str, user_id: int) -> tuple[bool, str, Optional[dict]]:
+        async with _lock_for(guild_id):
             marriages = await global_get_section("marriages")
             m = marriages.get(marriage_id)
             if not m or m["status"] != "pending":
-                return False, "not_found"
+                return False, "not_found", None
             if m["proposal_creator_id"] != user_id:
-                return False, "not_creator"
+                return False, "not_creator", None
             m["status"] = "cancelled"
             await global_save_section("marriages", marriages)
-            return True, "cancelled"
+            return True, "cancelled", m
 
     @staticmethod
     async def get_active_for_user(guild_id: int, user_id: int) -> Optional[dict]:
         marriages = await global_get_section("marriages")
-        _, m = _active_marriage_for(marriages, user_id)
+        _, m = _active_marriage_for(marriages, guild_id, user_id)
         return m
 
     @staticmethod
     async def start_divorce(guild_id: int, marriage_id: str, requester_id: int, reason: str) -> tuple[bool, str, Optional[dict]]:
-        async with _global_lock:
+        async with _lock_for(guild_id):
             marriages = await global_get_section("marriages")
             m = marriages.get(marriage_id)
             if not m or m["status"] != "active":
@@ -336,7 +336,7 @@ class MarriageDB:
 
     @staticmethod
     async def judge_decide(guild_id: int, case_id: str, judge_id: int, approve: bool, involved_can_judge: bool) -> tuple[bool, str, Optional[dict]]:
-        async with _global_lock:
+        async with _lock_for(guild_id):
             divorces = await global_get_section("marriage_divorces")
             case = divorces.get(case_id)
             if not case or case["status"] != "pending":
@@ -362,7 +362,7 @@ class MarriageDB:
 
     @staticmethod
     async def cancel_divorce(guild_id: int, case_id: str, user_id: int) -> tuple[bool, str]:
-        async with _global_lock:
+        async with _lock_for(guild_id):
             divorces = await global_get_section("marriage_divorces")
             case = divorces.get(case_id)
             if not case or case["status"] != "pending":
@@ -446,11 +446,9 @@ class ProposalView(discord.ui.View):
             return await interaction.response.send_message(
                 "Only the person who made the proposal can cancel it.", ephemeral=True
             )
-        ok, reason = await MarriageDB.cancel(self.guild_id, self.marriage_id, interaction.user.id)
+        ok, reason, m = await MarriageDB.cancel(self.guild_id, self.marriage_id, interaction.user.id)
         if not ok:
             return await interaction.response.send_message("This proposal is no longer active.", ephemeral=True)
-        store = _load_store(self.guild_id)
-        m = store["marriages"][self.marriage_id]
         await self._refresh_embed(interaction, m, "🚫 Proposal cancelled.")
 
 
@@ -632,15 +630,15 @@ class MarriageSystem(commands.Cog):
             if member.bot and not cfg["allow_bots"]:
                 return await interaction.response.send_message("Bots can't participate in marriages here.", ephemeral=True)
 
-        async with _global_lock:
+        async with _lock_for(guild.id):
             marriages = await global_get_section("marriages")
             for uid in participant_ids:
-                mid, _ = _active_marriage_for(marriages, uid)
+                mid, _ = _active_marriage_for(marriages, guild.id, uid)
                 if mid:
                     return await interaction.response.send_message(
                         f"<@{uid}> is already in an active marriage.", ephemeral=True
                     )
-            mid, _ = _active_proposal_involving(marriages, set(participant_ids))
+            mid, _ = _active_proposal_involving(marriages, guild.id, set(participant_ids))
             if mid:
                 return await interaction.response.send_message(
                     "One or more of these users already has a pending proposal.", ephemeral=True
@@ -1460,7 +1458,7 @@ class SuggestionView(discord.ui.View):
     async def btn_reject(self, interaction: discord.Interaction, button: discord.ui.Button):
         await interaction.response.send_message("❌ Suggestion rejected.", ephemeral=True)
         embed = interaction.message.embeds[0]
-        embed.color = Palette.ERROR
+        embed.color = Palette.DANGER
         embed.title = "❌ Rejected Suggestion"
         await interaction.message.edit(embed=embed, view=None)
 
@@ -1573,7 +1571,7 @@ async def generate_card_image(card_data: dict) -> io.BytesIO:
         font = ImageFont.load_default()
         font_sm = ImageFont.load_default()
     
-    name = card_data.get("name", "Unknown Card")
+    name = card_data.get("name") or card_data.get("title", "Unknown Card")
     draw.text((15, target_h-40), name, fill=(255,255,255), font=font)
     
     card_type = card_data.get("type", "Unknown")
@@ -1699,9 +1697,9 @@ async def buy_card(interaction: discord.Interaction, pack: app_commands.Choice[i
 
     # Generate Image
     if count == 1:
-        buf = generate_card_image(pulled_templates[0])
+        buf = await generate_card_image(pulled_templates[0])
         file = discord.File(fp=buf, filename="card.png")
-        embed = EmbedBuilder(color=Palette.PRIMARY).title(f"🎉 Pulled: {pulled_templates[0].get('title', 'Unknown')}!").build()
+        embed = EmbedBuilder(color=Palette.PRIMARY).title(f"🎉 Pulled: {pulled_templates[0].get('title') or pulled_templates[0].get('name', 'Unknown')}!").build()
         embed.set_image(url="attachment://card.png")
         await interaction.followup.send(embed=embed, file=file)
     else:
@@ -1720,7 +1718,7 @@ async def buy_card(interaction: discord.Interaction, pack: app_commands.Choice[i
         
         import io
         for idx, t in enumerate(pulled_templates):
-            c_buf = generate_card_image(t)
+            c_buf = await generate_card_image(t)
             c_img = Image.open(c_buf)
             
             x = (idx % cols) * (card_w + 10)
