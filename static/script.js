@@ -1063,24 +1063,27 @@ function renderTcCarousel() {
         return;
     }
     
-    // Create a Set of owned template IDs
-    const ownedIds = new Set(tcInventoryCache.map(c => c.template_id));
+    const ownedCounts = {};
+    tcInventoryCache.forEach(c => {
+        ownedCounts[c.template_id] = (ownedCounts[c.template_id] || 0) + 1;
+    });
     
     tcTemplatesCache.forEach(t => {
-        const owned = ownedIds.has(t.id);
+        const count = ownedCounts[t.id] || 0;
+        const owned = count > 0;
         const c = document.createElement('div');
         c.className = `tc-card ${owned ? 'discovered' : 'undiscovered'}`;
         
         let titleHtml = '';
         if(owned) {
-            titleHtml = `<div style="position:absolute; bottom:5px; width:100%; text-align:center; color:white; font-size:0.8rem; font-weight:bold; text-shadow:1px 1px 2px black;">${t.title || t.name || 'Unknown'}</div>`;
+            titleHtml = `<div style="position:absolute; bottom:5px; width:100%; text-align:center; color:white; font-size:0.8rem; font-weight:bold; text-shadow:1px 1px 2px black;">${t.title || t.name || 'Unknown'} (x${count})</div>`;
         }
         
         c.innerHTML = `
             <img class="tc-image" src="${t.img || 'https://via.placeholder.com/200x280'}" />
-            <div class="tc-overlay"></div>
+            <div class="tc-rarity badge badge-${t.rarity}">${t.rarity}</div>
+            <div class="tc-type badge badge-dark">${t.type}</div>
             ${titleHtml}
-            <div class="tc-type-badge">${t.rarity || 'C'}</div>
         `;
         carousel.appendChild(c);
     });
