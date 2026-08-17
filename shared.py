@@ -71,7 +71,13 @@ async def _db_load(guild_id: int) -> dict:
     db = _get_mongo_db()
     if db is not None:
         doc = await db.guilds.find_one({"_id": str(guild_id)})
-        return doc.get("data", {}) if doc else {}
+        if doc:
+            res = {}
+            if isinstance(doc.get("data"), dict): res.update(doc["data"])
+            for k, v in doc.items():
+                if k not in ("_id", "data"): res[k] = v
+            return res
+        return {}
     path = _db_path(guild_id)
     if path.exists():
         try:
@@ -84,7 +90,7 @@ async def _db_load(guild_id: int) -> dict:
 async def _db_save(guild_id: int, data: dict):
     db = _get_mongo_db()
     if db is not None:
-        await db.guilds.update_one({"_id": str(guild_id)}, {"$set": {"data": data}}, upsert=True)
+        await db.guilds.update_one({"_id": str(guild_id)}, {"$set": data}, upsert=True)
         return
     with open(_db_path(guild_id), "w", encoding="utf-8") as f:
         json.dump(data, f, indent=2, ensure_ascii=False)
@@ -395,7 +401,9 @@ def print_banner(bot_key: str, bot: commands.Bot):
 # ── CARDS GACHA ──────────────────────────────────────────────────────────────
 async def cards_get_templates(guild_id: int) -> list:
     res = await db_get_section(guild_id, 'cards_templates')
-    return res if isinstance(res, list) else []
+    if isinstance(res, list): return res
+    if isinstance(res, dict): return res.get("templates", [])
+    return []
 
 async def cards_save_templates(guild_id: int, data: list):
     await db_save_section(guild_id, 'cards_templates', data)
