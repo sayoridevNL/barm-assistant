@@ -1625,7 +1625,7 @@ async def buy_card(interaction: discord.Interaction, pack: app_commands.Choice[i
     if not guild_id:
         return await interaction.response.send_message("❌ This command must be used in a server.", ephemeral=True)
         
-    if guild_id != 1366404929727762554:
+    if guild_id not in (1366404929727762554, 1049396166250475612):
         return await interaction.response.send_message("❌ Trading cards are not available in this server.", ephemeral=True)
         
     count = pack.value if pack else 1
@@ -1639,12 +1639,12 @@ async def buy_card(interaction: discord.Interaction, pack: app_commands.Choice[i
         await interaction.response.send_message(embed=embed, ephemeral=True)
         return
 
-    templates = await shared.cards_get_templates(guild_id)
+    templates = await shared.cards_get_templates(1366404929727762554)
     if not templates:
         await interaction.response.send_message("No cards exist in this server yet!", ephemeral=True)
         return
         
-    rarities = await shared.cards_get_rarities(guild_id)
+    rarities = await shared.cards_get_rarities(1366404929727762554)
     if isinstance(rarities, dict): rarities = rarities.get("rarities", [])
     if not rarities:
         rarities = [
@@ -1689,11 +1689,11 @@ async def buy_card(interaction: discord.Interaction, pack: app_commands.Choice[i
         pulled_items.append({'id': str(uuid.uuid4()), 'template_id': card.get('id', str(uuid.uuid4())), 'timestamp': int(time.time()), 'locked': False})
         
     # Save to DB
-    inv = await shared.cards_get_inventory(guild_id, interaction.user.id)
+    inv = await shared.cards_get_inventory(1366404929727762554, interaction.user.id)
     cards_list = inv.get('cards', [])
     cards_list.extend(pulled_items)
     inv['cards'] = cards_list
-    await shared.cards_save_inventory(guild_id, interaction.user.id, inv)
+    await shared.cards_save_inventory(1366404929727762554, interaction.user.id, inv)
 
     # Generate Image
     if count == 1:
@@ -1741,21 +1741,29 @@ async def inventory(interaction: discord.Interaction):
         await interaction.response.send_message("Must be used in a server.", ephemeral=True)
         return
         
-    if guild_id != 1366404929727762554:
+    if guild_id not in (1366404929727762554, 1049396166250475612):
         return await interaction.response.send_message("❌ Trading cards are not available in this server.", ephemeral=True)
 
-    inv = await db_get_section(guild_id, "inventory")
-    user_inv = inv.get(str(interaction.user.id), {})
+    user_inv = await shared.cards_get_inventory(1366404929727762554, interaction.user.id)
+    cards_list = user_inv.get('cards', [])
     
-    if not user_inv:
+    if not cards_list:
         await interaction.response.send_message("Your inventory is empty.", ephemeral=True)
         return
         
+    counts = {}
+    for c in cards_list:
+        tid = c.get('template_id')
+        if tid:
+            counts[tid] = counts.get(tid, 0) + 1
+            
+    templates = await shared.cards_get_templates(1366404929727762554)
+    
     lines = []
-    for cid_str, count in user_inv.items():
-        card = next((c for c in bot.cards_db if str(c.get("id")) == cid_str), None)
+    for tid, count in counts.items():
+        card = next((t for t in templates if str(t.get("id")) == str(tid)), None)
         if card:
-            lines.append(f"**{card.get('name')}** ({card.get('rarity')}) x{count}")
+            lines.append(f"**{card.get('name', 'Unknown')}** ({card.get('rarity', 'C')}) x{count}")
             
     if not lines:
         await interaction.response.send_message("Your inventory is empty.", ephemeral=True)
