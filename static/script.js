@@ -1017,6 +1017,7 @@ window.saveNewCard = function() {
     const rarity = document.getElementById('tc-rarity-select').value;
     
     if(!title) return showToast('Invalid input', 'error');
+    if(!img) return showToast('Base Image URL is required', 'error');
     
     const newCard = { id: Date.now(), title, img, type, rarity };
     tcTemplatesCache.push(newCard);
