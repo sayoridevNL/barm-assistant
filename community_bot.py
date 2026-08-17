@@ -1639,12 +1639,12 @@ async def buy_card(interaction: discord.Interaction, pack: app_commands.Choice[i
         await interaction.response.send_message(embed=embed, ephemeral=True)
         return
 
-    templates = await shared.cards_get_templates(1366404929727762554)
+    templates = await shared.cards_get_templates(guild_id)
     if not templates:
         await interaction.response.send_message("No cards exist in this server yet!", ephemeral=True)
         return
         
-    rarities = await shared.cards_get_rarities(1366404929727762554)
+    rarities = await shared.cards_get_rarities(guild_id)
     if isinstance(rarities, dict): rarities = rarities.get("rarities", [])
     if not rarities:
         rarities = [
@@ -1689,11 +1689,11 @@ async def buy_card(interaction: discord.Interaction, pack: app_commands.Choice[i
         pulled_items.append({'id': str(uuid.uuid4()), 'template_id': card.get('id', str(uuid.uuid4())), 'timestamp': int(time.time()), 'locked': False})
         
     # Save to DB
-    inv = await shared.cards_get_inventory(1366404929727762554, interaction.user.id)
+    inv = await shared.cards_get_inventory(guild_id, interaction.user.id)
     cards_list = inv.get('cards', [])
     cards_list.extend(pulled_items)
     inv['cards'] = cards_list
-    await shared.cards_save_inventory(1366404929727762554, interaction.user.id, inv)
+    await shared.cards_save_inventory(guild_id, interaction.user.id, inv)
 
     # Generate Image
     if count == 1:
@@ -1744,7 +1744,7 @@ async def inventory(interaction: discord.Interaction):
     if guild_id not in (1366404929727762554, 1049396166250475612):
         return await interaction.response.send_message("❌ Trading cards are not available in this server.", ephemeral=True)
 
-    user_inv = await shared.cards_get_inventory(1366404929727762554, interaction.user.id)
+    user_inv = await shared.cards_get_inventory(guild_id, interaction.user.id)
     cards_list = user_inv.get('cards', [])
     
     if not cards_list:
@@ -1757,7 +1757,7 @@ async def inventory(interaction: discord.Interaction):
         if tid:
             counts[tid] = counts.get(tid, 0) + 1
             
-    templates = await shared.cards_get_templates(1366404929727762554)
+    templates = await shared.cards_get_templates(guild_id)
     
     lines = []
     for tid, count in counts.items():
