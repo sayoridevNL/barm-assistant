@@ -706,7 +706,10 @@ def save_file(filename):
 
 
 # --- CARDS GACHA ROUTES ---
-CARDS_GUILD_ID = 1366404929727762554
+# Canonical guild id that all cards data is stored/read under. Must stay in sync
+# with CARDS_GUILD_ID in community_bot.py — both CARDS_ALLOWED_GUILD_IDS there
+# (1049396166250475612, 1463541554496012431) share this one card economy.
+CARDS_GUILD_ID = 1049396166250475612
 
 def is_cards_admin():
     uid = session.get('user_id')
