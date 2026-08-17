@@ -1410,6 +1410,10 @@ async def help_cmd(interaction: discord.Interaction) -> None:
 
 # ─────────────────────────────  Custom Suggestions  ─────────────────────────────
 CUSTOM_GUILD_ID = 1366404929727762554
+
+# Must stay in sync with CARDS_GUILD_ID in server.py — the website only ever reads
+# cards data for this single guild, so the bot must not save cards data anywhere else.
+CARDS_GUILD_ID = 1366404929727762554
 SUGGESTION_CHANNEL_ID = 1171457664136532010
 SERVER_OWNER_ID = 879118301169602570
 
@@ -1629,7 +1633,7 @@ async def buy_card(interaction: discord.Interaction, pack: app_commands.Choice[i
     if not guild_id:
         return await interaction.response.send_message("❌ This command must be used in a server.", ephemeral=True)
         
-    if guild_id not in (1366404929727762554, 1049396166250475612):
+    if guild_id != CARDS_GUILD_ID:
         return await interaction.response.send_message("❌ Trading cards are not available in this server.", ephemeral=True)
         
     count = pack.value if pack else 1
@@ -1745,7 +1749,7 @@ async def inventory(interaction: discord.Interaction):
         await interaction.response.send_message("Must be used in a server.", ephemeral=True)
         return
         
-    if guild_id not in (1366404929727762554, 1049396166250475612):
+    if guild_id != CARDS_GUILD_ID:
         return await interaction.response.send_message("❌ Trading cards are not available in this server.", ephemeral=True)
 
     user_inv = await shared.cards_get_inventory(guild_id, interaction.user.id)

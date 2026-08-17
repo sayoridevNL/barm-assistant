@@ -230,6 +230,17 @@ def db_save_section_sync(guild_id, section, data):
     if db is not None:
         db.guilds.update_one({"_id": str(guild_id)}, {"$set": {section: data}}, upsert=True)
 
+def cards_save_inventory_sync(guild_id, user_id, user_inv):
+    # Atomic per-user update — avoids the read-modify-write race on the whole
+    # cards_inventory dict that could silently drop other users' concurrent pulls.
+    db = _get_mongo_db_sync()
+    if db is not None:
+        db.guilds.update_one(
+            {"_id": str(guild_id)},
+            {"$set": {f"cards_inventory.{user_id}": user_inv}},
+            upsert=True
+        )
+
 def get_global_section_sync(section):
     db = _get_mongo_db_sync()
     if db is not None:
@@ -815,7 +826,7 @@ def cards_pull():
     cards_list = inv.get('cards', [])
     cards_list.extend(pulled_items)
     inv['cards'] = cards_list
-    _invs=db_get_section_sync(CARDS_GUILD_ID, 'cards_inventory'); _invs[str(user_id)]=inv; db_save_section_sync(CARDS_GUILD_ID, 'cards_inventory', _invs)
+    cards_save_inventory_sync(CARDS_GUILD_ID, user_id, inv)
     
     new_sayories = get_global_section_sync('economy').get(str(user_id), {}).get('balance', 0)
     

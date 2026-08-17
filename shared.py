@@ -420,10 +420,24 @@ async def cards_get_inventory(guild_id: int, user_id: int) -> dict:
     return inv.get(str(user_id), {}) if isinstance(inv, dict) else {}
 
 async def cards_save_inventory(guild_id: int, user_id: int, user_inv: dict):
-    inv = await db_get_section(guild_id, 'cards_inventory')
-    if not isinstance(inv, dict): inv = {}
-    inv[str(user_id)] = user_inv
-    await db_save_section(guild_id, 'cards_inventory', inv)
+    db = _get_mongo_db()
+    if db is not None:
+        # Atomic per-user update — avoids clobbering other users' concurrent
+        # writes that a full read-modify-write of the whole inventory dict would cause.
+        await db.guilds.update_one(
+            {"_id": str(guild_id)},
+            {"$set": {f"cards_inventory.{user_id}": user_inv}},
+            upsert=True
+        )
+        return
+    # Local JSON fallback (no Mongo configured): still serialize via the guild lock.
+    async with _db_lock(guild_id):
+        d = await _db_load(guild_id)
+        inv = d.setdefault('cards_inventory', {})
+        if not isinstance(inv, dict):
+            inv = d['cards_inventory'] = {}
+        inv[str(user_id)] = user_inv
+        await _db_save(guild_id, d)
 
 async def cards_get_settings(guild_id: int) -> dict:
     res = await db_get_section(guild_id, 'cards_settings')
