@@ -1463,7 +1463,7 @@ class SuggestionView(discord.ui.View):
         await interaction.message.edit(embed=embed, view=None)
 
 async def generate_card_image(card_data: dict) -> io.BytesIO:
-    url = card_data.get("base_image", card_data.get("image_url", "")).replace("&width=100", "")
+    url = card_data.get("img", card_data.get("base_image", card_data.get("image_url", ""))).replace("&width=100", "")
     
     img = None
     if url:
