@@ -391,7 +391,7 @@
                 <label><i class="fa-solid fa-image"></i> Artwork</label>
                 <div id="tcm-dropzone" class="tc-dropzone" style="width: 250px; height: 350px; overflow: hidden; position: relative; margin: 0 auto; background: #000; border-radius: 8px; cursor: pointer; display: flex; align-items: center; justify-content: center; border: 2px dashed var(--border);">
                     <img id="tcm-preview" class="hidden" alt="Card artwork preview" style="position: absolute; transform-origin: top left; pointer-events: none;">
-                    <div id="tcm-dropzone-placeholder" class="tc-dropzone-placeholder" style="pointer-events: none;">
+                    <div id="tcm-dropzone-placeholder" class="tc-dropzone-placeholder" onclick="document.getElementById('tcm-file').click()" style="pointer-events: auto; width: 100%; height: 100%; display: flex; flex-direction: column; justify-content: center; align-items: center;">
                         <i class="fa-solid fa-cloud-arrow-up fa-2x"></i>
                         <p>Click or drag an image here</p>
                         <p class="tc-dropzone-hint">PNG, JPG, WEBP</p>
