@@ -1062,8 +1062,13 @@ function resetTcModalFields() {
     document.getElementById('tcm-dropzone-placeholder').classList.remove('hidden');
     document.getElementById('tcm-upload-status').classList.add('hidden');
     document.getElementById('tcm-file').value = '';
+    document.getElementById('tcm-cropper-controls').classList.add('hidden');
     tcModalUploadedUrl = null;
     tcModalUploadedImageId = null;
+    userZoom = 1.0;
+    userOffsetX = 0;
+    userOffsetY = 0;
+    document.getElementById('tcm-zoom').value = 1.0;
 }
 
 window.openTcCardModal = function(mode, id) {
@@ -1089,10 +1094,21 @@ window.openTcCardModal = function(mode, id) {
         if ([...typeSel.options].some(o => o.value === card.type)) typeSel.value = card.type;
 
         if (card.img) {
+            userZoom = card.zoom || 1.0;
+            userOffsetX = card.offsetX || 0;
+            userOffsetY = card.offsetY || 0;
+            document.getElementById('tcm-zoom').value = userZoom;
+            
             const preview = document.getElementById('tcm-preview');
+            preview.onload = () => {
+                imgNatW = preview.naturalWidth;
+                imgNatH = preview.naturalHeight;
+                updateCropper();
+            };
             preview.src = card.img;
             preview.classList.remove('hidden');
             document.getElementById('tcm-dropzone-placeholder').classList.add('hidden');
+            document.getElementById('tcm-cropper-controls').classList.remove('hidden');
             tcModalUploadedUrl = card.img;
             tcModalUploadedImageId = card.image_id || null;
         }
@@ -1147,10 +1163,22 @@ function uploadTcImage(file) {
             document.getElementById('tcm-upload-status').classList.add('hidden');
             tcModalUploadedUrl = data.url;
             tcModalUploadedImageId = data.image_id;
+            
+            userZoom = 1.0;
+            userOffsetX = 0;
+            userOffsetY = 0;
+            document.getElementById('tcm-zoom').value = 1.0;
+            
             const preview = document.getElementById('tcm-preview');
+            preview.onload = () => {
+                imgNatW = preview.naturalWidth;
+                imgNatH = preview.naturalHeight;
+                updateCropper();
+            };
             preview.src = data.url;
             preview.classList.remove('hidden');
             document.getElementById('tcm-dropzone-placeholder').classList.add('hidden');
+            document.getElementById('tcm-cropper-controls').classList.remove('hidden');
         })
         .catch(e => {
             tcModalUploading = false;
@@ -1175,12 +1203,18 @@ window.submitTcCardModal = function() {
         card.type = type;
         card.rarity = rarity;
         card.img = tcModalUploadedUrl;
+        card.zoom = userZoom;
+        card.offsetX = userOffsetX;
+        card.offsetY = userOffsetY;
         if (tcModalUploadedImageId) card.image_id = tcModalUploadedImageId; else delete card.image_id;
     } else {
         tcTemplatesCache.push({
             id: Date.now(),
             title, type, rarity,
             img: tcModalUploadedUrl,
+            zoom: userZoom,
+            offsetX: userOffsetX,
+            offsetY: userOffsetY,
             image_id: tcModalUploadedImageId || undefined,
         });
     }
@@ -1237,6 +1271,39 @@ function setupTcModalListeners() {
         const file = e.dataTransfer.files && e.dataTransfer.files[0];
         if (file) uploadTcImage(file);
     });
+
+    let isDragging = false;
+    let startX = 0, startY = 0;
+    let startOffsetX = 0, startOffsetY = 0;
+
+    dropzone.addEventListener('mousedown', (e) => {
+        if (!tcModalUploadedUrl) return;
+        isDragging = true;
+        startX = e.clientX;
+        startY = e.clientY;
+        startOffsetX = userOffsetX;
+        startOffsetY = userOffsetY;
+        e.preventDefault();
+    });
+
+    window.addEventListener('mousemove', (e) => {
+        if (!isDragging) return;
+        userOffsetX = startOffsetX + (e.clientX - startX);
+        userOffsetY = startOffsetY + (e.clientY - startY);
+        updateCropper();
+    });
+
+    window.addEventListener('mouseup', () => {
+        isDragging = false;
+    });
+
+    const zoomSlider = document.getElementById('tcm-zoom');
+    if (zoomSlider) {
+        zoomSlider.addEventListener('input', (e) => {
+            userZoom = parseFloat(e.target.value);
+            updateCropper();
+        });
+    }
 
     // Close either modal by clicking its overlay backdrop, or with Escape.
     document.getElementById('tc-card-modal').addEventListener('click', (e) => {

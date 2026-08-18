@@ -1748,12 +1748,23 @@ async def generate_card_image(card_data: dict) -> io.BytesIO:
         
     target_w, target_h = 250, 350
     w, h = img.size
-    ratio = max(target_w / w, target_h / h)
-    new_w, new_h = int(w * ratio), int(h * ratio)
+    
+    zoom = float(card_data.get("zoom", 1.0))
+    offset_x = float(card_data.get("offsetX", 0))
+    offset_y = float(card_data.get("offsetY", 0))
+    
+    base_scale = max(target_w / w, target_h / h)
+    scale = base_scale * zoom
+    new_w, new_h = int(w * scale), int(h * scale)
+    
     img = img.resize((new_w, new_h), Image.Resampling.LANCZOS)
-    left = (new_w - target_w) / 2
-    top = (new_h - target_h) / 2
-    img = img.crop((left, top, left + target_w, top + target_h))
+    
+    canvas = Image.new("RGBA", (target_w, target_h), (0, 0, 0, 255))
+    paste_x = int((target_w - new_w) / 2 + offset_x)
+    paste_y = int((target_h - new_h) / 2 + offset_y)
+    
+    canvas.paste(img, (paste_x, paste_y))
+    img = canvas
 
     rarity = card_data.get("rarity", "R")
     card_type = card_data.get("type", "Unknown")
