@@ -6,7 +6,7 @@ import threading
 import time
 import requests
 from zoneinfo import ZoneInfo
-from flask import Flask, request, jsonify, render_template, session, redirect
+from flask import Flask, request, jsonify, render_template, session, redirect, Response
 from dotenv import load_dotenv
 
 load_dotenv()
@@ -715,6 +715,55 @@ def is_cards_admin():
     uid = session.get('user_id')
     return uid in ["1043235209639886972", "879118301169602570"]
 
+def cards_ingest_image_sync(url):
+    """Download an externally-hosted image (e.g. a pasted Discord attachment
+    link, which carries a signed expiry and eventually 404s) exactly once, and
+    store its bytes permanently in the `card_images` Mongo collection, so card
+    art survives long after the original link has gone stale. Returns the new
+    permanent (relative) URL to store on the template, or None on failure."""
+    db = _get_mongo_db_sync()
+    if db is None:
+        return None
+    try:
+        resp = requests.get(url, timeout=15)
+        resp.raise_for_status()
+        content_type = resp.headers.get('Content-Type', 'image/jpeg').split(';')[0].strip()
+        if not content_type.startswith('image/'):
+            return None
+        import uuid
+        image_id = str(uuid.uuid4())
+        db.card_images.insert_one({
+            "_id": image_id,
+            "data": resp.content,
+            "content_type": content_type,
+            "created_at": time.time(),
+        })
+        return f"/api/cards/image/{image_id}"
+    except Exception as e:
+        print(f"Card image ingest failed for {url}: {e}", flush=True)
+        return None
+
+def _first_img_field(card):
+    for key in ('img', 'base_image', 'image_url'):
+        val = card.get(key)
+        if isinstance(val, str) and val:
+            return key, val
+    return None, None
+
+@app.route('/api/cards/image/<image_id>', methods=['GET'])
+def cards_image(image_id):
+    db = _get_mongo_db_sync()
+    if db is None:
+        return jsonify({'error': 'Storage unavailable'}), 503
+    doc = db.card_images.find_one({"_id": image_id})
+    if not doc:
+        return jsonify({'error': 'Not found'}), 404
+    return Response(
+        doc["data"],
+        mimetype=doc.get("content_type", "image/jpeg"),
+        headers={"Cache-Control": "public, max-age=31536000, immutable"}
+    )
+
 @app.route('/api/cards/settings', methods=['GET', 'POST'])
 def cards_settings():
     if request.method == 'POST':
@@ -740,8 +789,24 @@ def cards_templates():
     if request.method == 'POST':
         if not is_cards_admin(): return jsonify({'error': 'Unauthorized'}), 401
         data = request.json or []
+        warnings = []
+        for card in data:
+            key, img = _first_img_field(card)
+            if key and img.startswith(('http://', 'https://')):
+                # Fresh/edited external URL (e.g. a pasted Discord attachment link) —
+                # ingest it into permanent storage now, before it can expire.
+                # Already-ingested cards have img="/api/cards/image/..." and are skipped.
+                permanent = cards_ingest_image_sync(img)
+                if permanent:
+                    card[key] = permanent
+                    card['image_id'] = permanent.rsplit('/', 1)[-1]
+                else:
+                    warnings.append(f"Couldn't fetch the image for '{card.get('name') or card.get('title') or card.get('id')}' — kept the original link, but it may be broken already.")
         db_save_section_sync(CARDS_GUILD_ID, 'cards_templates', data)
-        return jsonify({'success': True})
+        resp = {'success': True}
+        if warnings:
+            resp['warnings'] = warnings
+        return jsonify(resp)
     templates = db_get_section_sync(CARDS_GUILD_ID, 'cards_templates')
     return jsonify(templates)
 

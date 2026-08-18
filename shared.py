@@ -445,3 +445,17 @@ async def cards_get_settings(guild_id: int) -> dict:
 
 async def cards_save_settings(guild_id: int, data: dict):
     await db_save_section(guild_id, 'cards_settings', data)
+
+async def cards_get_image_bytes(image_id: str):
+    """Fetch a permanently-stored card image straight from Mongo (bypasses HTTP
+    entirely, so the bot doesn't need to know the website's domain and doesn't
+    depend on it being up). Mirrors the `card_images` collection server.py
+    ingests into via POST /api/cards/templates. Returns (bytes, content_type)
+    or (None, None) if unavailable."""
+    db = _get_mongo_db()
+    if db is None or not image_id:
+        return None, None
+    doc = await db.card_images.find_one({"_id": image_id})
+    if not doc:
+        return None, None
+    return doc.get("data"), doc.get("content_type", "image/jpeg")

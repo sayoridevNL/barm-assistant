@@ -1685,23 +1685,45 @@ def get_card_type_theme(card_type: str) -> dict:
     }
 
 async def generate_card_image(card_data: dict) -> io.BytesIO:
-    url = card_data.get("img", card_data.get("base_image", card_data.get("image_url", ""))).replace("&width=100", "")
-    
     img = None
-    if url:
+
+    # Preferred path: images ingested by server.py's /api/cards/templates route are
+    # stored permanently in Mongo and referenced by image_id. Fetching them straight
+    # from Mongo sidesteps expiring Discord CDN links entirely (and doesn't need the
+    # website to be reachable at all).
+    image_id = card_data.get("image_id")
+    if image_id:
         try:
-            async with aiohttp.ClientSession() as session:
-                async with session.get(url) as resp:
-                    if resp.status == 200:
-                        data = await resp.read()
-                        img = Image.open(io.BytesIO(data)).convert("RGBA")
-                        print(f"Card image fetched OK ({len(data)} bytes, mode={img.mode}, size={img.size}): {url}", flush=True)
-                    else:
-                        print(f"Card image fetch failed ({resp.status}): {url}", flush=True)
+            data, _content_type = await cards_get_image_bytes(image_id)
+            if data:
+                img = Image.open(io.BytesIO(data)).convert("RGBA")
+                print(f"Card image loaded from storage OK ({len(data)} bytes, id={image_id})", flush=True)
+            else:
+                print(f"Card image not found in storage for id={image_id}", flush=True)
         except Exception as e:
-            print(f"Card image fetch error for {url}: {e}", flush=True)
-    else:
-        print(f"Card '{card_data.get('name') or card_data.get('title')}' has no image URL set", flush=True)
+            print(f"Card image storage fetch error for id={image_id}: {e}", flush=True)
+
+    # Fallback for any template not yet migrated to permanent storage (or if the
+    # lookup above failed): fetch the raw URL directly. Note this can be an
+    # expiring Discord CDN link and may 404 once that expiry passes — re-saving
+    # the template through the website's admin panel ingests it permanently.
+    if not img:
+        url = card_data.get("img", card_data.get("base_image", card_data.get("image_url", ""))) or ""
+        url = url.replace("&width=100", "")
+        if url:
+            try:
+                async with aiohttp.ClientSession() as session:
+                    async with session.get(url) as resp:
+                        if resp.status == 200:
+                            data = await resp.read()
+                            img = Image.open(io.BytesIO(data)).convert("RGBA")
+                            print(f"Card image fetched OK ({len(data)} bytes, mode={img.mode}, size={img.size}): {url}", flush=True)
+                        else:
+                            print(f"Card image fetch failed ({resp.status}): {url}", flush=True)
+            except Exception as e:
+                print(f"Card image fetch error for {url}: {e}", flush=True)
+        else:
+            print(f"Card '{card_data.get('name') or card_data.get('title')}' has no image URL set", flush=True)
 
     if not img:
         img = Image.new("RGBA", (250, 350), (40, 40, 40, 255))
