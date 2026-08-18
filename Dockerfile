@@ -9,8 +9,8 @@ COPY . /app
 
 # Install Python requirements
 RUN pip install --no-cache-dir --upgrade pip
-RUN pip install --no-cache-dir -r requirements.txt
-RUN pip install -U --pre yt-dlp
+RUN pip install --no-cache-dir --retries 5 --timeout 100 -r requirements.txt
+RUN pip install --no-cache-dir --retries 5 --timeout 100 -U --pre yt-dlp
 
 # Render automatically injects the PORT environment variable
 # Expose the default Render port just in case
