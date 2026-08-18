@@ -1053,11 +1053,48 @@ let tcModalUploadedImageId = null;
 let tcModalUploading = false;
 let tcDeleteId = null;
 
+// Cropper state for the artwork preview inside the create/edit modal.
+const TC_CROP_W = 250;
+const TC_CROP_H = 350;
+let userZoom = 1.0;
+let userOffsetX = 0;
+let userOffsetY = 0;
+let imgNatW = 0;
+let imgNatH = 0;
+
+// Positions the preview image with a single transform: scale it to "cover"
+// the 250x350 frame (so the whole picture is visible the instant it loads,
+// before any zoom is applied), then layer the zoom slider and drag offset
+// on top. The offset is clamped every time so dragging can never pull the
+// image away from an edge and leave an empty gap in the frame.
+function updateCropper() {
+    const preview = document.getElementById('tcm-preview');
+    if (!preview || !imgNatW || !imgNatH) return;
+
+    const coverScale = Math.max(TC_CROP_W / imgNatW, TC_CROP_H / imgNatH);
+    const scale = coverScale * userZoom;
+    const dispW = imgNatW * scale;
+    const dispH = imgNatH * scale;
+
+    const maxOffsetX = Math.max(0, (dispW - TC_CROP_W) / 2);
+    const maxOffsetY = Math.max(0, (dispH - TC_CROP_H) / 2);
+    userOffsetX = Math.min(maxOffsetX, Math.max(-maxOffsetX, userOffsetX));
+    userOffsetY = Math.min(maxOffsetY, Math.max(-maxOffsetY, userOffsetY));
+
+    const translateX = (TC_CROP_W - dispW) / 2 + userOffsetX;
+    const translateY = (TC_CROP_H - dispH) / 2 + userOffsetY;
+
+    preview.style.transform = `translate(${translateX}px, ${translateY}px) scale(${scale})`;
+    preview.classList.add('tc-ready');
+}
+
 function resetTcModalFields() {
     document.getElementById('tcm-title').value = '';
     document.getElementById('tcm-type').selectedIndex = 0;
     const preview = document.getElementById('tcm-preview');
     preview.classList.add('hidden');
+    preview.classList.remove('tc-ready');
+    preview.style.transform = '';
     preview.src = '';
     document.getElementById('tcm-dropzone-placeholder').classList.remove('hidden');
     document.getElementById('tcm-upload-status').classList.add('hidden');
@@ -1068,6 +1105,8 @@ function resetTcModalFields() {
     userZoom = 1.0;
     userOffsetX = 0;
     userOffsetY = 0;
+    imgNatW = 0;
+    imgNatH = 0;
     document.getElementById('tcm-zoom').value = 1.0;
 }
 
@@ -1094,7 +1133,7 @@ window.openTcCardModal = function(mode, id) {
         if ([...typeSel.options].some(o => o.value === card.type)) typeSel.value = card.type;
 
         if (card.img) {
-            userZoom = card.zoom || 1.0;
+            userZoom = Math.min(4, Math.max(1, card.zoom || 1.0));
             userOffsetX = card.offsetX || 0;
             userOffsetY = card.offsetY || 0;
             document.getElementById('tcm-zoom').value = userZoom;
@@ -1272,35 +1311,79 @@ function setupTcModalListeners() {
         if (file) uploadTcImage(file);
     });
 
+    // Pointer events cover mouse, touch and pen with one code path, so
+    // dragging the artwork to reposition it works the same on mobile as
+    // on desktop. Position updates are batched into a single
+    // requestAnimationFrame per tick so drags stay smooth even on quick
+    // swipes.
     let isDragging = false;
+    let dragPointerId = null;
     let startX = 0, startY = 0;
     let startOffsetX = 0, startOffsetY = 0;
+    let dragFrameQueued = false;
 
-    dropzone.addEventListener('mousedown', (e) => {
+    dropzone.addEventListener('pointerdown', (e) => {
         if (!tcModalUploadedUrl) return;
         isDragging = true;
+        dragPointerId = e.pointerId;
         startX = e.clientX;
         startY = e.clientY;
         startOffsetX = userOffsetX;
         startOffsetY = userOffsetY;
+        dropzone.classList.add('tc-dragging');
+        dropzone.setPointerCapture(e.pointerId);
         e.preventDefault();
     });
 
-    window.addEventListener('mousemove', (e) => {
-        if (!isDragging) return;
+    dropzone.addEventListener('pointermove', (e) => {
+        if (!isDragging || e.pointerId !== dragPointerId) return;
         userOffsetX = startOffsetX + (e.clientX - startX);
         userOffsetY = startOffsetY + (e.clientY - startY);
-        updateCropper();
+        if (!dragFrameQueued) {
+            dragFrameQueued = true;
+            requestAnimationFrame(() => {
+                updateCropper();
+                dragFrameQueued = false;
+            });
+        }
     });
 
-    window.addEventListener('mouseup', () => {
+    function endDrag(e) {
+        if (dragPointerId !== null && e && e.pointerId !== dragPointerId) return;
         isDragging = false;
-    });
+        dragPointerId = null;
+        dropzone.classList.remove('tc-dragging');
+    }
+    dropzone.addEventListener('pointerup', endDrag);
+    dropzone.addEventListener('pointercancel', endDrag);
+
+    // Scroll/trackpad zoom, so people don't have to reach for the slider
+    // to fine-tune framing while their hand is already on the image.
+    dropzone.addEventListener('wheel', (e) => {
+        if (!tcModalUploadedUrl) return;
+        e.preventDefault();
+        const zoomSlider = document.getElementById('tcm-zoom');
+        const step = e.deltaY < 0 ? 0.05 : -0.05;
+        userZoom = Math.min(4, Math.max(1, userZoom + step));
+        if (zoomSlider) zoomSlider.value = userZoom;
+        updateCropper();
+    }, { passive: false });
 
     const zoomSlider = document.getElementById('tcm-zoom');
     if (zoomSlider) {
         zoomSlider.addEventListener('input', (e) => {
             userZoom = parseFloat(e.target.value);
+            updateCropper();
+        });
+    }
+
+    const resetPositionBtn = document.getElementById('tcm-reset-position');
+    if (resetPositionBtn) {
+        resetPositionBtn.addEventListener('click', () => {
+            userZoom = 1.0;
+            userOffsetX = 0;
+            userOffsetY = 0;
+            if (zoomSlider) zoomSlider.value = 1.0;
             updateCropper();
         });
     }

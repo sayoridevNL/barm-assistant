@@ -389,9 +389,9 @@
 
             <div class="broadcast-form-group">
                 <label><i class="fa-solid fa-image"></i> Artwork</label>
-                <div id="tcm-dropzone" class="tc-dropzone" style="width: 250px; height: 350px; overflow: hidden; position: relative; margin: 0 auto; background: #000; border-radius: 8px; cursor: pointer; display: flex; align-items: center; justify-content: center; border: 2px dashed var(--border);">
+                <div id="tcm-dropzone" class="tc-dropzone" style="width: 250px; height: 350px; overflow: hidden; position: relative; margin: 0 auto; background: #000; border-radius: 8px; display: flex; align-items: center; justify-content: center; border: 2px dashed var(--border);">
                     <img id="tcm-preview" class="hidden" alt="Card artwork preview" style="position: absolute; transform-origin: top left; pointer-events: none;">
-                    <div id="tcm-dropzone-placeholder" class="tc-dropzone-placeholder" onclick="document.getElementById('tcm-file').click()" style="pointer-events: auto; width: 100%; height: 100%; display: flex; flex-direction: column; justify-content: center; align-items: center;">
+                    <div id="tcm-dropzone-placeholder" class="tc-dropzone-placeholder" onclick="document.getElementById('tcm-file').click()" style="pointer-events: auto; width: 100%; height: 100%; display: flex; flex-direction: column; justify-content: center; align-items: center; cursor: pointer;">
                         <i class="fa-solid fa-cloud-arrow-up fa-2x"></i>
                         <p>Click or drag an image here</p>
                         <p class="tc-dropzone-hint">PNG, JPG, WEBP</p>
@@ -399,10 +399,12 @@
                     <div id="tcm-upload-status" class="tc-upload-status hidden" style="position: absolute; z-index: 10; background: rgba(0,0,0,0.7); color: white; padding: 5px 10px; border-radius: 4px;"></div>
                 </div>
                 <div id="tcm-cropper-controls" class="hidden" style="margin-top: 1rem; text-align: center;">
+                    <p class="tc-cropper-hint"><i class="fa-solid fa-arrows-up-down-left-right"></i> Drag the image to reposition it</p>
                     <label for="tcm-zoom" style="display: block; font-size: 0.8rem; margin-bottom: 0.5rem; color: var(--text-muted);">ZOOM</label>
-                    <input type="range" id="tcm-zoom" min="0.1" max="5" step="0.05" value="1" style="width: 80%; cursor: pointer;">
-                    <div style="margin-top: 0.5rem;">
+                    <input type="range" id="tcm-zoom" min="1" max="4" step="0.02" value="1" style="width: 80%; cursor: pointer;">
+                    <div class="tc-cropper-actions">
                         <button type="button" class="btn-secondary" style="font-size: 0.8rem; padding: 0.4rem 0.8rem;" onclick="document.getElementById('tcm-file').click()"><i class="fa-solid fa-upload"></i> Replace Artwork</button>
+                        <button type="button" class="btn-secondary" id="tcm-reset-position" style="font-size: 0.8rem; padding: 0.4rem 0.8rem;"><i class="fa-solid fa-arrows-rotate"></i> Reset Position</button>
                     </div>
                 </div>
                 <input type="file" id="tcm-file" accept="image/*" class="hidden">

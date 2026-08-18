@@ -850,11 +850,33 @@ textarea { resize: vertical; }
 .tc-dropzone-placeholder i { color: var(--pink); margin-bottom: .5rem; }
 .tc-dropzone-placeholder p { margin: .35rem 0 0; font-size: .85rem; }
 .tc-dropzone-hint { color: var(--faint); font-size: .74rem !important; }
+
+/* Trading card artwork cropper: the image is positioned with a single
+   `transform` (translate + scale) anchored top-left, so panning and
+   zooming animate together smoothly and stay GPU-accelerated. */
+.tc-dropzone { cursor: grab; touch-action: none; }
+.tc-dropzone.tc-dragging { cursor: grabbing; }
+.tc-dropzone.tc-dragging #tcm-preview { transition: none; }
 #tcm-preview {
-    width: 100%;
-    max-height: 320px;
-    object-fit: contain;
-    display: block;
+    max-width: none;
+    top: 0;
+    left: 0;
+    opacity: 0;
+    transition: transform .16s cubic-bezier(.22, .68, .36, 1), opacity .2s ease;
+    will-change: transform;
+}
+#tcm-preview.tc-ready { opacity: 1; }
+.tc-cropper-hint {
+    margin-top: .5rem;
+    color: var(--faint);
+    font-size: .74rem;
+    text-align: center;
+}
+.tc-cropper-actions {
+    margin-top: .6rem;
+    display: flex;
+    gap: .5rem;
+    justify-content: center;
 }
 .tc-upload-status {
     position: absolute;
