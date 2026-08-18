@@ -1010,33 +1010,100 @@ function updateTcRaritySelect() {
     });
 }
 
-window.saveNewCard = function() {
-    const title = document.getElementById('tc-title').value;
-    const img = document.getElementById('tc-image').value;
-    const type = document.getElementById('tc-type').value;
-    const rarity = document.getElementById('tc-rarity-select').value;
-    
-    if(!title) return showToast('Invalid input', 'error');
-    if(!img) return showToast('Base Image URL is required', 'error');
-    
-    const newCard = { id: Date.now(), title, img, type, rarity };
-    tcTemplatesCache.push(newCard);
-    
-    fetch('/api/cards/templates', {
+// Persists the current tcTemplatesCache array to the server (used for create,
+// edit, and delete alike, since the backend replaces the whole template list).
+// Surfaces any per-card image-ingest warnings the backend reports, since a
+// silently-kept dead Discord CDN link is exactly what causes broken /buy_card
+// pulls later.
+function persistTcTemplates(successMessage) {
+    return fetch('/api/cards/templates', {
         method: 'POST',
         headers: {'Content-Type': 'application/json'},
         body: JSON.stringify(tcTemplatesCache)
-    }).then(res => {
-        if(res.ok) {
-            showToast('Card saved!', 'success');
-            fetchTcData();
-        } else {
-            showToast('Failed to save card', 'error');
+    }).then(res => res.json().catch(() => ({})).then(data => ({ ok: res.ok, data }))
+    ).then(({ ok, data }) => {
+        if (!ok) {
+            showToast(data.error || 'Failed to save', 'error');
+            return false;
         }
+        if (data.warnings && data.warnings.length) {
+            data.warnings.forEach(w => showToast(w, 'error'));
+        } else {
+            showToast(successMessage, 'success');
+        }
+        fetchTcData();
+        return true;
     }).catch(e => {
         console.error(e);
-        showToast('Error saving card', 'error');
+        showToast('Error saving card(s)', 'error');
+        return false;
     });
+}
+
+window.saveNewCard = function() {
+    const titleEl = document.getElementById('tc-title');
+    const imgEl = document.getElementById('tc-image');
+    const typeEl = document.getElementById('tc-type');
+    const rarityEl = document.getElementById('tc-rarity-select');
+
+    const title = titleEl.value.trim();
+    const img = imgEl.value.trim();
+    const type = typeEl.value;
+    const rarity = rarityEl.value;
+
+    if(!title) return showToast('Invalid input', 'error');
+    if(!img) return showToast('Base Image URL is required', 'error');
+
+    const newCard = { id: Date.now(), title, img, type, rarity };
+    tcTemplatesCache.push(newCard);
+
+    persistTcTemplates('Card saved!').then(ok => {
+        if (ok) {
+            titleEl.value = '';
+            imgEl.value = '';
+        }
+    });
+}
+
+// Admin: edit an existing card's fields in place. Re-submitting a fresh image
+// URL here re-triggers server-side permanent ingestion, which is how a card
+// whose original Discord attachment link expired gets fixed.
+window.editTcCard = function(id) {
+    const card = tcTemplatesCache.find(c => String(c.id) === String(id));
+    if (!card) return showToast('Card not found', 'error');
+
+    const title = prompt('Card Title:', card.title || card.name || '');
+    if (title === null) return;
+    const img = prompt('Base Image URL (paste a fresh link if the old one broke):', card.img || '');
+    if (img === null) return;
+    const rarity = prompt('Rarity:', card.rarity || '');
+    if (rarity === null) return;
+    const type = prompt('Type:', card.type || '');
+    if (type === null) return;
+
+    if (!title.trim() || !img.trim()) return showToast('Title and image are required', 'error');
+
+    card.title = title.trim();
+    card.rarity = rarity.trim();
+    card.type = type.trim();
+    if (img.trim() !== card.img) {
+        // New URL supplied — clear the stale permanent-storage id so the
+        // backend knows this is a fresh link that needs (re-)ingesting.
+        card.img = img.trim();
+        delete card.image_id;
+    }
+
+    persistTcTemplates('Card updated!');
+}
+
+// Admin: remove a card template entirely.
+window.deleteTcCard = function(id) {
+    const card = tcTemplatesCache.find(c => String(c.id) === String(id));
+    if (!card) return;
+    if (!confirm(`Delete "${card.title || card.name || 'this card'}"? This can't be undone.`)) return;
+
+    tcTemplatesCache = tcTemplatesCache.filter(c => String(c.id) !== String(id));
+    persistTcTemplates('Card deleted.');
 }
 
 
@@ -1074,17 +1141,37 @@ function renderTcCarousel() {
         const owned = count > 0;
         const c = document.createElement('div');
         c.className = `tc-card ${owned ? 'discovered' : 'undiscovered'}`;
-        
+
         let titleHtml = '';
         if(owned) {
             titleHtml = `<div style="position:absolute; bottom:5px; width:100%; text-align:center; color:white; font-size:0.8rem; font-weight:bold; text-shadow:1px 1px 2px black;">${t.title || t.name || 'Unknown'} (x${count})</div>`;
         }
-        
+
+        // A card whose image is still a raw external (e.g. Discord CDN) link
+        // means permanent ingestion never succeeded — that link can expire
+        // and 404 out, which is exactly what breaks /buy_card. Flag it.
+        const isBroken = !!(t.img && /^https?:\/\//i.test(t.img) && !t.image_id);
+
+        const rarityColor = (tcRarities.find(r => r.name === t.rarity) || {}).color;
+        const rarityStyle = rarityColor ? ` style="background:${rarityColor}; color:#111;"` : '';
+
+        let adminHtml = '';
+        if (typeof IS_ADMIN !== 'undefined' && IS_ADMIN) {
+            adminHtml = `
+                <div class="tc-card-admin-actions">
+                    <button class="tc-admin-btn edit" title="Edit card" onclick="event.stopPropagation(); editTcCard('${t.id}')"><i class="fa-solid fa-pen"></i></button>
+                    <button class="tc-admin-btn delete" title="Delete card" onclick="event.stopPropagation(); deleteTcCard('${t.id}')"><i class="fa-solid fa-trash"></i></button>
+                </div>
+            `;
+        }
+
         c.innerHTML = `
             <img class="tc-image" src="${t.img || 'https://via.placeholder.com/200x280'}" />
-            <div class="tc-rarity badge badge-${t.rarity}">${t.rarity}</div>
-            <div class="tc-type badge badge-dark">${t.type}</div>
+            <div class="tc-rarity badge"${rarityStyle}>${t.rarity || ''}</div>
+            <div class="tc-type badge badge-dark">${t.type || ''}</div>
+            ${isBroken ? '<div class="tc-card-broken"><i class="fa-solid fa-triangle-exclamation"></i> Image link broken — edit to fix</div>' : ''}
             ${titleHtml}
+            ${adminHtml}
         `;
         carousel.appendChild(c);
     });

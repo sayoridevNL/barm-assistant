@@ -663,6 +663,69 @@ textarea { resize: vertical; }
     100% { transform: scale(3) rotate(15deg); opacity: 0; }
 }
 
+.tc-image { display: block; }
+.tc-rarity, .tc-type {
+    position: absolute;
+    z-index: 2;
+    padding: .2rem .5rem;
+    border-radius: 999px;
+    font-size: .62rem;
+    font-weight: 900;
+    letter-spacing: .05em;
+    text-shadow: 0 1px 2px rgba(0,0,0,.5);
+    box-shadow: 0 2px 6px rgba(0,0,0,.35);
+}
+.tc-rarity { top: .5rem; left: .5rem; }
+.tc-type { top: .5rem; right: .5rem; }
+.badge { color: #fff; }
+.badge-dark { background: rgba(20, 18, 32, .82); border: 1px solid rgba(255,255,255,.15); color: #eee; }
+
+.tc-card-broken {
+    position: absolute;
+    inset: auto 0 0 0;
+    z-index: 2;
+    background: rgba(236, 96, 115, .88);
+    color: #fff;
+    font-size: .62rem;
+    font-weight: 800;
+    text-align: center;
+    padding: .3rem .4rem;
+    letter-spacing: .02em;
+}
+.tc-card-admin-actions {
+    position: absolute;
+    inset: 0;
+    z-index: 3;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: .6rem;
+    background: rgba(15, 12, 26, 0);
+    opacity: 0;
+    transition: opacity .2s var(--ease), background .2s var(--ease);
+    pointer-events: none;
+}
+.tc-card:hover .tc-card-admin-actions {
+    opacity: 1;
+    background: rgba(15, 12, 26, .55);
+    pointer-events: auto;
+}
+.tc-admin-btn {
+    display: grid;
+    place-items: center;
+    width: 2.2rem;
+    height: 2.2rem;
+    border-radius: 50%;
+    border: 1px solid rgba(255,255,255,.25);
+    background: var(--surface-strong);
+    color: var(--text);
+    cursor: pointer;
+    transition: transform .15s var(--ease-bounce), background .15s var(--ease);
+}
+.tc-admin-btn:hover { transform: translateY(-2px) scale(1.05); }
+.tc-admin-btn.edit:hover { color: var(--violet); }
+.tc-admin-btn.delete:hover { color: var(--danger); }
+
 #tc-rarity-list li {
     padding: 0.5rem;
     margin-bottom: 0.5rem;
