@@ -1695,12 +1695,13 @@ async def generate_card_image(card_data: dict) -> io.BytesIO:
                     if resp.status == 200:
                         data = await resp.read()
                         img = Image.open(io.BytesIO(data)).convert("RGBA")
+                        print(f"Card image fetched OK ({len(data)} bytes, mode={img.mode}, size={img.size}): {url}", flush=True)
                     else:
-                        print(f"Card image fetch failed ({resp.status}): {url}")
+                        print(f"Card image fetch failed ({resp.status}): {url}", flush=True)
         except Exception as e:
-            print(f"Card image fetch error for {url}: {e}")
+            print(f"Card image fetch error for {url}: {e}", flush=True)
     else:
-        print(f"Card '{card_data.get('name') or card_data.get('title')}' has no image URL set")
+        print(f"Card '{card_data.get('name') or card_data.get('title')}' has no image URL set", flush=True)
 
     if not img:
         img = Image.new("RGBA", (250, 350), (40, 40, 40, 255))
