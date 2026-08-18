@@ -1472,6 +1472,218 @@ class SuggestionView(discord.ui.View):
         embed.title = "❌ Rejected Suggestion"
         await interaction.message.edit(embed=embed, view=None)
 
+# ── CARD FRAME STYLING (Umamusume-inspired) ──────────────────────────────────
+# Full rarity list (must match the drop table in shared.py / server.py fallback rarities)
+# ── CARD RARITY STYLING (Umamusume-inspired frame colors) ────────────────────
+# Full rarity list (must match the drop table in shared.py / server.py fallback rarities)
+CARD_RARITY_STYLE = {
+    "C":   {"base": (176, 141, 98),  "hi": (222, 200, 170), "lo": (110, 85, 55),  "stars": 1, "level": 10, "prismatic": False},
+    "UC":  {"base": (96, 189, 122),  "hi": (190, 240, 200), "lo": (50, 120, 70),  "stars": 2, "level": 20, "prismatic": False},
+    "R":   {"base": (90, 170, 235),  "hi": (200, 228, 250), "lo": (40, 95, 150),  "stars": 3, "level": 30, "prismatic": False},
+    "SR":  {"base": (255, 195, 40),  "hi": (255, 235, 180), "lo": (170, 120, 10), "stars": 4, "level": 40, "prismatic": False},
+    "SSR": {"base": (255, 110, 170), "hi": (255, 210, 90),  "lo": (170, 40, 100), "stars": 5, "level": 50, "prismatic": False},
+    "SSL": {"base": (130, 210, 255), "hi": (255, 255, 255), "lo": (60, 130, 180), "stars": 6, "level": 60, "prismatic": True},
+    "USL": {"base": (255, 215, 120), "hi": (255, 255, 255), "lo": (200, 120, 30), "stars": 7, "level": 70, "prismatic": True},
+}
+CARD_RAINBOW_RING = [(255, 90, 90), (255, 170, 60), (255, 235, 80), (110, 220, 110), (90, 190, 255), (140, 120, 255), (230, 110, 230)]
+
+# Card-type "set" -> broad category, used only as a fallback theme for any type
+# not covered by CARD_TYPE_THEME_MAP below (see _card_category / get_card_type_theme).
+CARD_TRIP_TYPES = {"Texel", "Berlijn", "Tikibad", "Bobbejaanland", "Uitje"}
+
+def _card_category(card_type: str) -> str:
+    t = card_type or ""
+    if t in CARD_TRIP_TYPES:
+        return "trip"
+    if "HAVO" in t or "Examen" in t:
+        return "school"
+    if t == "IRL Autisten" or "Gamemiddag" in t:
+        return "hangout"
+    return "other"
+
+CARD_CATEGORY_STYLE = {
+    "trip":    {"accent": (46, 160, 110),  "icon": "T"},   # Trip & Adventure
+    "school":  {"accent": (65, 130, 235),  "icon": "S"},   # School Life
+    "hangout": {"accent": (150, 110, 230), "icon": "G"},   # Hangout & Gaming
+    "other":   {"accent": (140, 140, 140), "icon": "?"},
+}
+
+# ── CARD TYPE PATTERNS (per-set border themes) ───────────────────────────────
+# Each pattern function returns a full-canvas RGB image; only the ring-shaped
+# border area of the card actually uses it (see generate_card_image), so the
+# artwork itself is never covered.
+
+def _pattern_stripes_horizontal(colors, w, h):
+    img = Image.new("RGB", (w, h))
+    d = ImageDraw.Draw(img)
+    n = len(colors)
+    band = h / n
+    for i, c in enumerate(colors):
+        y0 = int(i * band)
+        y1 = int((i + 1) * band) if i < n - 1 else h
+        d.rectangle([(0, y0), (w, y1)], fill=c)
+    return img
+
+def _pattern_stripes_vertical(colors, w, h):
+    img = Image.new("RGB", (w, h))
+    d = ImageDraw.Draw(img)
+    n = len(colors)
+    band = w / n
+    for i, c in enumerate(colors):
+        x0 = int(i * band)
+        x1 = int((i + 1) * band) if i < n - 1 else w
+        d.rectangle([(x0, 0), (x1, h)], fill=c)
+    return img
+
+def _pattern_tiki(w, h):
+    import math
+    img = Image.new("RGB", (w, h), (0, 121, 107))
+    d = ImageDraw.Draw(img)
+    for band_i, (yc, col) in enumerate([(h * 0.28, (255, 138, 26)), (h * 0.62, (0, 150, 136)), (h * 0.9, (255, 111, 0))]):
+        pts = [(x, yc + 10 * math.sin(x / 18 + band_i)) for x in range(0, w + 1, 6)]
+        d.line(pts, fill=col, width=10)
+    return img
+
+def _pattern_notebook(base_color, w, h):
+    bg = tuple(min(255, int(c * 0.35 + 180)) for c in base_color)
+    img = Image.new("RGB", (w, h), bg)
+    d = ImageDraw.Draw(img)
+    for y in range(18, h, 16):
+        d.line([(0, y), (w, y)], fill=base_color, width=1)
+    d.line([(22, 0), (22, h)], fill=(220, 80, 80), width=2)
+    return img
+
+def _pattern_hazard(w, h):
+    img = Image.new("RGB", (w, h), (20, 20, 20))
+    d = ImageDraw.Draw(img)
+    stripe_w = 18
+    for x in range(-h, w + h, stripe_w * 2):
+        d.polygon([(x, 0), (x + stripe_w, 0), (x + stripe_w - h, h), (x - h, h)], fill=(230, 30, 30))
+    return img
+
+def _pattern_diploma(w, h):
+    img = Image.new("RGB", (w, h), (212, 175, 55))
+    d = ImageDraw.Draw(img)
+    for y in range(10, h, 20):
+        for x in range(10, w, 20):
+            d.ellipse([(x, y), (x + 3, y + 3)], fill=(255, 255, 255))
+    return img
+
+def _pattern_infinity(w, h):
+    img = Image.new("RGB", (w, h), (255, 250, 240))
+    d = ImageDraw.Draw(img)
+    for i, col in enumerate(CARD_RAINBOW_RING):
+        d.line([(0, 20 + i * 8), (w, 20 + i * 8)], fill=col, width=3)
+        d.line([(0, h - 20 - i * 8), (w, h - 20 - i * 8)], fill=col, width=3)
+    return img
+
+def _pattern_arcade(primary, secondary, w, h):
+    img = Image.new("RGB", (w, h), secondary)
+    d = ImageDraw.Draw(img)
+    cell = 14
+    for gy in range(0, h, cell):
+        for gx in range(0, w, cell):
+            if ((gx // cell) + (gy // cell)) % 2 == 0:
+                d.rectangle([(gx, gy), (gx + cell, gy + cell)], fill=primary)
+    return img
+
+def _pattern_sunset(colors, w, h):
+    img = Image.new("RGB", (w, h))
+    d = ImageDraw.Draw(img)
+    n = len(colors)
+    for y in range(h):
+        idx = min(n - 1, int((y / h) * n))
+        d.line([(0, y), (w, y)], fill=colors[idx])
+    return img
+
+def _gamemiddag_theme(card_type: str) -> dict:
+    import re
+    t = card_type.lower()
+    if "henry" in t:
+        primary, secondary, code = (60, 170, 255), (10, 40, 70), "H"
+    elif "barm" in t:
+        primary, secondary, code = (220, 80, 220), (50, 10, 60), "B"
+    elif "simon" in t:
+        primary, secondary, code = (255, 170, 40), (70, 40, 0), "S"
+    else:
+        primary, secondary, code = (0, 220, 120), (10, 50, 30), "G"
+    m = re.search(r"20\d{2}", card_type)
+    year = m.group(0)[-2:] if m else "??"
+    return {
+        "pattern_fn": lambda w, h: _pattern_arcade(primary, secondary, w, h),
+        "ribbon_text": f"{code}{year}",
+        "ribbon_color": primary,
+    }
+
+# Explicit per-set themes. Trip & Adventure cards are based on real flags
+# (Texel's municipal flag, the German flag for Berlijn, the Belgian flag for
+# Bobbejaanland); School Life uses a "ruled notebook" motif that escalates in
+# urgency towards exams; Hangout & Gaming (aside from the per-host Gamemiddag
+# arcade pattern above) gets its own look too.
+CARD_TYPE_THEME_MAP = {
+    "Texel": {  # Texel municipal flag: green over black
+        "pattern_fn": lambda w, h: _pattern_stripes_horizontal([(0, 110, 60), (20, 20, 20)], w, h),
+        "ribbon_text": "TX", "ribbon_color": (0, 110, 60),
+    },
+    "Berlijn": {  # German flag: black-red-gold
+        "pattern_fn": lambda w, h: _pattern_stripes_horizontal([(0, 0, 0), (221, 0, 0), (255, 206, 0)], w, h),
+        "ribbon_text": "DE", "ribbon_color": (221, 0, 0),
+    },
+    "Bobbejaanland": {  # Belgian flag: black-yellow-red
+        "pattern_fn": lambda w, h: _pattern_stripes_vertical([(0, 0, 0), (255, 224, 0), (237, 41, 57)], w, h),
+        "ribbon_text": "BE", "ribbon_color": (237, 41, 57),
+    },
+    "Tikibad": {  # Tropical / Polynesian pool theme
+        "pattern_fn": _pattern_tiki,
+        "ribbon_text": "TIK", "ribbon_color": (255, 138, 26),
+    },
+    "Uitje": {  # Generic day-trip: warm sunset gradient
+        "pattern_fn": lambda w, h: _pattern_sunset([(255, 140, 60), (255, 94, 98), (150, 60, 120)], w, h),
+        "ribbon_text": "UIT", "ribbon_color": (255, 140, 60),
+    },
+    "Rookie 1-2-3 HAVO": {
+        "pattern_fn": lambda w, h: _pattern_notebook((120, 170, 210), w, h),
+        "ribbon_text": "RK", "ribbon_color": (120, 170, 210),
+    },
+    "4HAVO": {
+        "pattern_fn": lambda w, h: _pattern_notebook((210, 140, 80), w, h),
+        "ribbon_text": "4H", "ribbon_color": (210, 140, 80),
+    },
+    "5HAVO": {
+        "pattern_fn": lambda w, h: _pattern_notebook((220, 90, 60), w, h),
+        "ribbon_text": "5H", "ribbon_color": (220, 90, 60),
+    },
+    "5HAVO EXAMENTIJD": {  # exam-stress hazard stripes
+        "pattern_fn": _pattern_hazard,
+        "ribbon_text": "EX!", "ribbon_color": (230, 30, 30),
+    },
+    "6HAVO": {
+        "pattern_fn": lambda w, h: _pattern_notebook((60, 170, 70), w, h),
+        "ribbon_text": "6H", "ribbon_color": (60, 170, 70),
+    },
+    "Examen Uitrijking": {  # graduation: gold diploma pattern
+        "pattern_fn": _pattern_diploma,
+        "ribbon_text": "DIP", "ribbon_color": (212, 175, 55),
+    },
+    "IRL Autisten": {
+        "pattern_fn": _pattern_infinity,
+        "ribbon_text": "IRL", "ribbon_color": (255, 250, 240),
+    },
+}
+
+def get_card_type_theme(card_type: str) -> dict:
+    if card_type in CARD_TYPE_THEME_MAP:
+        return CARD_TYPE_THEME_MAP[card_type]
+    if "Gamemiddag" in (card_type or ""):
+        return _gamemiddag_theme(card_type)
+    # Fallback for any future/unlisted type: solid category color.
+    cat_style = CARD_CATEGORY_STYLE[_card_category(card_type)]
+    return {
+        "pattern_fn": lambda w, h: Image.new("RGB", (w, h), cat_style["accent"]),
+        "ribbon_text": cat_style["icon"],
+        "ribbon_color": cat_style["accent"],
+    }
+
 async def generate_card_image(card_data: dict) -> io.BytesIO:
     url = card_data.get("img", card_data.get("base_image", card_data.get("image_url", ""))).replace("&width=100", "")
     
@@ -1501,128 +1713,115 @@ async def generate_card_image(card_data: dict) -> io.BytesIO:
     left = (new_w - target_w) / 2
     top = (new_h - target_h) / 2
     img = img.crop((left, top, left + target_w, top + target_h))
-    
-    card_type = card_data.get("type", "Unknown")
-    
-    # ── THEMATIC OVERLAYS ──
-    # Trip & Adventure Set
-    if card_type == "Texel":
-        overlay = Image.new("RGBA", (target_w, target_h), (34, 139, 34, 40)) # Green/Black overlay
-        img = Image.alpha_composite(img, overlay)
-        draw = ImageDraw.Draw(img)
-        draw.rectangle([(0,0), (target_w-1, target_h-1)], outline=(0, 0, 0), width=12)
-        draw.rectangle([(2,2), (target_w-3, target_h-3)], outline=(34, 139, 34), width=8)
-    elif card_type == "Berlijn":
-        draw = ImageDraw.Draw(img)
-        draw.rectangle([(0,0), (target_w-1, target_h-1)], outline=(0, 0, 0), width=15)
-        draw.rectangle([(3,3), (target_w-4, target_h-4)], outline=(255, 0, 0), width=10)
-        draw.rectangle([(6,6), (target_w-7, target_h-7)], outline=(255, 215, 0), width=5)
-    elif card_type == "Tikibad":
-        overlay = Image.new("RGBA", (target_w, target_h), (0, 191, 255, 60)) # Splash blue
-        img = Image.alpha_composite(img, overlay)
-        draw = ImageDraw.Draw(img)
-        draw.rectangle([(0,0), (target_w-1, target_h-1)], outline=(32, 178, 170), width=12)
-    elif card_type in ["Bobbejaanland", "Uitje"]:
-        draw = ImageDraw.Draw(img)
-        draw.rectangle([(0,0), (target_w-1, target_h-1)], outline=(139, 69, 19), width=14)
-    # School Life Set
-    elif "HAVO" in card_type or "Examen" in card_type:
-        draw = ImageDraw.Draw(img)
-        if card_type == "Rookie 1-2-3 HAVO":
-            draw.rectangle([(0,0), (target_w-1, target_h-1)], outline=(173, 216, 230), width=12)
-        elif card_type == "4HAVO":
-            draw.rectangle([(0,0), (target_w-1, target_h-1)], outline=(244, 164, 96), width=12)
-        elif card_type == "5HAVO":
-            draw.rectangle([(0,0), (target_w-1, target_h-1)], outline=(255, 69, 0), width=12)
-        elif card_type == "5HAVO EXAMENTIJD":
-            draw.rectangle([(0,0), (target_w-1, target_h-1)], outline=(255, 0, 0), width=16)
-            overlay = Image.new("RGBA", (target_w, target_h), (255, 0, 0, 30))
-            img = Image.alpha_composite(img, overlay)
-            draw = ImageDraw.Draw(img)
-        elif card_type == "6HAVO":
-            draw.rectangle([(0,0), (target_w-1, target_h-1)], outline=(50, 205, 50), width=12)
-        elif card_type == "Examen Uitrijking":
-            draw.rectangle([(0,0), (target_w-1, target_h-1)], outline=(255, 215, 0), width=20)
-            draw.rectangle([(5,5), (target_w-6, target_h-6)], outline=(255, 255, 255), width=5)
-    # Hangout & Gaming Set
-    elif card_type == "IRL Autisten":
-        draw = ImageDraw.Draw(img)
-        draw.rectangle([(0,0), (target_w-1, target_h-1)], outline=(255, 250, 240), width=18)
-    elif "Gamemiddagen" in card_type or "Gamemiddag" in card_type:
-        draw = ImageDraw.Draw(img)
-        if "Barm" in card_type:
-            draw.rectangle([(0,0), (target_w-1, target_h-1)], outline=(138, 43, 226), width=14)
-        else:
-            draw.rectangle([(0,0), (target_w-1, target_h-1)], outline=(0, 255, 0), width=14)
-    else:
-        draw = ImageDraw.Draw(img)
-        
+
     rarity = card_data.get("rarity", "R")
-    
-    # Umamusume style rarity colors
-    # SSR: Rainbow/Gold (using deep gold/orange gradient-like colors)
-    # SR: Gold/Silver
-    # R: Silver/Blue
-    color = {"R": (192, 192, 192), "SR": (255, 215, 0), "SSR": (255, 140, 0), "USL": (255, 255, 255)}.get(rarity, (200, 200, 200))
-    inner_color = {"R": (135, 206, 235), "SR": (218, 165, 32), "SSR": (255, 0, 127), "USL": (200, 200, 255)}.get(rarity, (255,255,255))
-    
-    # If it wasn't one of the special custom borders, draw the standard rarity border
-    if card_type not in ["Texel", "Berlijn", "Tikibad", "Bobbejaanland", "Uitje", "Rookie 1-2-3 HAVO", "4HAVO", "5HAVO", "5HAVO EXAMENTIJD", "6HAVO", "Examen Uitrijking", "IRL Autisten"] and "Gamemiddag" not in card_type:
-        # Outer thick border
-        draw.rectangle([(0,0), (target_w-1, target_h-1)], outline=color, width=12)
-        # Inner accent border to give a "metallic/framed" look
-        draw.rectangle([(10,10), (target_w-11, target_h-11)], outline=inner_color, width=2)
-    
-    # Bottom name banner (gradient/colored instead of plain black)
-    draw.rectangle([(0, target_h-55), (target_w, target_h)], fill=(20, 20, 30, 230))
-    # A colored top strip for the name banner based on rarity
-    draw.rectangle([(0, target_h-55), (target_w, target_h-52)], fill=color)
-    
+    card_type = card_data.get("type", "Unknown")
+    style = CARD_RARITY_STYLE.get(rarity, CARD_RARITY_STYLE["R"])
+    theme = get_card_type_theme(card_type)
+    base, hi, lo = style["base"], style["hi"], style["lo"]
+
+    # Subtle tint (matching this specific type's ribbon color) + bottom vignette
+    # so the name plate stays readable regardless of the source photo.
+    wash = Image.new("RGBA", (target_w, target_h), tuple(theme["ribbon_color"]) + (18,))
+    img = Image.alpha_composite(img, wash)
+    vignette = Image.new("RGBA", (target_w, target_h), (0, 0, 0, 0))
+    vdraw = ImageDraw.Draw(vignette)
+    fade_h = 90
+    for i in range(fade_h):
+        alpha = int(120 * (i / fade_h))
+        vdraw.line([(0, target_h - fade_h + i), (target_w, target_h - fade_h + i)], fill=(0, 0, 0, alpha))
+    img = Image.alpha_composite(img, vignette)
+
+    # ── FRAME / BORDER: type pattern in the ring, rarity accent line inside it ──
+    border_w = 10
+    inset = border_w + 2
+    outer_radius, inner_radius = 16, max(0, 16 - inset)
+    ring_mask = Image.new("L", (target_w, target_h), 0)
+    rdraw = ImageDraw.Draw(ring_mask)
+    rdraw.rounded_rectangle([(0, 0), (target_w - 1, target_h - 1)], radius=outer_radius, fill=255)
+    rdraw.rounded_rectangle([(inset, inset), (target_w - 1 - inset, target_h - 1 - inset)], radius=inner_radius, fill=0)
+
+    pattern_img = theme["pattern_fn"](target_w, target_h).convert("RGBA")
+    img = Image.composite(pattern_img, img, ring_mask)
+
+    if style["prismatic"]:
+        # Holographic sweep over the type pattern for the top two rarities
+        shimmer = Image.new("RGBA", (target_w, target_h), (0, 0, 0, 0))
+        sdraw = ImageDraw.Draw(shimmer)
+        n = len(CARD_RAINBOW_RING)
+        band = target_w / n
+        for i, c in enumerate(CARD_RAINBOW_RING):
+            x0 = int(i * band)
+            x1 = int((i + 1) * band) if i < n - 1 else target_w
+            sdraw.rectangle([(x0, 0), (x1, target_h)], fill=c + (90,))
+        empty = Image.new("RGBA", (target_w, target_h), (0, 0, 0, 0))
+        shimmer = Image.composite(shimmer, empty, ring_mask)
+        img = Image.alpha_composite(img, shimmer)
+
+    draw = ImageDraw.Draw(img)
+    draw.rounded_rectangle([(0, 0), (target_w - 1, target_h - 1)], radius=outer_radius, outline=(15, 15, 20), width=2)
+    draw.rounded_rectangle([(inset, inset), (target_w - 1 - inset, target_h - 1 - inset)], radius=inner_radius, outline=hi, width=2)
+
+    # Diagonal gloss streak near the top, like a foil card sheen
+    shine = Image.new("RGBA", (target_w, target_h), (0, 0, 0, 0))
+    sdraw = ImageDraw.Draw(shine)
+    sdraw.polygon([(0, 0), (target_w * 0.55, 0), (target_w * 0.15, target_h * 0.35), (0, target_h * 0.35)], fill=(255, 255, 255, 40))
+    img = Image.alpha_composite(img, shine)
+    draw = ImageDraw.Draw(img)
+
     try:
         font = load_font("bold", 18)
-        font_sm = load_font("bold", 14)
-    except:
+        font_sm = load_font("bold", 13)
+    except Exception:
         font = ImageFont.load_default()
         font_sm = ImageFont.load_default()
-    
+
+    # ── BOTTOM NAME PLATE (gradient rarity color fading into a dark plate) ──
+    plate_top = target_h - 55
+    for i in range(3):
+        blend = tuple(int(base[c] * (1 - i / 3) + 20 * (i / 3)) for c in range(3))
+        draw.rectangle([(0, plate_top + i), (target_w, plate_top + i + 1)], fill=blend)
+    draw.rectangle([(0, plate_top + 3), (target_w, target_h)], fill=(18, 18, 26, 235))
+
     name = card_data.get("name") or card_data.get("title", "Unknown Card")
-    draw.text((15, target_h-40), name, fill=(255,255,255), font=font)
-    
-    card_type = card_data.get("type", "Unknown")
-    type_colors = {
-        "Speed": (135, 206, 235), "Stamina": (255, 165, 0),
-        "Power": (255, 69, 0), "Guts": (255, 105, 180),
-        "Intelligence": (50, 205, 50), "Friend": (255, 215, 0),
-        "Group": (147, 112, 219),
-        "Texel": (34, 139, 34), "Berlijn": (255, 0, 0),
-        "Tikibad": (0, 191, 255), "Uitje": (255, 182, 193),
-        "Bobbejaanland": (139, 69, 19), "IRL Autisten": (255, 250, 240)
-    }
-    t_col = type_colors.get(card_type, color)
-    
-    # Support Card Type Ribbon (Top Right)
-    draw.polygon([(target_w-50, 0), (target_w, 0), (target_w, 50), (target_w-25, 40), (target_w-50, 50)], fill=t_col)
-    draw.polygon([(target_w-45, 0), (target_w, 0), (target_w, 45), (target_w-25, 36), (target_w-45, 45)], outline=(255,255,255), width=2)
-    
-    # Type icon (first letter of type)
-    short_type = card_type[0] if card_type else "?"
-    if "HAVO" in card_type or "Examen" in card_type: short_type = "S" # School
-    if "Gamemiddag" in card_type: short_type = "G" # Gaming
-    
-    draw.text((target_w-32, 8), short_type, fill=(255,255,255), font=font)
-    
-    # Rarity Indicator Ribbon (Top Left)
-    draw.polygon([(0,0), (65,0), (55, 30), (0,30)], fill=color)
-    draw.polygon([(0,0), (65,0), (55, 30), (0,30)], outline=(255,255,255), width=2)
-    draw.text((10, 6), rarity, fill=(0,0,0), font=font)
-    
-    # Level Badge (Bottom Right above banner)
-    lv = "Lv.50" if rarity == "SSR" else ("Lv.45" if rarity == "SR" else "Lv.40")
-    draw.rectangle([(target_w-55, target_h-75), (target_w-5, target_h-60)], fill=(0,0,0,180), outline=color, width=1)
-    draw.text((target_w-48, target_h-75), lv, fill=(255,255,255), font=font_sm)
-    
+    draw.text((16, target_h - 39), name, fill=(0, 0, 0), font=font)
+    draw.text((15, target_h - 40), name, fill=(255, 255, 255), font=font)
+
+    # ── RARITY RIBBON (top-left): rarity text + pips showing tier ──
+    draw.polygon([(0, 0), (66, 0), (56, 32), (0, 32)], fill=base)
+    draw.polygon([(0, 0), (66, 0), (56, 32), (0, 32)], outline=hi, width=2)
+    draw.text((11, 4), rarity, fill=(20, 20, 20), font=font)
+    for p in range(min(style["stars"], 5)):
+        cx = 9 + p * 9
+        draw.ellipse([(cx, 24), (cx + 5, 29)], fill=hi)
+
+    # ── TYPE RIBBON (top-right): this specific set's code (TX, DE, H24, EX!, ...) ──
+    t_col = tuple(theme["ribbon_color"])
+    draw.polygon([(target_w - 50, 0), (target_w, 0), (target_w, 50), (target_w - 25, 40), (target_w - 50, 50)], fill=t_col)
+    draw.polygon([(target_w - 45, 0), (target_w, 0), (target_w, 45), (target_w - 25, 36), (target_w - 45, 45)], outline=(255, 255, 255), width=2)
+    ribbon_text = theme["ribbon_text"]
+    rf = font_sm if len(ribbon_text) > 2 else font
+    lum = 0.299 * t_col[0] + 0.587 * t_col[1] + 0.114 * t_col[2]
+    text_fill = (20, 20, 20) if lum > 170 else (255, 255, 255)
+    tw = draw.textlength(ribbon_text, font=rf)
+    ty = 11 if rf is font_sm else 8
+    draw.text((target_w - 30 - tw / 2, ty), ribbon_text, fill=text_fill, font=rf)
+
+    # ── LEVEL BADGE (rounded pill, above the name plate) ──
+    lv_text = f"Lv.{style['level']}"
+    badge_w = 8 * len(lv_text) + 14
+    bx0, by0 = target_w - badge_w - 6, target_h - 75
+    draw.rounded_rectangle([(bx0, by0), (bx0 + badge_w, by0 + 16)], radius=8, fill=(0, 0, 0, 180), outline=base, width=1)
+    draw.text((bx0 + 7, by0 + 1), lv_text, fill=(255, 255, 255), font=font_sm)
+
+    # ── ROUNDED CORNERS (matches the softer, modern Umamusume card silhouette) ──
+    corner_mask = Image.new("L", (target_w, target_h), 0)
+    ImageDraw.Draw(corner_mask).rounded_rectangle([(0, 0), (target_w - 1, target_h - 1)], radius=outer_radius, fill=255)
+    rounded = Image.new("RGBA", (target_w, target_h), (0, 0, 0, 0))
+    rounded.paste(img, (0, 0), corner_mask)
+
     buf = io.BytesIO()
-    img.save(buf, format="PNG")
+    rounded.save(buf, format="PNG")
     buf.seek(0)
     return buf
 
