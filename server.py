@@ -750,6 +750,44 @@ def _first_img_field(card):
             return key, val
     return None, None
 
+@app.route('/api/cards/upload-image', methods=['POST'])
+def cards_upload_image():
+    """Accept a direct file upload (from the admin's device) for a card's
+    artwork and store its bytes permanently in the `card_images` Mongo
+    collection — the same permanent store used for ingested links, but
+    without ever needing an external URL at all. Returns the new relative
+    image URL to save on the card template."""
+    if not is_cards_admin():
+        return jsonify({'error': 'Unauthorized'}), 401
+
+    db = _get_mongo_db_sync()
+    if db is None:
+        return jsonify({'error': 'MongoDB is not connected. Card uploads require MongoDB.'}), 500
+
+    file = request.files.get('image')
+    if not file or not file.filename:
+        return jsonify({'error': 'No file uploaded'}), 400
+
+    content_type = (file.content_type or '').split(';')[0].strip()
+    if not content_type.startswith('image/'):
+        return jsonify({'error': 'File must be an image'}), 400
+
+    data = file.read()
+    if not data:
+        return jsonify({'error': 'Empty file'}), 400
+    if len(data) > 8 * 1024 * 1024:
+        return jsonify({'error': 'Image too large (max 8MB)'}), 400
+
+    import uuid
+    image_id = str(uuid.uuid4())
+    db.card_images.insert_one({
+        "_id": image_id,
+        "data": data,
+        "content_type": content_type,
+        "created_at": time.time(),
+    })
+    return jsonify({'success': True, 'url': f'/api/cards/image/{image_id}', 'image_id': image_id})
+
 @app.route('/api/cards/image/<image_id>', methods=['GET'])
 def cards_image(image_id):
     db = _get_mongo_db_sync()

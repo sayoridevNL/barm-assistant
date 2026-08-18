@@ -998,9 +998,10 @@ window.addRarity = function() {
     }
 }
 
-function updateTcRaritySelect() {
-    const sel = document.getElementById('tc-rarity-select');
+function updateTcRaritySelect(targetId) {
+    const sel = document.getElementById(targetId || 'tcm-rarity');
     if(!sel) return;
+    const previous = sel.value;
     sel.innerHTML = '';
     tcRarities.forEach(r => {
         const opt = document.createElement('option');
@@ -1008,6 +1009,7 @@ function updateTcRaritySelect() {
         opt.textContent = r.name;
         sel.appendChild(opt);
     });
+    if ([...sel.options].some(o => o.value === previous)) sel.value = previous;
 }
 
 // Persists the current tcTemplatesCache array to the server (used for create,
@@ -1040,70 +1042,214 @@ function persistTcTemplates(successMessage) {
     });
 }
 
-window.saveNewCard = function() {
-    const titleEl = document.getElementById('tc-title');
-    const imgEl = document.getElementById('tc-image');
-    const typeEl = document.getElementById('tc-type');
-    const rarityEl = document.getElementById('tc-rarity-select');
+// ── Trading Card modals (create/edit + delete confirm) ─────────────────────
+// Cards now get their artwork from a direct upload to /api/cards/upload-image
+// (stored permanently in the card_images Mongo collection) instead of a
+// pasted external link, so there's nothing left to expire or 404.
+let tcModalMode = null;      // 'create' | 'edit'
+let tcModalEditId = null;
+let tcModalUploadedUrl = null;
+let tcModalUploadedImageId = null;
+let tcModalUploading = false;
+let tcDeleteId = null;
 
-    const title = titleEl.value.trim();
-    const img = imgEl.value.trim();
-    const type = typeEl.value;
-    const rarity = rarityEl.value;
+function resetTcModalFields() {
+    document.getElementById('tcm-title').value = '';
+    document.getElementById('tcm-type').selectedIndex = 0;
+    const preview = document.getElementById('tcm-preview');
+    preview.classList.add('hidden');
+    preview.src = '';
+    document.getElementById('tcm-dropzone-placeholder').classList.remove('hidden');
+    document.getElementById('tcm-upload-status').classList.add('hidden');
+    document.getElementById('tcm-file').value = '';
+    tcModalUploadedUrl = null;
+    tcModalUploadedImageId = null;
+}
 
-    if(!title) return showToast('Invalid input', 'error');
-    if(!img) return showToast('Base Image URL is required', 'error');
+window.openTcCardModal = function(mode, id) {
+    tcModalMode = mode;
+    tcModalEditId = mode === 'edit' ? id : null;
+    resetTcModalFields();
+    updateTcRaritySelect('tcm-rarity');
 
-    const newCard = { id: Date.now(), title, img, type, rarity };
-    tcTemplatesCache.push(newCard);
+    const heading = document.getElementById('tcm-heading');
+    const subheading = document.getElementById('tcm-subheading');
+    const saveBtn = document.getElementById('tcm-save-btn');
 
-    persistTcTemplates('Card saved!').then(ok => {
-        if (ok) {
-            titleEl.value = '';
-            imgEl.value = '';
+    if (mode === 'edit') {
+        const card = tcTemplatesCache.find(c => String(c.id) === String(id));
+        if (!card) return showToast('Card not found', 'error');
+
+        heading.innerHTML = '<i class="fa-solid fa-pen"></i> Edit Card';
+        subheading.textContent = 'Update the details, or upload a new image to replace the artwork.';
+        saveBtn.innerHTML = '<i class="fa-solid fa-floppy-disk"></i> Save Changes';
+
+        document.getElementById('tcm-title').value = card.title || card.name || '';
+        const typeSel = document.getElementById('tcm-type');
+        if ([...typeSel.options].some(o => o.value === card.type)) typeSel.value = card.type;
+
+        if (card.img) {
+            const preview = document.getElementById('tcm-preview');
+            preview.src = card.img;
+            preview.classList.remove('hidden');
+            document.getElementById('tcm-dropzone-placeholder').classList.add('hidden');
+            tcModalUploadedUrl = card.img;
+            tcModalUploadedImageId = card.image_id || null;
         }
+    } else {
+        heading.innerHTML = '<i class="fa-solid fa-square-plus"></i> Create New Card';
+        subheading.textContent = "Upload artwork and set the card's details.";
+        saveBtn.innerHTML = '<i class="fa-solid fa-floppy-disk"></i> Save Card';
+    }
+
+    // Rarity select needs the right value picked after being (re)populated.
+    const raritySel = document.getElementById('tcm-rarity');
+    if (mode === 'edit') {
+        const card = tcTemplatesCache.find(c => String(c.id) === String(id));
+        if (card && [...raritySel.options].some(o => o.value === card.rarity)) raritySel.value = card.rarity;
+    }
+
+    document.getElementById('tc-card-modal').classList.remove('hidden');
+}
+
+window.closeTcCardModal = function() {
+    document.getElementById('tc-card-modal').classList.add('hidden');
+    tcModalMode = null;
+    tcModalEditId = null;
+}
+
+function setTcUploadStatus(html, isError) {
+    const status = document.getElementById('tcm-upload-status');
+    status.innerHTML = html;
+    status.classList.toggle('error', !!isError);
+    status.classList.remove('hidden');
+}
+
+function uploadTcImage(file) {
+    if (!file) return;
+    if (!file.type.startsWith('image/')) return showToast('Please choose an image file', 'error');
+    if (file.size > 8 * 1024 * 1024) return showToast('Image must be under 8MB', 'error');
+
+    tcModalUploading = true;
+    setTcUploadStatus('<i class="fa-solid fa-spinner fa-spin"></i> Uploading...', false);
+
+    const formData = new FormData();
+    formData.append('image', file);
+
+    fetch('/api/cards/upload-image', { method: 'POST', body: formData })
+        .then(res => res.json().catch(() => ({})).then(data => ({ ok: res.ok, data })))
+        .then(({ ok, data }) => {
+            tcModalUploading = false;
+            if (!ok) {
+                setTcUploadStatus(`<i class="fa-solid fa-triangle-exclamation"></i> ${data.error || 'Upload failed'}`, true);
+                return;
+            }
+            document.getElementById('tcm-upload-status').classList.add('hidden');
+            tcModalUploadedUrl = data.url;
+            tcModalUploadedImageId = data.image_id;
+            const preview = document.getElementById('tcm-preview');
+            preview.src = data.url;
+            preview.classList.remove('hidden');
+            document.getElementById('tcm-dropzone-placeholder').classList.add('hidden');
+        })
+        .catch(e => {
+            tcModalUploading = false;
+            console.error(e);
+            setTcUploadStatus('<i class="fa-solid fa-triangle-exclamation"></i> Upload failed', true);
+        });
+}
+
+window.submitTcCardModal = function() {
+    const title = document.getElementById('tcm-title').value.trim();
+    const type = document.getElementById('tcm-type').value;
+    const rarity = document.getElementById('tcm-rarity').value;
+
+    if (!title) return showToast('A card title is required', 'error');
+    if (tcModalUploading) return showToast('Still uploading the image, hang on...', 'error');
+    if (!tcModalUploadedUrl) return showToast('Please upload an image for the card', 'error');
+
+    if (tcModalMode === 'edit') {
+        const card = tcTemplatesCache.find(c => String(c.id) === String(tcModalEditId));
+        if (!card) return showToast('Card not found', 'error');
+        card.title = title;
+        card.type = type;
+        card.rarity = rarity;
+        card.img = tcModalUploadedUrl;
+        if (tcModalUploadedImageId) card.image_id = tcModalUploadedImageId; else delete card.image_id;
+    } else {
+        tcTemplatesCache.push({
+            id: Date.now(),
+            title, type, rarity,
+            img: tcModalUploadedUrl,
+            image_id: tcModalUploadedImageId || undefined,
+        });
+    }
+
+    persistTcTemplates(tcModalMode === 'edit' ? 'Card updated!' : 'Card saved!').then(ok => {
+        if (ok) closeTcCardModal();
     });
 }
 
-// Admin: edit an existing card's fields in place. Re-submitting a fresh image
-// URL here re-triggers server-side permanent ingestion, which is how a card
-// whose original Discord attachment link expired gets fixed.
-window.editTcCard = function(id) {
-    const card = tcTemplatesCache.find(c => String(c.id) === String(id));
-    if (!card) return showToast('Card not found', 'error');
-
-    const title = prompt('Card Title:', card.title || card.name || '');
-    if (title === null) return;
-    const img = prompt('Base Image URL (paste a fresh link if the old one broke):', card.img || '');
-    if (img === null) return;
-    const rarity = prompt('Rarity:', card.rarity || '');
-    if (rarity === null) return;
-    const type = prompt('Type:', card.type || '');
-    if (type === null) return;
-
-    if (!title.trim() || !img.trim()) return showToast('Title and image are required', 'error');
-
-    card.title = title.trim();
-    card.rarity = rarity.trim();
-    card.type = type.trim();
-    if (img.trim() !== card.img) {
-        // New URL supplied — clear the stale permanent-storage id so the
-        // backend knows this is a fresh link that needs (re-)ingesting.
-        card.img = img.trim();
-        delete card.image_id;
-    }
-
-    persistTcTemplates('Card updated!');
-}
-
-// Admin: remove a card template entirely.
-window.deleteTcCard = function(id) {
+// Admin: remove a card template entirely, via confirm modal instead of a
+// native confirm() popup.
+window.openTcDeleteModal = function(id) {
     const card = tcTemplatesCache.find(c => String(c.id) === String(id));
     if (!card) return;
-    if (!confirm(`Delete "${card.title || card.name || 'this card'}"? This can't be undone.`)) return;
+    tcDeleteId = id;
+    document.getElementById('tcm-delete-name').textContent = `"${card.title || card.name || 'this card'}"`;
+    document.getElementById('tc-delete-modal').classList.remove('hidden');
+}
 
-    tcTemplatesCache = tcTemplatesCache.filter(c => String(c.id) !== String(id));
+window.closeTcDeleteModal = function() {
+    document.getElementById('tc-delete-modal').classList.add('hidden');
+    tcDeleteId = null;
+}
+
+window.confirmTcDelete = function() {
+    if (tcDeleteId === null) return;
+    tcTemplatesCache = tcTemplatesCache.filter(c => String(c.id) !== String(tcDeleteId));
     persistTcTemplates('Card deleted.');
+    closeTcDeleteModal();
+}
+
+function setupTcModalListeners() {
+    const dropzone = document.getElementById('tcm-dropzone');
+    const fileInput = document.getElementById('tcm-file');
+    if (!dropzone || !fileInput) return;
+
+    fileInput.addEventListener('change', () => {
+        if (fileInput.files && fileInput.files[0]) uploadTcImage(fileInput.files[0]);
+    });
+
+    ['dragenter', 'dragover'].forEach(evt => {
+        dropzone.addEventListener(evt, (e) => {
+            e.preventDefault();
+            dropzone.classList.add('dragover');
+        });
+    });
+    ['dragleave', 'drop'].forEach(evt => {
+        dropzone.addEventListener(evt, (e) => {
+            e.preventDefault();
+            dropzone.classList.remove('dragover');
+        });
+    });
+    dropzone.addEventListener('drop', (e) => {
+        const file = e.dataTransfer.files && e.dataTransfer.files[0];
+        if (file) uploadTcImage(file);
+    });
+
+    // Close either modal by clicking its overlay backdrop, or with Escape.
+    document.getElementById('tc-card-modal').addEventListener('click', (e) => {
+        if (e.target.id === 'tc-card-modal') closeTcCardModal();
+    });
+    document.getElementById('tc-delete-modal').addEventListener('click', (e) => {
+        if (e.target.id === 'tc-delete-modal') closeTcDeleteModal();
+    });
+    document.addEventListener('keydown', (e) => {
+        if (e.key !== 'Escape') return;
+        if (!document.getElementById('tc-card-modal').classList.contains('hidden')) closeTcCardModal();
+        if (!document.getElementById('tc-delete-modal').classList.contains('hidden')) closeTcDeleteModal();
+    });
 }
 
 
@@ -1159,8 +1305,8 @@ function renderTcCarousel() {
         if (typeof IS_ADMIN !== 'undefined' && IS_ADMIN) {
             adminHtml = `
                 <div class="tc-card-admin-actions">
-                    <button class="tc-admin-btn edit" title="Edit card" onclick="event.stopPropagation(); editTcCard('${t.id}')"><i class="fa-solid fa-pen"></i></button>
-                    <button class="tc-admin-btn delete" title="Delete card" onclick="event.stopPropagation(); deleteTcCard('${t.id}')"><i class="fa-solid fa-trash"></i></button>
+                    <button class="tc-admin-btn edit" title="Edit card" onclick="event.stopPropagation(); openTcCardModal('edit', '${t.id}')"><i class="fa-solid fa-pen"></i></button>
+                    <button class="tc-admin-btn delete" title="Delete card" onclick="event.stopPropagation(); openTcDeleteModal('${t.id}')"><i class="fa-solid fa-trash"></i></button>
                 </div>
             `;
         }
@@ -1229,5 +1375,6 @@ document.addEventListener('DOMContentLoaded', () => {
         renderTcRarities();
         updateTcRaritySelect();
         fetchTcData();
+        setupTcModalListeners();
     }, 500);
 });

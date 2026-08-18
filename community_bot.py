@@ -1596,6 +1596,20 @@ def _pattern_sunset(colors, w, h):
         d.line([(0, y), (w, y)], fill=colors[idx])
     return img
 
+def _pattern_panda(w, h):
+    img = Image.new("RGB", (w, h), (245, 245, 245))
+    d = ImageDraw.Draw(img)
+    # Rounded black "fur" patches, panda-style
+    patches = [
+        (0.05, 0.05, 0.35, 0.30), (0.65, 0.08, 0.98, 0.34),
+        (0.10, 0.62, 0.42, 0.95), (0.60, 0.60, 0.95, 0.92),
+    ]
+    for x0, y0, x1, y1 in patches:
+        d.ellipse([x0 * w, y0 * h, x1 * w, y1 * h], fill=(25, 25, 25))
+    # Bamboo-green accent stripe down the middle
+    d.rectangle([(w * 0.46, 0), (w * 0.54, h)], fill=(80, 160, 80))
+    return img
+
 def _gamemiddag_theme(card_type: str) -> dict:
     import re
     t = card_type.lower()
@@ -1668,6 +1682,10 @@ CARD_TYPE_THEME_MAP = {
     "IRL Autisten": {
         "pattern_fn": _pattern_infinity,
         "ribbon_text": "IRL", "ribbon_color": (255, 250, 240),
+    },
+    "Panda": {
+        "pattern_fn": _pattern_panda,
+        "ribbon_text": "PND", "ribbon_color": (80, 160, 80),
     },
 }
 
@@ -1848,6 +1866,103 @@ async def generate_card_image(card_data: dict) -> io.BytesIO:
     buf.seek(0)
     return buf
 
+def _card_rarity_display(rarity: str) -> str:
+    """Rarity name plus a star rating, when the rarity is one of the bot's
+    known art-styling tiers. Card rarities are admin-defined on the website
+    and can use names outside CARD_RARITY_STYLE, so fall back to the bare
+    name in that case."""
+    style = CARD_RARITY_STYLE.get(rarity)
+    if not style:
+        return rarity or "Unknown"
+    return f"{rarity} {'⭐' * style['stars']}"
+
+
+def _card_info_line(card_data: dict) -> str:
+    """One-line 'Name — Type • Rarity' summary, used in multi-card pack embeds."""
+    name = card_data.get("name") or card_data.get("title", "Unknown Card")
+    card_type = card_data.get("type", "Unknown")
+    rarity = _card_rarity_display(card_data.get("rarity", "R"))
+    return f"**{name}** — {card_type} • {rarity}"
+
+
+class CardPackView(discord.ui.View):
+    """Lets whoever opened a multi-card pack flip through the pulled cards one
+    at a time with Prev/Next, or flip back to the full pack grid image."""
+
+    def __init__(self, opener_id: int, cards: list[dict], card_images: list[bytes], grid_image: bytes):
+        super().__init__(timeout=180)
+        self.opener_id = opener_id
+        self.cards = cards
+        self.card_images = card_images  # PNG bytes, one per pulled card, same order as `cards`
+        self.grid_image = grid_image    # PNG bytes of the full pack grid
+        self.index = 0
+        self.mode = "single"  # "single" or "grid"
+        self.message: Optional[discord.WebhookMessage] = None
+        self._update_buttons()
+
+    def _update_buttons(self):
+        single = self.mode == "single"
+        self.prev_btn.disabled = not single or self.index == 0
+        self.next_btn.disabled = not single or self.index >= len(self.cards) - 1
+        self.toggle_btn.label = "🖼 View All" if single else "🔍 Browse Cards"
+
+    def _build(self):
+        if self.mode == "grid":
+            embed = (EmbedBuilder(color=Palette.PRIMARY)
+                     .title(f"🎉 You opened a {len(self.cards)}-Card Pack!")
+                     .description("\n".join(_card_info_line(c) for c in self.cards))
+                     .build())
+            embed.set_image(url="attachment://pack.png")
+            file = discord.File(fp=io.BytesIO(self.grid_image), filename="pack.png")
+        else:
+            card = self.cards[self.index]
+            embed = (EmbedBuilder(color=Palette.PRIMARY)
+                     .title(f"🎉 Pulled: {card.get('title') or card.get('name', 'Unknown')}!")
+                     .field("Type", card.get("type", "Unknown"))
+                     .field("Rarity", _card_rarity_display(card.get("rarity", "R")))
+                     .footer(f"Card {self.index + 1} of {len(self.cards)}")
+                     .build())
+            embed.set_image(url="attachment://card.png")
+            file = discord.File(fp=io.BytesIO(self.card_images[self.index]), filename="card.png")
+        return embed, file
+
+    async def interaction_check(self, interaction: discord.Interaction) -> bool:
+        if interaction.user.id != self.opener_id:
+            await interaction.response.send_message("Only the person who opened this pack can browse it.", ephemeral=True)
+            return False
+        return True
+
+    async def on_timeout(self):
+        for child in self.children:
+            child.disabled = True
+        if self.message:
+            try:
+                await self.message.edit(view=self)
+            except discord.HTTPException:
+                pass
+
+    @discord.ui.button(label="◀ Prev", style=discord.ButtonStyle.secondary)
+    async def prev_btn(self, interaction: discord.Interaction, button: discord.ui.Button):
+        self.index = max(0, self.index - 1)
+        self._update_buttons()
+        embed, file = self._build()
+        await interaction.response.edit_message(embed=embed, attachments=[file], view=self)
+
+    @discord.ui.button(label="Next ▶", style=discord.ButtonStyle.secondary)
+    async def next_btn(self, interaction: discord.Interaction, button: discord.ui.Button):
+        self.index = min(len(self.cards) - 1, self.index + 1)
+        self._update_buttons()
+        embed, file = self._build()
+        await interaction.response.edit_message(embed=embed, attachments=[file], view=self)
+
+    @discord.ui.button(label="🖼 View All", style=discord.ButtonStyle.primary)
+    async def toggle_btn(self, interaction: discord.Interaction, button: discord.ui.Button):
+        self.mode = "grid" if self.mode == "single" else "single"
+        self._update_buttons()
+        embed, file = self._build()
+        await interaction.response.edit_message(embed=embed, attachments=[file], view=self)
+
+
 @bot.tree.command(name="buy_card", description="Buy a gacha pack with Sayories")
 @app_commands.choices(pack=[
     app_commands.Choice(name="Single Pull (100 Sayories)", value=1),
@@ -1935,13 +2050,19 @@ async def buy_card(interaction: discord.Interaction, pack: app_commands.Choice[i
 
     # Generate Image
     if count == 1:
-        buf = await generate_card_image(pulled_templates[0])
+        pulled_card = pulled_templates[0]
+        buf = await generate_card_image(pulled_card)
         file = discord.File(fp=buf, filename="card.png")
-        embed = EmbedBuilder(color=Palette.PRIMARY).title(f"🎉 Pulled: {pulled_templates[0].get('title') or pulled_templates[0].get('name', 'Unknown')}!").build()
+        embed = (EmbedBuilder(color=Palette.PRIMARY)
+                 .title(f"🎉 Pulled: {pulled_card.get('title') or pulled_card.get('name', 'Unknown')}!")
+                 .field("Type", pulled_card.get("type", "Unknown"))
+                 .field("Rarity", _card_rarity_display(pulled_card.get("rarity", "R")))
+                 .build())
         embed.set_image(url="attachment://card.png")
         await interaction.followup.send(embed=embed, file=file)
     else:
-        # Create a grid for multiple cards
+        # Create a grid for multiple cards, but also keep each card's individual
+        # rendered PNG bytes so CardPackView can page through them one at a time.
         import math
         from PIL import Image
         
@@ -1955,9 +2076,12 @@ async def buy_card(interaction: discord.Interaction, pack: app_commands.Choice[i
         grid_img = Image.new('RGB', (grid_w, grid_h), (20, 20, 20))
         
         import io
+        card_image_bytes = []
         for idx, t in enumerate(pulled_templates):
             c_buf = await generate_card_image(t)
-            c_img = Image.open(c_buf)
+            c_bytes = c_buf.getvalue()
+            card_image_bytes.append(c_bytes)
+            c_img = Image.open(io.BytesIO(c_bytes))
             
             x = (idx % cols) * (card_w + 10)
             y = (idx // cols) * (card_h + 10)
@@ -1965,12 +2089,11 @@ async def buy_card(interaction: discord.Interaction, pack: app_commands.Choice[i
             
         out_buf = io.BytesIO()
         grid_img.save(out_buf, format="PNG")
-        out_buf.seek(0)
-        
-        file = discord.File(fp=out_buf, filename="pack.png")
-        embed = EmbedBuilder(color=Palette.PRIMARY).title(f"🎉 You opened a {count}-Card Pack!").build()
-        embed.set_image(url="attachment://pack.png")
-        await interaction.followup.send(embed=embed, file=file)
+        grid_bytes = out_buf.getvalue()
+
+        view = CardPackView(interaction.user.id, pulled_templates, card_image_bytes, grid_bytes)
+        embed, file = view._build()
+        view.message = await interaction.followup.send(embed=embed, file=file, view=view)
 
 @bot.tree.command(name="inventory", description="View your card collection")
 async def inventory(interaction: discord.Interaction):
