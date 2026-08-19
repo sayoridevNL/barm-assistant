@@ -1090,7 +1090,6 @@ function updateCropper() {
 
 function resetTcModalFields() {
     document.getElementById('tcm-title').value = '';
-    document.getElementById('tcm-type').selectedIndex = 0;
     const preview = document.getElementById('tcm-preview');
     preview.classList.add('hidden');
     preview.classList.remove('tc-ready');
@@ -1100,6 +1099,7 @@ function resetTcModalFields() {
     document.getElementById('tcm-upload-status').classList.add('hidden');
     document.getElementById('tcm-file').value = '';
     document.getElementById('tcm-cropper-controls').classList.add('hidden');
+    document.getElementById('tcm-dropzone').classList.remove('tc-has-image');
     tcModalUploadedUrl = null;
     tcModalUploadedImageId = null;
     userZoom = 1.0;
@@ -1137,7 +1137,7 @@ window.openTcCardModal = function(mode, id) {
             userOffsetX = card.offsetX || 0;
             userOffsetY = card.offsetY || 0;
             document.getElementById('tcm-zoom').value = userZoom;
-            
+
             const preview = document.getElementById('tcm-preview');
             preview.onload = () => {
                 imgNatW = preview.naturalWidth;
@@ -1148,6 +1148,7 @@ window.openTcCardModal = function(mode, id) {
             preview.classList.remove('hidden');
             document.getElementById('tcm-dropzone-placeholder').classList.add('hidden');
             document.getElementById('tcm-cropper-controls').classList.remove('hidden');
+            document.getElementById('tcm-dropzone').classList.add('tc-has-image');
             tcModalUploadedUrl = card.img;
             tcModalUploadedImageId = card.image_id || null;
         }
@@ -1202,13 +1203,14 @@ function uploadTcImage(file) {
             document.getElementById('tcm-upload-status').classList.add('hidden');
             tcModalUploadedUrl = data.url;
             tcModalUploadedImageId = data.image_id;
-            
+
             userZoom = 1.0;
             userOffsetX = 0;
             userOffsetY = 0;
             document.getElementById('tcm-zoom').value = 1.0;
-            
+
             const preview = document.getElementById('tcm-preview');
+            preview.classList.remove('tc-ready');
             preview.onload = () => {
                 imgNatW = preview.naturalWidth;
                 imgNatH = preview.naturalHeight;
@@ -1218,6 +1220,7 @@ function uploadTcImage(file) {
             preview.classList.remove('hidden');
             document.getElementById('tcm-dropzone-placeholder').classList.add('hidden');
             document.getElementById('tcm-cropper-controls').classList.remove('hidden');
+            document.getElementById('tcm-dropzone').classList.add('tc-has-image');
         })
         .catch(e => {
             tcModalUploading = false;
